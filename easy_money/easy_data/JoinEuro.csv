@@ -1,0 +1,23 @@
+country_name,currency_name,currency_code,alpha2,alpha3,join_year
+Vatican City,Vatican City Vatican lira,VAL,VA,VAT,1999
+France,France French franc,FRF,FR,FRA,1999
+Latvia,Latvia Latvian lats,LVL,LV,LVA,2014
+Cyprus,Cyprus Cypriot pound,CYP,CY,CYP,2008
+Belgium,Belgium Belgian franc,BEF,BE,BEL,1999
+Austria,Austria Austrian schilling,ATS,AT,AUT,1999
+Monaco,Monaco Monegasque franc,MCF,MC,MCO,1999
+Slovakia,Slovakia Slovak koruna,SKK,SK,SVK,2009
+Netherlands,Netherlands Dutch guilder,NLG,NL,NLD,1999
+Germany,Germany German mark,DEM,DE,DEU,1999
+Malta,Malta Maltese lira,MTL,MT,MLT,2008
+Estonia,Estonia Estonian kroon,EEK,EE,EST,2011
+Lithuania,Lithuania Lithuanian litas,LTL,LT,LTU,2015
+Spain,Spain Spanish peseta,ESP,ES,ESP,1999
+Portugal,Portugal Portuguese escudo,PTE,PT,PRT,1999
+Italy,Italy Italian lira,ITL,IT,ITA,1999
+Luxembourg,Luxembourg Luxembourgish franc,LUF,LU,LUX,1999
+Greence,Greece Greek drachma,GRD,GR,GRC,2001
+Slovenia,Slovenia Slovenian tolar,SIT,SI,SVN,2007
+Ireland,Republic of Ireland Irish pound,SIT,IE,IRL,1999
+San Marino,San Marino Sammarinese lira,SML,SM,SMR,1999
+Finland,Finland Finnish markka,FIM,FI,FIN,1999
