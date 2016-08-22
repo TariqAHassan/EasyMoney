@@ -11,7 +11,7 @@ setup(
     keywords = 'economics, finance',
     url = "https://github.com/TariqAHassan/NewMoney.git",
     packages = ['new_money'],
-    install_requires = ['numpy', 'pandas', 'wbdata'],
+    install_requires = ['numpy', 'pandas', 'wbdata', 'bs4'],
     classifiers=[  "Development Status :: 3 - Alpha"
                  , "Natural Language :: English"
                  , "Programming Language :: Python :: 3.5"

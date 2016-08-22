@@ -2,18 +2,17 @@
 
 '''
 
-Tools for Obtaining World Bank Information
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Tools for Obtaining World Bank Data
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Python 3.5
 
 '''
 
 # Modules #
-import os
 import re
-import numpy as np
 import wbdata
+import numpy as np
 import pandas as pd
 
 
@@ -23,6 +22,7 @@ class WorldBankParse(object):
     Get indicator data from the World Bank.
 
     """
+
 
     def __init__(self, value_true_name, indicator):
         self.indicator = indicator
@@ -135,11 +135,6 @@ class WorldBankParse(object):
 
         # Reorder and Return
         return data_frame[self.final_col_order]
-
-
-# df = WorldBankParse(value_true_name = "exchange_rate", indicator = "PA.NUS.FCRF").world_bank_pull()
-# df[5000:5500]
-
 
 
 

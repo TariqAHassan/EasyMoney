@@ -1,16 +1,13 @@
-NewMoney
+EasyMoney
 ========
 
 **Overview**
 
-NewMoney is a set of tools for:
+EasyMoney is a set of tools for:
 - computing inflation
 - adjusting a given currency for inflation
 - converting one currency into another based on averaged, historical data.
 - 'normalizing' a currency.<sup>1</sup>
-
-*A small, but convenient feature of this tool is that one need not 
-know a country's currency code*
 
 *Data*
 Finance data is obtained from the World Bank Group's 
@@ -18,13 +15,13 @@ Application Programming Interface (API).
 
 <sup>1</sup>Adjust for inflation and convert to USD.
 
-Note: *NewMoney is in Alpha and very much under development*
+Note: *EasyMoney is in Alpha and very much under development*
 
 ------------------------------------------------------------------------
 
 **Dependencies**
 
-NewMoney requires: [numpy], [pandas] and [wbdata]<sup>†</sup>.
+EasyMoney requires: [numpy], [pandas] and [wbdata]<sup>†</sup>.
 
 <sup>†</sup> Sherouse, Oliver (2014). Wbdata. Arlington, VA. 
 
@@ -32,9 +29,9 @@ NewMoney requires: [numpy], [pandas] and [wbdata]<sup>†</sup>.
 
 **Installation**
 
-`$ pip3 install git+git://github.com/TariqAHassan/NewMoney@master`
+`$ pip3 install git+git://github.com/TariqAHassan/EasyMoney@master`
 
-*Note*: only for use with Python 3.5.
+*Note*: only known to be stable with Python 3.5.
 
 ------------------------------------------------------------------------
 
@@ -43,7 +40,7 @@ NewMoney requires: [numpy], [pandas] and [wbdata]<sup>†</sup>.
 ***Setup***
 ```python
 # Import
-from new_money.money import Currency
+from easy_money.money import Currency
 
 # Create an instance of the currency class
 curr = Currency()

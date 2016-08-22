@@ -9,6 +9,19 @@ Python 3.5
 
 """
 
+def floater(input_to_process, just_check=False):
+    """
+
+    :param input_to_process:
+    :param just_check: return boolean if string can be converted to a float.
+    :return:
+    """
+
+    try:
+        float(input_to_process)
+        return float(input_to_process) if not just_check else True
+    except:
+        return np.NaN if not just_check else False
 
 def twoD_nested_dict(data_frame, nest_col_a, nest_col_b, nest_col_c, to_float = None, to_int = None):
     """
