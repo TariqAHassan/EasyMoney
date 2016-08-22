@@ -42,7 +42,7 @@ class Currency(object):
     def __init__(self, precision = 2):
         """
 
-        :param precision: number of places to round to
+        :param precision: number of places to round to.
         """
 
         # Get CPI Data
@@ -85,6 +85,17 @@ class Currency(object):
 
         In progress...
 
+        :return:
+        """
+        pass
+
+    def iso_convert(self, iso_standard, convert_to):
+        """
+
+        In progress...
+
+        :param iso_standard: Alpha2, Alpha2 or CurrencyCode
+        :param convert_to: Alpha2, Alpha2 or CurrencyCode
         :return:
         """
         pass
@@ -263,7 +274,7 @@ class Currency(object):
         date_range = self._dates_in_range(start_date, end_date, self.ex_dict_keys_series)
         return mean([self.currency_converter(amount, from_currency, to_currency, date = d) for d in date_range.tolist()])
 
-    def normalize(self, amount, from_currency, from_year, to_year = "most_current", base_currency = "EUR"):
+    def normalize(self, amount, from_currency, from_year, to_year = "most_current", base_currency = "EUR", pretty_print = False):
         """
 
         :param amount:
@@ -284,15 +295,12 @@ class Currency(object):
         # Adjust input for inflation
         from_currency_adj_inflation = self.inflation_calculator(amount, "US", from_year, inflation_year_b)
 
-        return self.currency_converter(from_currency_adj_inflation, from_currency, base_currency)
+        result = self.currency_converter(from_currency_adj_inflation, from_currency, base_currency)
 
-
-
-
-
-
-
-
+        if pretty_print :
+            print(result, base_currency)
+        else:
+            return result
 
 
 

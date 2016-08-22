@@ -37,7 +37,28 @@ EasyMoney requires: [numpy], [pandas], [bs4] and [wbdata]<sup>†</sup>.
 
 **Examples**
 
-Coming Soon...
+####Import the tool
+```python
+from easy_money.money import Currency
+```
+
+#####Create an instance of the Currency Class
+```python
+curr = Currency()
+```
+#####Currency Converter
+```python
+curr.currency_converter(amount = 1, from_currency = "USD", to_currency = "EUR", pretty_print = True)
+
+# 0.88 EUR
+```
+
+#####Currency Converter while adjusting for inflation.
+```python
+curr.normalize(amount = 1, from_currency = "USD", from_year = 2010, to_year = "most_current", base_currency = "CAD", pretty_print = True)
+
+# 1.41 CAD
+```
 
 ------------------------------------------------------------------------
 
