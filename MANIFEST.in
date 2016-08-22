@@ -1,3 +1,5 @@
+include easy_money/easy_data/CountryAlpha2_and_3.csv
 include easy_money/easy_data/CurrencyCodes_DB.p
 include easy_money/easy_data/JoinEuro.csv
 include Licence.txt
+include README.md
