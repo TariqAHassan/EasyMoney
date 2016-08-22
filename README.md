@@ -37,7 +37,7 @@ EasyMoney requires: [numpy], [pandas], [bs4] and [wbdata]<sup>†</sup>.
 
 **Examples**
 
-####Import the tool
+#####Import the tool
 ```python
 from easy_money.money import Currency
 ```
