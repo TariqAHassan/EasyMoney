@@ -20,20 +20,8 @@ from statistics import mean
 
 from easy_money.support_money import twoD_nested_dict, floater
 from easy_money.ecb_interface import _ecb_exchange_data
-from easy_money.world_bank_interface import WorldBankParse
+from easy_money.world_bank_interface import WorldBankParse, world_bank_pull_wrapper
 
-def world_bank_pull_wrapper(value_true_name, indicator):
-    """
-
-    :param value_true_name:
-    :param indicator:
-    :return:
-    """
-    data_frame = WorldBankParse(value_true_name, indicator).world_bank_pull()
-    data_frame = data_frame[data_frame[value_true_name].astype(str) != 'None']
-    data_frame.index = range(data_frame.shape[0])
-
-    return data_frame
 
 class Currency(object):
     """
@@ -49,6 +37,7 @@ class Currency(object):
     To do:
         1) Impliment option for linear interpolation of missing values.
     """
+
 
     def __init__(self, precision = 2):
         """
@@ -297,10 +286,6 @@ class Currency(object):
 
         return self.currency_converter(from_currency_adj_inflation, from_currency, base_currency)
 
-
-curr = Currency()
-
-curr.normalize(5, "USD", 2010)
 
 
 
