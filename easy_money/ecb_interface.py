@@ -1,15 +1,16 @@
-"""
+#!/usr/bin/env python3
 
+"""
 
 Tools for Obtaining European Central Bank Data
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
 
 Python 3.5
 
 """
 
 # Modules #
+import re
 import urllib.request
 from bs4 import BeautifulSoup
 from easy_money.support_money import floater
@@ -72,4 +73,8 @@ def _ecb_exchange_data(return_as = 'dict', xmlpath = "http://www.ecb.europa.eu/s
         df.date = pd.to_datetime(df.date, infer_datetime_format=True)
 
         return df
+
+
+
+
 

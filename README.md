@@ -37,28 +37,7 @@ EasyMoney requires: [numpy], [pandas] and [wbdata]<sup>†</sup>.
 
 **Examples**
 
-***Setup***
-```python
-# Import
-from easy_money.money import Currency
-
-# Create an instance of the currency class
-curr = Currency()
-```
-
-***Get Inflation Rate***
-```python
-inf = curr.inflation_rate('Germany', '2014', '2015')
-print(inf)
-```
-
-***Normalize Currency***
-```python
-# Normalize 10 of 'Germany' (i.e., EUR) to USD
-norm = curr.currency_normalizer(10, "Germany", 2000, 2015)
-print(norm)
-```
-
+Coming Soon...
 
 ------------------------------------------------------------------------
 

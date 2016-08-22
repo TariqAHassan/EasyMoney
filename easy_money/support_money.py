@@ -52,3 +52,24 @@ def twoD_nested_dict(data_frame, nest_col_a, nest_col_b, nest_col_c, to_float = 
 
     return master_dict
 
+
+# def _best_date_match(date):
+#     """
+#
+#     :param date: YYYY-MM-DD
+#     :return:
+#     """
+#
+#     if date in sorted_exchange_dates:
+#         return date
+#
+#     # Convert date str to datetime
+#     tstamp = datetime.datetime.strptime(date, "%Y-%m-%d")
+#
+#     # Restrict by year, month
+#     close_dates = [d for d in sorted_exchange_dates if (d.year == tstamp.year) and (d.month == tstamp.month) ]
+#
+#     # Closest Date to the one supplied by the user
+#     nearest_day = min([d.day for d in close_dates], key = lambda x: abs(x - tstamp.day))
+#
+#     return [d for d in close_dates if d.day == nearest_day][0].strftime('%Y-%m-%d')

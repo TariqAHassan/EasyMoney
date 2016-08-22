@@ -15,7 +15,6 @@ import wbdata
 import numpy as np
 import pandas as pd
 
-
 class WorldBankParse(object):
     """
 
@@ -25,6 +24,11 @@ class WorldBankParse(object):
 
 
     def __init__(self, value_true_name, indicator):
+        """
+
+        :param value_true_name:
+        :param indicator:
+        """
         self.indicator = indicator
         self.raw_data = wbdata.get_data(indicator)
         self.dict_keys = ['region', 'alpha2', 'indicator', value_true_name, 'year']
@@ -33,12 +37,11 @@ class WorldBankParse(object):
         # Import Currency Code Database.
         currency_df = pd.read_pickle("easy_money/easy_data/CurrencyCodes_DB.p")
 
+        # Import Country Codes Database
+        country_codes = pd.read_csv("easy_money/easy_data/CountryAlpha2_and_3.csv", encoding = "ISO-8859-1", keep_default_na = False)
+
         # Alpha2 --> Alpha 3
-        self.alpha2_to_alpha3 = dict.fromkeys(set([i for sublist in currency_df.Alpha2.tolist() for i in sublist]))
-        for i in zip(currency_df.Alpha2.tolist(), currency_df.Alpha3.tolist()):
-            for j in range(len(i[0])):
-                if self.alpha2_to_alpha3[i[0][j]] == None:
-                    self.alpha2_to_alpha3[i[0][j]] = i[1][j]
+        self.alpha2_to_alpha3 = dict(zip(country_codes.Alpha2.tolist(), country_codes.Alpha3.tolist()))
 
         # Alpha2 --> Currency Code
         self.alpha2_to_currency_code = dict.fromkeys(set([i for sublist in currency_df.Alpha2.tolist() for i in sublist]))
@@ -135,7 +138,6 @@ class WorldBankParse(object):
 
         # Reorder and Return
         return data_frame[self.final_col_order]
-
 
 
 

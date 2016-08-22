@@ -3,6 +3,9 @@
 Database of which Nations use which Currency
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+Note: quick script -- unlikely to ever be used again
+...hence the use of messy 'shortcuts'.
+
 Python 3.5
 
 """
@@ -13,13 +16,19 @@ import os
 import numpy as np
 import pandas as pd
 
-# Import Country Codes
-country_codes = pd.read_csv("CountryAlpha2_and_3.csv", encoding = "ISO-8859-1", keep_default_na = False)
-country_codes_dict = dict(zip(country_codes['Alpha2'], country_codes['Alpha3']))
 
 # Import Curency Codes
-currency_codes = pd.read_csv("CurrencyCodes.csv", encoding = "ISO-8859-1")
+currency_codes = pd.read_csv("data_sources/CurrencyCodes.csv", encoding = "ISO-8859-1")
 currency_codes['Locations'] = currency_codes['Locations'].astype(str).map(lambda x: re.sub(r"\s\s+", " ", str(x).strip()))
+
+# Move to the easy_data directory
+os.chdir("easy_money/easy_data")
+
+# Import Country Codes
+country_codes = pd.read_csv("CountryAlpha2_and_3.csv", encoding = "ISO-8859-1", keep_default_na = False)
+
+# Construct Dicts
+country_codes_dict = dict(zip(country_codes['Alpha2'], country_codes['Alpha3']))
 country_codes_dict2 = dict(zip(country_codes['CountryName'], country_codes['Alpha2']))
 
 # Dict. for special cases in the currency_codes dataframe.
@@ -80,16 +89,16 @@ for cc in currency_codes.Alpha2.tolist():
 currency_codes['Alpha3'] = alpha3_list
 
 # Drop the Locations Column
-currency_codes.drop('Locations', axis=1, inplace=True)
+currency_codes.drop('Locations', axis = 1, inplace = True)
 
 # Reorder
 currency_codes = currency_codes[['Currency', 'Code', 'Alpha2', 'Alpha3']]
 
 # Rename column
-currency_codes.rename(columns={'Code': 'CurrencyCode'}, inplace=True)
+currency_codes.rename(columns = {'Code': 'CurrencyCode'}, inplace = True)
 
 # Save
-currency_codes.to_pickle("CurrencyCodes_DB")
+currency_codes.to_pickle("CurrencyCodes_DB.p")
 
 
 
