@@ -57,9 +57,9 @@ Indicators used:
 2. [Euro foreign exchange reference rates - European Central Bank]
        * Source: European Central Bank (ECB).
        	* Notes:
-       		1. The ECB states, clearly, that usage for transaction purposes is strongly discouraged. This sentiment is echoed here; ***this tool is intended to be for information-purposes only***.
-       		2. The ECB data used here can be obtained directly from the link provided above.
-       		3. Rates are updated by the ECB around 16:00 CET.
+       		1. The ECB data used here can be obtained directly from the link provided above.
+       		2. Rates are updated by the ECB around 16:00 CET.
+       		3. The ECB states, clearly, that usage for transaction purposes is strongly discouraged. This sentiment is echoed here; ***this tool is intended to be for information-purposes only***.
        		4. ALL RESULTS OBTAINED FROM EASYMONEY ARE THE RESULT OF CALCULATIONS *BASED* ON ECB DATA. THAT IS, THESE RESULTS ARE NOT A DIRECT REPORTING OF ECB-PROVIDED DATA.
        		
 
