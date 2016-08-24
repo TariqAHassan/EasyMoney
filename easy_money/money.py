@@ -99,14 +99,14 @@ class Currency(object):
         :return:
         """
 
-        if region in alpha3_to_alpha2.values():
+        if region in self.alpha3_to_alpha2.values():
             return region, "alpha2"
-        elif region in alpha3_to_alpha2.keys():
-            return alpha3_to_alpha2[region], "alpha3"
-        elif region in currency_to_alpha2.keys():
-            return currency_to_alpha2[region], "currency"
-        elif region.lower().title() in region_to_alpha2.keys():
-            return region_to_alpha2[region.lower().title()], "natural_name"
+        elif region in self.alpha3_to_alpha2.keys():
+            return self.alpha3_to_alpha2[region], "alpha3"
+        elif region in self.currency_to_alpha2.keys():
+            return self.currency_to_alpha2[region], "currency"
+        elif region.lower().title() in self.region_to_alpha2.keys():
+            return self.region_to_alpha2[region.lower().title()], "natural_name"
         else:
             raise ValueError("Region Error. '%s' is not recognized." % (region))
 
@@ -125,9 +125,9 @@ class Currency(object):
         if map_to == 'alpha2':
             return alpha2_mapping
         elif map_to == 'alpha3':
-            return alpha2_to_alpha3[alpha2_mapping]
+            return self.alpha2_to_alpha3[alpha2_mapping]
         elif map_to == 'currency':
-            return alpha2_to_currency[alpha2_mapping]
+            return self.alpha2_to_currency[alpha2_mapping]
         else:
             raise ValueError("Invalid map_to request.")
 
@@ -358,7 +358,6 @@ class Currency(object):
 
         if inflation_correction:
             for d in date_range:
-
                 # Convert
                 converted_rate = self.currency_converter(amount, from_currency, to_currency, date = d)
 
@@ -374,10 +373,6 @@ class Currency(object):
             exchange_rates = ([self.currency_converter(amount, from_currency, to_currency, date = d) for d in date_range])
 
         return mean(exchange_rates)
-
-
-
-
 
 
 

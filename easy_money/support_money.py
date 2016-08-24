@@ -9,6 +9,10 @@ Python 3.5
 
 """
 
+# Imports
+import numpy as np
+
+
 def floater(input_to_process, just_check=False):
     """
 
