@@ -29,6 +29,7 @@ class WorldBankParse(object):
         :param value_true_name:
         :param indicator:
         """
+
         self.indicator = indicator
         self.raw_data = wbdata.get_data(indicator)
         self.dict_keys = ['region', 'alpha2', 'indicator', value_true_name, 'year']
@@ -140,7 +141,16 @@ class WorldBankParse(object):
         return data_frame[self.final_col_order]
 
 
+def world_bank_pull_wrapper(value_true_name, indicator):
+    """
 
+    :param value_true_name:
+    :param indicator:
+    :return:
+    """
+    data_frame = WorldBankParse(value_true_name, indicator).world_bank_pull()
+    data_frame = data_frame[data_frame[value_true_name].astype(str) != 'None']
+    data_frame.index = range(data_frame.shape[0])
 
-
+    return data_frame
 

@@ -12,6 +12,7 @@ Python 3.5
 # Modules #
 import re
 import urllib.request
+import pandas as pd
 from bs4 import BeautifulSoup
 from easy_money.support_money import floater
 

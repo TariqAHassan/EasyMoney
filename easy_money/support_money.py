@@ -52,6 +52,18 @@ def twoD_nested_dict(data_frame, nest_col_a, nest_col_b, nest_col_c, to_float = 
 
     return master_dict
 
+def dict_key_remove(input_dict, to_remove = np.nan, wrt = 'both'):
+    """
+
+    :param input_dict:
+    :param to_remove:
+    :return:
+    """
+    if wrt in ['key', 'value']:
+        return {k: v for k, v in input_dict.items() if (k if wrt == 'key' else v) is not to_remove}
+    elif wrt == 'both':
+        return {k: v for k, v in input_dict.items() if (k is not to_remove and v is not to_remove)}
+
 
 # def _best_date_match(date):
 #     """
