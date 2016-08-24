@@ -376,6 +376,11 @@ class Currency(object):
 
 
 
+curr = Currency()
+
+
+
+curr.currency_converter(100, "Canada", "United Kingdom", pretty_print=True)
 
 
 
