@@ -1,4 +1,4 @@
-include easy_money/easy_data/*.csv
-include easy_money/easy_data/*.p
+include data/*.csv
+include data/*.p
 include Licence.txt
 include README.md
