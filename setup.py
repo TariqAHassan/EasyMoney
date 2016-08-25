@@ -10,7 +10,7 @@ setup(
     license = "BSD",
     keywords = 'economics, finance',
     url = "https://github.com/TariqAHassan/NewMoney.git",
-    packages = ['new_money'],
+    packages = ['easy_money'],
     install_requires = ['numpy', 'pandas', 'wbdata', 'bs4'],
     classifiers=[  "Development Status :: 3 - Alpha"
                  , "Natural Language :: English"
