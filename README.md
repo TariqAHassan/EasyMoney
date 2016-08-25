@@ -1,41 +1,34 @@
 EasyMoney
-========
+=========
 
-**Overview**
+###Overview
 
 EasyMoney is a set of tools for:
+
 - computing inflation
 - adjusting a given currency for inflation
-- converting one currency into another based on averaged, historical data.
-- 'normalizing' a currency.<sup>1</sup>
+- converting from one currency to another
+- 'normalizing' a currency, i.e., adjust for inflation and then convert a base currency, e.g., USD.
 
-*Data*
-Finance data is obtained from the World Bank Group's 
-Application Programming Interface (API).
-
-<sup>1</sup>Adjust for inflation and convert to USD.
-
-Note: *EasyMoney is in Alpha and very much under development*
+**WARNING: Due to EasyMoney's Alpha Status, results are likely to contain inaccuracies.**
 
 ------------------------------------------------------------------------
 
-**Dependencies**
+###Dependencies
 
 EasyMoney requires: [numpy], [pandas], [bs4] and [wbdata]<sup>†</sup>.
 
-<sup>†</sup> Sherouse, Oliver (2014). Wbdata. Arlington, VA. 
-
 ------------------------------------------------------------------------
 
-**Installation**
+###Installation
 
 `$ pip3 install git+git://github.com/TariqAHassan/EasyMoney@master`
 
-*Note*: only known to be stable with Python 3.5.
+*Note*: EasyMoney requires Python 3 and will *not* work with Python 2.
 
 ------------------------------------------------------------------------
 
-**Examples**
+###Examples
 
 #####Import the tool
 ```python
@@ -47,30 +40,64 @@ from easy_money.money import Currency
 curr = Currency()
 ```
 
+####Prototypical Conversion Problems
+
 #####Currency Converter
 ```python
-curr.currency_converter(amount = 1, from_currency = "USD", to_currency = "EUR", pretty_print = True)
+curr.currency_converter(amount = 100, from_currency = "USD", to_currency = "EUR", pretty_print = True)
 
-# 0.88 EUR
+# 88.75 EUR
 ```
 
 #####Adjust for Inflation and Convert
 ```python
-curr.normalize(amount = 1, from_currency = "USD", from_year = 2010, to_year = "most_current", base_currency = "CAD", pretty_print = True)
+curr.normalize(amount = 100, currency = "USD", from_year = 2010, to_year = "most_recent", base_currency = "CAD", pretty_print = True)
 
-# 1.41 CAD
+# 140.66 CAD
 ```
+
+#####Convert Currency in a more Natural Way
+```python
+curr.currency_converter(amount = 100, from_currency = "Canada", to_currency = "Ireland", pretty_print = True)
+
+# 68.58 EUR
+```
+
+####Handling Common Curriences
+
+#####1. Currency Conversion:
+```python
+curr.currency_converter(amount = 100, from_currency = "France", to_currency = "Germany", pretty_print = True)
+
+# 100.0 EUR
+```
+EasyMoney understands that these two nations share a common currency.
+
+#####2. Normalization
+
+```python
+curr.normalize(amount = 100, currency = "France", from_year = 2010, to_year = "most_recent", base_currency = "USD", pretty_print = True)
+
+# 118.98 USD
+```
+
+```python
+curr.normalize(amount = 100, currency = "Germany", from_year = 2010, to_year = "most_recent", base_currency = "USD", pretty_print = True)
+
+# 120.45 USD
+```
+
+EasyMoney also understands that, while these two nations may share a common currency, inflation is not assured to be the in the two countries.
 
 ------------------------------------------------------------------------
 
-**License**
-
+##License
 
 This software is provided under a BSD License.
 
 ------------------------------------------------------------------------
 
-**References**
+##References
 
 Indicators used:
 
@@ -83,7 +110,9 @@ Indicators used:
        		2. Rates are updated by the ECB around 16:00 CET.
        		3. The ECB states, clearly, that usage for transaction purposes is strongly discouraged. This sentiment is echoed here; ***this tool is intended to be for information-purposes only***.
        		4. ALL RESULTS OBTAINED FROM EASYMONEY ARE THE RESULT OF CALCULATIONS *BASED* ON ECB DATA. THAT IS, THESE RESULTS ARE NOT A DIRECT REPORTING OF ECB-PROVIDED DATA.
-       		
+    
+
+<sup>†</sup>Sherouse, Oliver (2014). Wbdata. Arlington, VA. 
 
   [Consumer price index (2010 = 100)]: http://data.worldbank.org/indicator/FP.CPI.TOTL
   [Euro foreign exchange reference rates - European Central Bank]: https://www.ecb.europa.eu/stats/exchange/eurofxref/html/index.en.html
