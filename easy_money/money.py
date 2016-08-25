@@ -18,7 +18,7 @@ import numpy as np
 import pandas as pd
 from statistics import mean
 
-from easy_money.support_money import twoD_nested_dict, floater, dict_key_remove
+from easy_money.support_money import twoD_nested_dict, floater, dict_key_remove, money_printer
 from easy_money.ecb_interface import _ecb_exchange_data
 from easy_money.world_bank_interface import WorldBankParse, world_bank_pull_wrapper
 
@@ -59,10 +59,10 @@ class Currency(object):
         self.ex_dict_keys_series = pd.Series(sorted(list(self.ex_dict.keys())))
 
         # Import EU join Data
-        eu_join = pd.read_csv("easy_money/easy_data/JoinEuro.csv")
+        eu_join = pd.read_csv("data/JoinEuro.csv")
         self.eu_join_dict = dict(zip(eu_join.alpha2, eu_join.join_year))
 
-        alpha2_alpha3_df = pd.read_csv("easy_money/easy_data/CountryAlpha2_and_3.csv")
+        alpha2_alpha3_df = pd.read_csv("data/CountryAlpha2_and_3.csv")
 
         # Create Alpha3 --> Alpha2 Dict
         self.alpha3_to_alpha2 = dict_key_remove(dict(zip(alpha2_alpha3_df.Alpha3, alpha2_alpha3_df.Alpha2)))
@@ -287,7 +287,7 @@ class Currency(object):
 
         # Check for from_currency == to_currency
         if self._iso_mapping(from_currency_fn) == self._iso_mapping(to_currency):
-            return round(amount, self.round_to) if not pretty_print else print(round(amount, self.round_to), to_currency)
+            return round(amount, self.round_to) if not pretty_print else print(money_printer(amount, self.round_to), to_currency)
 
         # To some currency from EURO
         if from_currency_fn == "EUR":
@@ -355,12 +355,7 @@ class Currency(object):
         # Convert into the base currency, e.g., EURO.
         adjusted_amount = self.currency_converter(currency_adj_inflation, from_currency, to_currency)
 
-        return adjusted_amount if not pretty_print else print(adjusted_amount, to_currency)
-
-
-
-
-
+        return adjusted_amount if not pretty_print else print(money_printer(adjusted_amount, self.round_to), to_currency)
 
 
 

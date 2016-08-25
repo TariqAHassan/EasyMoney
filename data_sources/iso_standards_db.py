@@ -21,8 +21,8 @@ import pandas as pd
 currency_codes = pd.read_csv("data_sources/CurrencyCodes.csv", encoding = "ISO-8859-1")
 currency_codes['Locations'] = currency_codes['Locations'].astype(str).map(lambda x: re.sub(r"\s\s+", " ", str(x).strip()))
 
-# Move to the easy_data directory
-os.chdir("easy_money/easy_data")
+# Move to the data directory
+os.chdir("data")
 
 # Import Country Codes
 country_codes = pd.read_csv("CountryAlpha2_and_3.csv", encoding = "ISO-8859-1", keep_default_na = False)

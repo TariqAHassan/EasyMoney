@@ -36,10 +36,10 @@ class WorldBankParse(object):
         self.final_col_order = ['region', 'alpha2', 'alpha3', 'currency_code', 'indicator', value_true_name, 'year']
 
         # Import Currency Code Database.
-        currency_df = pd.read_pickle("easy_money/easy_data/CurrencyCodes_DB.p")
+        currency_df = pd.read_pickle("data/CurrencyCodes_DB.p")
 
         # Import Country Codes Database
-        country_codes = pd.read_csv("easy_money/easy_data/CountryAlpha2_and_3.csv", encoding = "ISO-8859-1", keep_default_na = False)
+        country_codes = pd.read_csv("data/CountryAlpha2_and_3.csv", encoding = "ISO-8859-1", keep_default_na = False)
 
         # Alpha2 --> Alpha 3
         self.alpha2_to_alpha3 = dict(zip(country_codes.Alpha2.tolist(), country_codes.Alpha3.tolist()))

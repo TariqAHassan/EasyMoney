@@ -68,6 +68,24 @@ def dict_key_remove(input_dict, to_remove = np.nan, wrt = 'both'):
     elif wrt == 'both':
         return {k: v for k, v in input_dict.items() if (k is not to_remove and v is not to_remove)}
 
+def money_printer(money, round_to):
+    """
+
+    :param money:
+    :return:
+    """
+
+    money_to_handle = str(round(floater(money), round_to))
+    split_money = money_to_handle.split(".")
+
+    if len(split_money[1]) == 1:
+        return money_to_handle + "0"
+    elif len(split_money[1]) == 2:
+        return money_to_handle
+    elif len(split_money[1]) > 2:
+        return ".".join([split_money[0], str(round(float(split_money[1]), -3))[:2]])
+    else:
+        raise ValueError("Invalid money conversion requested.")
 
 # def _best_date_match(date):
 #     """
