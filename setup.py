@@ -12,7 +12,6 @@ setup(
     url = "https://github.com/TariqAHassan/NewMoney.git",
     packages = ['easy_money'],
     install_requires = ['numpy', 'pandas', 'wbdata', 'bs4'],
-    package_data={'easymoney': ['easy_data/*.p']},
     classifiers=[  "Development Status :: 3 - Alpha"
                  , "Natural Language :: English"
                  , "Programming Language :: Python :: 3.5"
