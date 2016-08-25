@@ -358,9 +358,6 @@ class Currency(object):
         return adjusted_amount if not pretty_print else print(money_printer(adjusted_amount, self.round_to), to_currency)
 
 
-curr = Currency()
-curr.currency_converter(amount = 23.50, from_currency = "United Kingdom", to_currency = "Canada", pretty_print = True)
-
 
 
 
