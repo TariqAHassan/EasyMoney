@@ -77,6 +77,9 @@ class Currency(object):
         # Create Region Name --> Alpha2 Dict
         self.region_to_alpha2 = dict_key_remove(dict(zip(self.cpi_df.region, self.cpi_df.alpha2)))
 
+        # Create Alpha2 --> Region Name Dict
+        self.alpha2_to_region = dict([(v, k) for k, v in self.region_to_alpha2.items()])
+
     def _closest_date(self, list_of_dates, date):
         """
 
@@ -128,6 +131,8 @@ class Currency(object):
             return self.alpha2_to_alpha3[alpha2_mapping]
         elif map_to == 'currency':
             return self.alpha2_to_currency[alpha2_mapping]
+        elif map_to == "natural_name":
+            return self.alpha2_to_region[alpha2_mapping]
         else:
             raise ValueError("Invalid map_to request.")
 
@@ -139,13 +144,22 @@ class Currency(object):
         :return:
         """
 
+        # Init
+        cpi = None
+
         # convert region to alpha2
         cpi_region = self._iso_mapping(region, map_to = 'alpha2')
 
-        try:
-            cpi = floater(self.cpi_dict[cpi_region][str(year)])
-        except:
-            raise ValueError("Could not obtain required inflation (CPI) information for '%s' in %s." % (region, str(year)))
+        # Get most recent CPI year avaliable
+        max_cpi_year = str(int(max([float(i) for i in self.cpi_dict[cpi_region].keys()])))
+
+        if float(year) > float(max_cpi_year):
+            warnings.warn("Could not obtain required inflation (CPI) information for '%s' in %s."
+                          " Using %s instead." % \
+                         (self._iso_mapping(region, map_to = 'natural_name'), str(int(float(year))), max_cpi_year))
+            cpi = floater(self.cpi_dict[cpi_region][str(int(float(max_cpi_year)))])
+        else:
+            cpi = floater(self.cpi_dict[cpi_region][str(int(float(year)))])
 
         return cpi
 
@@ -183,13 +197,16 @@ class Currency(object):
         """
 
         # Input checking
-        if year_a == year_b:
+        if floater(year_a) == floater(year_b):
             return amount
-        if year_a > year_b:
+        if floater(year_a) > floater(year_b):
             raise ValueError("year_a cannot be greater than year_b")
 
         # Get the CPI information
-        inflation_dict = self.inflation_rate(region, year_a, year_b, return_raw_cpi_dict = True)
+        inflation_dict = self.inflation_rate(  region
+                                             , int(float(year_a))
+                                             , int(float(year_b))
+                                             , return_raw_cpi_dict = True)
 
         # Check all the values are floats
         if not all([floater(x, just_check = True) for x in inflation_dict.values()]):
@@ -202,7 +219,11 @@ class Currency(object):
             return np.NaN
 
         # Scale w.r.t. inflation.
-        adjusted_amount = inflation_dict[str(year_b)]/float(inflation_dict[str(year_a)]) * amount
+        try:
+            adjusted_amount = inflation_dict[str(int(float(year_b)))]/float(inflation_dict[str(int(float(year_a)))]) * amount
+        except KeyError as e:
+            raise KeyError("Could not obtain inflation information for %s in %s." % \
+                           (self._iso_mapping(region, map_to = 'natural_name'), e))
 
         # Round and Return
         return round(adjusted_amount, self.round_to)
@@ -233,8 +254,9 @@ class Currency(object):
             elif date not in self.ex_dict.keys():
                 date_key = self._closest_date([  datetime.datetime.strptime(d, "%Y-%m-%d") for d in ex_dict.keys()]
                                                , datetime.datetime.strptime(date, "%Y-%m-%d"))
+                warnings.warn("Currency information could not be obtained for '%s', %s was used instead" % (date, date_key))
 
-        return self.ex_dict[date_key][currency_to_convert.upper()] * float(1)
+        return self.ex_dict[date_key][currency_to_convert.upper()]
 
     def currency_converter(self, amount, from_currency, to_currency, date = 'most_recent', pretty_print = False):
         """
@@ -267,7 +289,7 @@ class Currency(object):
             converted_amount = self._eur_to_lcu(to_currency, date) * float(amount)
 
         # From some currency to EURO
-        elif to_currency == "EUR":
+        elif self._eur_to_lcu(to_currency) == "EUR":
             conversion_to_invert = self._eur_to_lcu(from_currency, date)
 
             if conversion_to_invert == 0.0:
@@ -282,10 +304,11 @@ class Currency(object):
 
             converted_amount = conversion_to_invert**-1 * self._eur_to_lcu(to_currency, date) * float(amount)
 
+        # Round
         rounded_amount = round(converted_amount, self.round_to)
 
         # Return results (or pretty print)
-        return rounded_amount if not pretty_print else print(rounded_amount, to_currency)
+        return rounded_amount if not pretty_print else print(rounded_amount, self._iso_mapping(to_currency, "currency"))
 
     def normalize(self, amount, currency, from_year, to_year = "most_recent", base_currency = "EUR", pretty_print = False):
         """
@@ -308,11 +331,17 @@ class Currency(object):
         from_region = self._iso_mapping(currency, map_to = 'alpha2')
 
         # Determine to CPI Data
-        if to_year != "most_recent":
-            inflation_year_b = to_year
-        elif to_year == "most_recent":
-            inflation_year_b = self.cpi_df[(self.cpi_df.alpha2 == self.currency_to_alpha2[from_currency]) & \
-                                           (~pd.isnull(self.cpi_df.cpi))].year.max()
+        most_recent_cpi_record = self.cpi_df[(self.cpi_df.alpha2 == self.currency_to_alpha2[from_currency]) & \
+                                             (~pd.isnull(self.cpi_df.cpi))].year.max()
+
+        if to_year != "most_recent" and float(to_year) < float(most_recent_cpi_record):
+            if floater(to_year):
+                inflation_year_b = to_year
+            else:
+                raise ValueError("to_year invalid; '%s' is not numeric (intiger or float).")
+        else:
+            inflation_year_b = most_recent_cpi_record
+            warnings.warn("Inflation information not avaliable for '%s', using %s" % (to_year, inflation_year_b))
 
         # Adjust input for inflation
         currency_adj_inflation = self.inflation_calculator(amount, from_region, from_year, inflation_year_b)
@@ -331,56 +360,56 @@ class Currency(object):
         :return: pandas series
         """
 
-        if datetime.datetime.strptime(self, start_date, "%Y-%m-%d") >= datetime.datetime.strptime(end_date, "%Y-%m-%d") :
+        if datetime.datetime.strptime(start_date, "%Y-%m-%d") >= datetime.datetime.strptime(end_date, "%Y-%m-%d") :
             raise ValueError("Indexing Error. The start_date cannot occur before the end date.")
 
         return pandas_series.loc[(pd.to_datetime(pandas_series) >= start_date) & \
                                  (pd.to_datetime(pandas_series) <= end_date)]
 
-    def exchange_rate_over_range(self, from_currency, to_currency, start_date, end_date, inflation_correction = True, amount = 1):
+    def exchange_rate_over_range(self, from_currency, to_currency, start_date, end_date, inflation_correction = True, amount = 100):
         """
 
-        Norminal Average Exchange Rate over some daterange
+        Norminal Average Exchange Rate over some daterange.
+
+        Note: slow and likely inaccurate. Needs to be refactored.
 
         :param amount:
         :param from_currency:
         :param to_currency:
         :param start_date: starting date; must be of the form: YYYY-MM-DD
-        :param end_date:  ending date; must be of the form: YYYY-MM-DD
+        :param end_date: ending date; must be of the form: YYYY-MM-DD
         :return:
         """
 
-        # Init
+        # Initialize
         exchange_rates = list()
+        norm_rate = 0
+        coverted_rate = 0
 
         # Get the list of dates over which to compute inflation
         date_range = self._dates_in_range(start_date, end_date, self.ex_dict_keys_series).tolist()
 
         if inflation_correction:
             for d in date_range:
-                # Convert
-                converted_rate = self.currency_converter(amount, from_currency, to_currency, date = d)
 
-                # Add check for from and to year
+                # Convert
+                coverted_rate = self.currency_converter(  amount = amount
+                                                        , from_currency = from_currency
+                                                        , to_currency = to_currency
+                                                        , date = d)
 
                 # Normalize
-                norm_rate = self.normalize(  amount = converted_rate
+                norm_rate = self.normalize(  amount = coverted_rate
                                            , currency = from_currency
                                            , from_year = str(datetime.datetime.strptime(d, "%Y-%m-%d").year)
                                            , base_currency = to_currency)
+
                 exchange_rates.append(norm_rate)
         else:
             exchange_rates = ([self.currency_converter(amount, from_currency, to_currency, date = d) for d in date_range])
 
         return mean(exchange_rates)
 
-
-
-curr = Currency()
-
-
-
-curr.currency_converter(100, "Canada", "United Kingdom", pretty_print=True)
 
 
 
