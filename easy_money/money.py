@@ -352,6 +352,65 @@ class Currency(object):
         return adjusted_amount if not pretty_print else print(adjusted_amount, to_currency)
 
 
+    def _dates_in_range(self, start_date, end_date, pandas_series):
+        """
+
+        :param start_date:
+        :param end_date:
+        :param pandas_series:
+        :return: pandas series
+        """
+
+        if datetime.datetime.strptime(start_date, "%Y-%m-%d") >= datetime.datetime.strptime(end_date, "%Y-%m-%d"):
+            raise ValueError("Indexing Error. The start_date cannot occur before the end date.")
+
+        return pandas_series.loc[(pd.to_datetime(pandas_series) >= start_date) & \
+                                 (pd.to_datetime(pandas_series) <= end_date)]
+
+
+    def exchange_rate_over_range(self, from_currency, to_currency, start_date, end_date, inflation_correction=True, amount=100):
+        """
+
+        Norminal Average Exchange Rate over some daterange.
+        Note: slow and likely inaccurate. Needs to be refactored.
+
+        :param amount:
+        :param from_currency:
+        :param to_currency:
+        :param start_date: starting date; must be of the form: YYYY-MM-DD
+        :param end_date: ending date; must be of the form: YYYY-MM-DD
+        :return:
+        """
+
+        # Initialize
+        exchange_rates = list()
+        norm_rate = 0
+        coverted_rate = 0
+
+        # Get the list of dates over which to compute inflation
+        date_range = self._dates_in_range(start_date, end_date, self.ex_dict_keys_series).tolist()
+
+        if inflation_correction:
+            for d in date_range:
+                # Convert
+                coverted_rate = self.currency_converter(amount=amount
+                                                        , from_currency=from_currency
+                                                        , to_currency=to_currency
+                                                        , date=d)
+
+                # Normalize
+                norm_rate = self.normalize(amount = coverted_rate
+                                           , currency = from_currency
+                                           , from_year = str(datetime.datetime.strptime(d, "%Y-%m-%d").year)
+                                           , base_currency = to_currency)
+
+                exchange_rates.append(norm_rate)
+        else:
+            exchange_rates = ([self.currency_converter(amount, from_currency, to_currency, date = d) for d in date_range])
+
+        return mean(exchange_rates)
+
+
 
 
 
