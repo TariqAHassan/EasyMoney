@@ -60,7 +60,7 @@ class Currency(object):
 
         # Import EU join Data
         eu_join = pd.read_csv("easy_money/easy_data/JoinEuro.csv")
-        eu_join_dict = dict(zip(eu_join.alpha2, eu_join.join_year))
+        self.eu_join_dict = dict(zip(eu_join.alpha2, eu_join.join_year))
 
         alpha2_alpha3_df = pd.read_csv("easy_money/easy_data/CountryAlpha2_and_3.csv")
 
@@ -132,7 +132,7 @@ class Currency(object):
         elif map_to == 'alpha3':
             return self.alpha2_to_alpha3[alpha2_mapping]
         elif map_to == 'currency':
-            return "EUR" if alpha2_mapping in eu_join_dict.keys() else self.alpha2_to_currency[alpha2_mapping]
+            return "EUR" if alpha2_mapping in self.eu_join_dict.keys() else self.alpha2_to_currency[alpha2_mapping]
         elif map_to == "natural_name":
             return "Europe" if region == "EUR" else self.alpha2_to_region[alpha2_mapping]
         else:
@@ -356,8 +356,6 @@ class Currency(object):
         adjusted_amount = self.currency_converter(currency_adj_inflation, from_currency, to_currency)
 
         return adjusted_amount if not pretty_print else print(adjusted_amount, to_currency)
-
-
 
 
 
