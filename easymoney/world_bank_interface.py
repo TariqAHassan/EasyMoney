@@ -18,7 +18,7 @@ import pandas as pd
 import pkg_resources
 
 
-DATA_PATH = pkg_resources.resource_filename('easy_money', 'data')
+DATA_PATH = pkg_resources.resource_filename('easymoney', 'data')
 
 
 class WorldBankParse(object):
