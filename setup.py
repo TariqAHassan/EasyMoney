@@ -12,6 +12,7 @@ setup(
     url = "https://github.com/TariqAHassan/NewMoney.git",
     packages = find_packages(),
     package_data = {'': ['*.csv', '*.p'],},
+    data_files = [('', ["LICENSE.txt"])],
     install_requires = ['numpy', 'pandas', 'wbdata', 'bs4', 'setuptools-git'],
     classifiers = [  "Development Status :: 3 - Alpha"
                    , "Natural Language :: English"
