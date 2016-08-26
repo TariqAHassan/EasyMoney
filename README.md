@@ -9,6 +9,7 @@ EasyMoney is a set of tools for:
 - adjusting a given currency for inflation
 - converting from one currency to another
 - 'normalizing' a currency, i.e., adjust for inflation and then convert a base currency, e.g., USD.
+- doing all of the above without having to memorize currency codes!
 
 **WARNING: Due to EasyMoney's Alpha Status, results are likely to contain inaccuracies.**
 
@@ -17,6 +18,8 @@ EasyMoney is a set of tools for:
 ###Dependencies
 
 EasyMoney requires: [numpy], [pandas], [bs4] and [wbdata]<sup>†</sup>.
+
+Internet Access Required.
 
 ------------------------------------------------------------------------
 
@@ -39,6 +42,7 @@ from easy_money.money import Currency
 ```python
 curr = Currency()
 ```
+Note: this may take a moment, depending on the speed of your internet connection.
 
 ####Prototypical Conversion Problems
 
@@ -87,7 +91,7 @@ curr.normalize(amount = 100, currency = "Germany", from_year = 2010, to_year = "
 # 120.45 USD
 ```
 
-EasyMoney also understands that, while these two nations may share a common currency, inflation is not assured to be the in the two countries.
+EasyMoney also understands that, while these two nations may share a common currency, inflation may differ.
 
 ------------------------------------------------------------------------
 
