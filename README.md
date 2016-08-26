@@ -35,7 +35,7 @@ Internet Access Required.
 
 #####Import the tool
 ```python
-from easy_money.money import Currency
+from easymoney.money import Currency
 ```
 
 #####Create an instance of the Currency Class

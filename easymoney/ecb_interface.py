@@ -14,7 +14,7 @@ import re
 import urllib.request
 import pandas as pd
 from bs4 import BeautifulSoup
-from easy_money.support_money import floater
+from easymoney.support_money import floater
 
 def _soup_from_url(url, parser = 'lxml'):
     """

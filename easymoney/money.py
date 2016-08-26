@@ -20,12 +20,12 @@ import pandas as pd
 import pkg_resources
 from statistics import mean
 
-from easy_money.support_money import twoD_nested_dict, floater, dict_key_remove, money_printer
-from easy_money.ecb_interface import _ecb_exchange_data
-from easy_money.world_bank_interface import WorldBankParse, world_bank_pull_wrapper
+from easymoney.support_money import twoD_nested_dict, floater, dict_key_remove, money_printer
+from easymoney.ecb_interface import _ecb_exchange_data
+from easymoney.world_bank_interface import WorldBankParse, world_bank_pull_wrapper
 
 
-DATA_PATH = pkg_resources.resource_filename('easy_money', 'data')
+DATA_PATH = pkg_resources.resource_filename('easymoney', 'data')
 
 
 class Currency(object):
