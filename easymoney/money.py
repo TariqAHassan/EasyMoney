@@ -18,8 +18,8 @@ import datetime
 import numpy as np
 import pandas as pd
 import pkg_resources
-from statistics import mean
 
+from statistics import mean
 from easymoney.support_money import twoD_nested_dict, floater, dict_key_remove, money_printer
 from easymoney.ecb_interface import _ecb_exchange_data
 from easymoney.world_bank_interface import WorldBankParse, world_bank_pull_wrapper
@@ -364,6 +364,8 @@ class Currency(object):
 
 
 
+
+curr = Currency()
 
 
 

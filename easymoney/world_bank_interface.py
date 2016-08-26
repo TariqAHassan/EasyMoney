@@ -15,10 +15,7 @@ import re
 import wbdata
 import numpy as np
 import pandas as pd
-import pkg_resources
-
-
-DATA_PATH = pkg_resources.resource_filename('easymoney', 'data')
+from easymoney.money import DATA_PATH
 
 
 class WorldBankParse(object):

@@ -34,7 +34,6 @@ def _soup_from_url(url, parser = 'lxml'):
     else:
         return BeautifulSoup(urllib2.Request(url), parser)
 
-
 def _ecb_exchange_data(return_as = 'dict', xmlpath = "http://www.ecb.europa.eu/stats/eurofxref/eurofxref-hist.xml"):
     """
 
@@ -42,7 +41,7 @@ def _ecb_exchange_data(return_as = 'dict', xmlpath = "http://www.ecb.europa.eu/s
     THIS GOES OUT TO THE EROPEAN CENTRAL BANK via THEIR GENEROUSLY PROVIDED API.
     DO *NOT* WRITE PROCEDURES THAT SLAM THEIR SERVERS.
 
-    :param xmlpath: URL9 to the exchange XML
+    :param xmlpath: URL to the exchange XML
     :param return_as: dict for dictionary (nested); df for pandas dataframe
     :return: exchangerate w.r.t. EURO as the base-currency
     :rtype: dict or pandas dataframe
