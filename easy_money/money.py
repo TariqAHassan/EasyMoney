@@ -10,17 +10,22 @@ Python 3.5
 '''
 
 # Modules #
+import os
 import wbdata
 import datetime
 import warnings
 import datetime
 import numpy as np
 import pandas as pd
+import pkg_resources
 from statistics import mean
 
-from easy_money.support_money import twoD_nested_dict, floater, dict_key_remove
+from easy_money.support_money import twoD_nested_dict, floater, dict_key_remove, money_printer
 from easy_money.ecb_interface import _ecb_exchange_data
 from easy_money.world_bank_interface import WorldBankParse, world_bank_pull_wrapper
+
+
+DATA_PATH = pkg_resources.resource_filename('easy_money', 'data')
 
 
 class Currency(object):
@@ -33,6 +38,7 @@ class Currency(object):
         1) Get Inflation Rate
         2) Convert Currency
         3) Exchange rate
+        4) Normalize a currency with respect to a base currecny, e.g., EUROs.
 
     """
 
@@ -48,6 +54,7 @@ class Currency(object):
 
         # Get CPI Data
         self.cpi_df = world_bank_pull_wrapper(value_true_name = "cpi", indicator = "FP.CPI.TOTL")
+
         # Create CPI dict
         self.cpi_dict = twoD_nested_dict(self.cpi_df, 'alpha2', 'year', 'cpi', to_float = ['cpi'], to_int = ['year'])
 
@@ -57,10 +64,10 @@ class Currency(object):
         self.ex_dict_keys_series = pd.Series(sorted(list(self.ex_dict.keys())))
 
         # Import EU join Data
-        eu_join = pd.read_csv("easy_money/easy_data/JoinEuro.csv")
-        eu_join_dict = dict(zip(eu_join.alpha2, eu_join.join_year))
+        eu_join = pd.read_csv(DATA_PATH + "/JoinEuro.csv")
+        self.eu_join_dict = dict(zip(eu_join.alpha2, eu_join.join_year))
 
-        alpha2_alpha3_df = pd.read_csv("easy_money/easy_data/CountryAlpha2_and_3.csv")
+        alpha2_alpha3_df = pd.read_csv(DATA_PATH + "/CountryAlpha2_and_3.csv")
 
         # Create Alpha3 --> Alpha2 Dict
         self.alpha3_to_alpha2 = dict_key_remove(dict(zip(alpha2_alpha3_df.Alpha3, alpha2_alpha3_df.Alpha2)))
@@ -130,7 +137,7 @@ class Currency(object):
         elif map_to == 'alpha3':
             return self.alpha2_to_alpha3[alpha2_mapping]
         elif map_to == 'currency':
-            return self.alpha2_to_currency[alpha2_mapping]
+            return "EUR" if alpha2_mapping in self.eu_join_dict.keys() else self.alpha2_to_currency[alpha2_mapping]
         elif map_to == "natural_name":
             return "Europe" if region == "EUR" else self.alpha2_to_region[alpha2_mapping]
         else:
@@ -239,6 +246,10 @@ class Currency(object):
         # Convert currency arg. to a currency code.
         currency_to_convert = self._iso_mapping(currency, 'currency')
 
+        # Block self conversion
+        if currency_to_convert == "EUR":
+            return 1.0
+
         # Initialize
         date_key = None
 
@@ -281,8 +292,7 @@ class Currency(object):
 
         # Check for from_currency == to_currency
         if self._iso_mapping(from_currency_fn) == self._iso_mapping(to_currency):
-            warnings.warn("from_currency is the same as to_currency")
-            return round(amount, self.round_to) if not pretty_print else print(round(amount, self.round_to), to_currency)
+            return round(amount, self.round_to) if not pretty_print else print(money_printer(amount, self.round_to), to_currency)
 
         # To some currency from EURO
         if from_currency_fn == "EUR":
@@ -341,7 +351,8 @@ class Currency(object):
                 raise ValueError("to_year invalid; '%s' is not numeric (intiger or float).")
         else:
             inflation_year_b = most_recent_cpi_record
-            warnings.warn("Inflation information not avaliable for '%s', using %s" % (to_year, inflation_year_b))
+            if float(inflation_year_b) <= (datetime.datetime.now().year - 2):
+                warnings.warn("Inflation information not avaliable for '%s', using %s." % (to_year, inflation_year_b))
 
         # Adjust input for inflation
         currency_adj_inflation = self.inflation_calculator(amount, from_region, from_year, inflation_year_b)
@@ -349,31 +360,7 @@ class Currency(object):
         # Convert into the base currency, e.g., EURO.
         adjusted_amount = self.currency_converter(currency_adj_inflation, from_currency, to_currency)
 
-        return adjusted_amount if not pretty_print else print(adjusted_amount, to_currency)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+        return adjusted_amount if not pretty_print else print(money_printer(adjusted_amount, self.round_to), to_currency)
 
 
 

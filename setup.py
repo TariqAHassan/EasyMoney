@@ -1,4 +1,4 @@
-from setuptools import setup
+from setuptools import setup, find_packages
 
 setup(
     name = "easymoney",
@@ -10,13 +10,15 @@ setup(
     license = "BSD",
     keywords = 'economics, finance',
     url = "https://github.com/TariqAHassan/NewMoney.git",
-    packages = ['new_money'],
-    install_requires = ['numpy', 'pandas', 'wbdata', 'bs4'],
-    classifiers=[  "Development Status :: 3 - Alpha"
-                 , "Natural Language :: English"
-                 , "Programming Language :: Python :: 3.5"
-                 , "Environment :: MacOS X"
-                 , "License :: OSI Approved :: BSD License"
+    packages = find_packages(),
+    package_data = {'': ['*.csv', '*.p'],},
+    install_requires = ['numpy', 'pandas', 'wbdata', 'bs4', 'setuptools-git'],
+    classifiers = [  "Development Status :: 3 - Alpha"
+                   , "Natural Language :: English"
+                   , "Intended Audience :: Financial and Insurance Industry"
+                   , "Intended Audience :: Science/Research"
+                   , "Programming Language :: Python :: 3.5"
+                   , "Environment :: MacOS X"
+                   , "License :: OSI Approved :: BSD License"
     ],
-    include_package_data = True
 )
