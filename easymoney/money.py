@@ -318,7 +318,10 @@ class Currency(object):
         rounded_amount = round(converted_amount, self.round_to)
 
         # Return results (or pretty print)
-        return rounded_amount if not pretty_print else print(rounded_amount, self._iso_mapping(to_currency, "currency"))
+        if not pretty_print:
+            return rounded_amount
+        else:
+            print(money_printer(rounded_amount, self.round_to), self._iso_mapping(to_currency, "currency"))
 
     def normalize(self, amount, currency, from_year, to_year = "most_recent", base_currency = "EUR", pretty_print = False):
         """
@@ -365,6 +368,8 @@ class Currency(object):
 
 
 
+curr = Currency()
+curr.currency_converter(amount = 100, from_currency = "France", to_currency = "Germany", pretty_print = True)
 
 
 
