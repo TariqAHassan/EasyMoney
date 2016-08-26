@@ -22,6 +22,7 @@ setup(
                    , "Environment :: MacOS X"
                    , "License :: OSI Approved :: BSD License"
     ],
+    include_package_data = True
 )
 
 
