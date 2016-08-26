@@ -27,7 +27,7 @@ Internet Access Required.
 
 `$ pip3 install git+git://github.com/TariqAHassan/EasyMoney@master`
 
-*Note*: EasyMoney requires Python 3 and will *not* work with Python 2.
+*Note*: EasyMoney requires Python 3 (though Python 2 *should* work).
 
 ------------------------------------------------------------------------
 
@@ -67,7 +67,7 @@ curr.currency_converter(amount = 100, from_currency = "Canada", to_currency = "I
 # 68.58 EUR
 ```
 
-####Handling Common Curriences
+####Handling Common Currencies
 
 #####1. Currency Conversion:
 ```python

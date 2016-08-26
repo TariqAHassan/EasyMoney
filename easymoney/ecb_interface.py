@@ -11,10 +11,17 @@ Python 3.5
 
 # Modules #
 import re
-import urllib.request
+import sys
 import pandas as pd
 from bs4 import BeautifulSoup
 from easymoney.support_money import floater
+
+if sys.version_info.major == 3:
+    import urllib.request
+elif sys.version_info.major == 2 and sys.version_info.minor >= 7:
+    import urllib2
+else:
+    raise ImportError("Your Version of Python is too old. Please Consider upgrading to --at least-- Python 2.7.")
 
 def _soup_from_url(url, parser = 'lxml'):
     """
@@ -22,7 +29,10 @@ def _soup_from_url(url, parser = 'lxml'):
     :param xmlpath:
     :return:
     """
-    return BeautifulSoup(urllib.request.urlopen(url), parser)
+    if sys.version_info.major == 3:
+        return BeautifulSoup(urllib.request.urlopen(url), parser)
+    else:
+        return BeautifulSoup(urllib2.Request(url), parser)
 
 def _ecb_exchange_data(return_as = 'dict', xmlpath = "http://www.ecb.europa.eu/stats/eurofxref/eurofxref-hist.xml"):
     """
@@ -31,7 +41,7 @@ def _ecb_exchange_data(return_as = 'dict', xmlpath = "http://www.ecb.europa.eu/s
     THIS GOES OUT TO THE EROPEAN CENTRAL BANK via THEIR GENEROUSLY PROVIDED API.
     DO *NOT* WRITE PROCEDURES THAT SLAM THEIR SERVERS.
 
-    :param xmlpath: URL9 to the exchange XML
+    :param xmlpath: URL to the exchange XML
     :param return_as: dict for dictionary (nested); df for pandas dataframe
     :return: exchangerate w.r.t. EURO as the base-currency
     :rtype: dict or pandas dataframe

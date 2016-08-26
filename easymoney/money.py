@@ -18,8 +18,8 @@ import datetime
 import numpy as np
 import pandas as pd
 import pkg_resources
-from statistics import mean
 
+from statistics import mean
 from easymoney.support_money import twoD_nested_dict, floater, dict_key_remove, money_printer
 from easymoney.ecb_interface import _ecb_exchange_data
 from easymoney.world_bank_interface import WorldBankParse, world_bank_pull_wrapper
@@ -318,7 +318,10 @@ class Currency(object):
         rounded_amount = round(converted_amount, self.round_to)
 
         # Return results (or pretty print)
-        return rounded_amount if not pretty_print else print(rounded_amount, self._iso_mapping(to_currency, "currency"))
+        if not pretty_print:
+            return rounded_amount
+        else:
+            print(money_printer(rounded_amount, self.round_to), self._iso_mapping(to_currency, "currency"))
 
     def normalize(self, amount, currency, from_year, to_year = "most_recent", base_currency = "EUR", pretty_print = False):
         """
