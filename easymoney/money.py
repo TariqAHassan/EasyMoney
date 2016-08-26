@@ -367,6 +367,8 @@ class Currency(object):
 
 curr = Currency()
 
+curr.currency_converter(amount = 100, from_currency = "France", to_currency = "Germany", pretty_print = True)
+
 
 
 
