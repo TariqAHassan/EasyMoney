@@ -152,12 +152,10 @@ class Currency(object):
 
         # Block EUR and Europe handling by the below _iso_mapping() code
         if region.upper() == 'EUR' or region.lower().title() == 'Europe':
-            if map_to == 'currency':
+            if map_to in ['alpha2', 'alpha3', 'currency']:
                 return 'EUR'
-            elif map_to == 'natural':
-                return 'Europe'
             else:
-                raise ValueError("Cannot map '%s' to a specfic country." % (region))
+                return 'Europe'
         else:
             alpha2_mapping, raw_region_type = self._region_type(region)
 
@@ -392,7 +390,7 @@ class Currency(object):
         # Adjust input for inflation
         currency_adj_inflation = self.inflation_calculator(amount, from_region, from_year, inflation_year_b)
 
-        # Convert into the base currency, e.g., EURO.
+        # Convert into the base currency
         adjusted_amount = self.currency_converter(currency_adj_inflation, from_currency, to_currency)
 
         return adjusted_amount if not pretty_print else print(money_printer(adjusted_amount, self.round_to), to_currency)
@@ -674,9 +672,6 @@ class Currency(object):
                         info_table[col] = info_table[col].map(full_date_to_datetime)
 
                 return info_table
-
-
-
 
 
 
