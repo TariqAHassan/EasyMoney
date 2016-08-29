@@ -19,8 +19,24 @@ import numpy as np
 import pandas as pd
 import pkg_resources
 
-from easymoney.support_money import twoD_nested_dict, floater, remove_from_dict, money_printer, key_value_flip, min_max, datetime_to_str, str_to_datetime, strlist_to_list
-from easymoney.ecb_interface import _ecb_exchange_data, ecb_currency_to_alpha2_dict
+from collections import defaultdict
+
+from easymoney.support_money import twoD_nested_dict
+from easymoney.support_money import alpha2_to_alpha2_unpack
+from easymoney.support_money import floater
+from easymoney.support_money import remove_from_dict
+from easymoney.support_money import money_printer
+from easymoney.support_money import key_value_flip
+from easymoney.support_money import min_max
+from easymoney.support_money import datetime_to_str
+from easymoney.support_money import str_to_datetime
+from easymoney.support_money import strlist_to_list
+from easymoney.support_money import alpha2_to_alpha2_unpack
+from easymoney.support_money import pandas_print_full
+from easymoney.support_money import date_bounds_floor
+
+from easymoney.ecb_interface import _ecb_exchange_data
+from easymoney.ecb_interface import ecb_currency_to_alpha2_dict
 from easymoney.world_bank_interface import world_bank_pull_wrapper
 
 
@@ -56,7 +72,7 @@ class Currency(object):
         self.fallback = fallback
 
         # Get CPI Data
-        self.cpi_df = world_bank_pull_wrapper(value_true_name = "cpi", indicator = "FP.CPI.TOTL")
+        self.cpi_df = world_bank_pull_wrapper(value_true_name = "cpi", indicator = "FP.CPI.TOTL") # add an NA col drop?
 
         # Create CPI dict
         self.cpi_dict = twoD_nested_dict(self.cpi_df, 'alpha2', 'year', 'cpi', to_float = ['cpi'], to_int = ['year'])
@@ -386,17 +402,15 @@ class Currency(object):
 
         return adjusted_amount if not pretty_print else print(money_printer(adjusted_amount, self.round_to), to_currency)
 
-    def _date_options(self, nested_date_dict, min_max_only = True, keys_as_dates = False, date_format = "%Y-%m-%d"):
+    def _date_options(self, nested_date_dict, keys_as_dates = False, date_format = "%Y-%m-%d"):
         """
 
 
-        Jumbo function (refactor ASAP...) that figures
-        out how to return dates for which data is avaliable.
+        Function that figures out how to return dates for which data is avaliable.
 
         :param nested_date_dict: expected structures:
                                  1. {KEY: {DATE: VALUE}, KEY: {DATE: VALUE}...}; keys_as_dates = False; DATE = YYYY
                                  2. {DATE: {KEY: VALUE}, DATE: {KEY: VALUE}...}; keys_as_dates = True; DATE = YYYY-MM-DD
-        :param min_max_only:
         :param keys_as_dates:
         :param rformat: 'str' or 'datetime'
         :return: dict
@@ -405,57 +419,44 @@ class Currency(object):
         # Init
         date_values = None
         date_ranges_dict = dict()
+        key_corrected_dict = dict()
 
         # Input Check
-        if not isinstance(min_max_only, bool):
-            raise ValueError('min_max_only must be a boolean.')
         if not isinstance(keys_as_dates, bool):
             raise ValueError('keys_as_dates must be a boolean.')
 
         # i.e., ex_dict
         if keys_as_dates:
-            if min_max_only:
-                date_values = [datetime.datetime.strptime(d, date_format) for d in nested_date_dict.keys()]
-                return dict(zip(['min', 'max'], min_max(date_values)))
-            elif not min_max_only:
-                # Iterate though the dates (keys)
-                for i in nested_date_dict:
-                    # Iterate through the first nest
-                    for j in nested_date_dict[i].keys():
-                        # Populate the date_ranges_dict
-                        alpha2_j = _iso_mapping(j)
-                        date_values = str_to_datetime([i])
-                        date_values = date_values if date_values != None else []
-                        if alpha2_j not in date_ranges_dict.keys():
-                            date_ranges_dict[alpha2_j] = date_values
-                        else:
-                            date_ranges_dict[alpha2_j] += date_values
-                return date_ranges_dict
+
+            # Replace the string keys with datetimes; populate with nested keys provided they have float values
+            # (i.e., data exists for that date).
+            key_key_dict = {str_to_datetime([k], date_format)[0]: [k2 for k2, v2 in v.items() if floater(v2, True)] \
+                            for k, v in nested_date_dict.items()}
+
+            # Collapse to 2D list of lists by key
+            zipped_key_key = [[[v_i, k] for v_i in v] for k, v in key_key_dict.items()]
+
+            # Flatten the list for processing
+            flattened_key_key = [i for s in zipped_key_key for i in s]
+
+            # Create a new default dict
+            date_ranges_dict = defaultdict(list)
+
+            # Populate with dates; {Country : [Datetimes]}.
+            for k, v in flattened_key_key:
+                date_ranges_dict[k].append(v)
+
+            # Convert Keys to Alpha2 and return
+            return dict((self._iso_mapping(k), v) for k, v in date_ranges_dict.items())
 
         # i.e., cpi_dict
         elif not keys_as_dates:
             date_ranges_dict = dict.fromkeys(nested_date_dict.keys()) # should be using _iso_mapping() here.
-            if min_max_only:
-                date_values = [i for s in nested_date_dict.values() for i in s]
-                return dict(zip(['min', 'max'], [datetime.datetime.strptime(d, date_format) for d in min_max(date_values)]))
-            elif not min_max_only:
-                # Get the date range for each key in the nested dict
-                for k in date_ranges_dict:
-                    date_values = sorted(str_to_datetime(nested_date_dict[k].keys(), date_format = date_format))
-                    date_ranges_dict[k] = date_values
-                return date_ranges_dict
-
-    def _alpha2_to_alpha2_unpack(self, pandas_series, unpack_dict):
-        """
-
-        :param pandas_series:
-        :param unpack_dict:
-        :return:
-        """
-
-        # Hacking the living daylights out of the pandas API
-        return pandas_series.replace(unpack_dict).map(
-               lambda x: np.NaN if 'nan' in str(x) else strlist_to_list(str(x)))
+            # Get the date range for each key in the nested dict
+            for k in date_ranges_dict:
+                date_values = sorted(str_to_datetime(nested_date_dict[k].keys(), date_format = date_format))
+                date_ranges_dict[k] = date_values
+            return date_ranges_dict
 
     def _currency_options(self):
         """
@@ -464,30 +465,31 @@ class Currency(object):
         """
 
         # Make a currency code of possible currency codes
-        currency_ops = pd.DataFrame(currency_codes, columns = ["CurrencyCodes"])
+        currency_ops = pd.DataFrame(self.currency_codes, columns = ["Currency"])
 
         # Make the Alpha2 Column
-        currency_ops['Alpha2'] = currency_ops["CurrencyCodes"].replace(
-            {**currency_to_alpha2, **ecb_currency_to_alpha2_dict})
+        currency_ops['Alpha2'] = currency_ops["Currency"].replace(
+            {**self.currency_to_alpha2, **ecb_currency_to_alpha2_dict})
 
         # Make the Alpha3 and Region Columns
-        currency_ops['Alpha3'] = currency_ops["Alpha2"].replace(alpha2_to_alpha3)
-        currency_ops['Region'] = currency_ops["Alpha2"].replace(alpha2_to_region)
+        currency_ops['Alpha3'] = currency_ops["Alpha2"].replace(self.alpha2_to_alpha3)
+        currency_ops['Region'] = currency_ops["Alpha2"].replace(self.alpha2_to_region)
 
-        # Reorder
-        currency_ops = currency_ops[['Region', 'CurrencyCodes', 'Alpha2', 'Alpha3']]
+        # Reorder columns
+        currency_ops = currency_ops[['Region', 'Currency', 'Alpha2', 'Alpha3']]
 
         # Add date information
-        dates_dict = _date_options(1, nested_date_dict = ex_dict, min_max_only = False, keys_as_dates = True)
+        dates_dict = self._date_options(nested_date_dict = self.ex_dict, keys_as_dates = True)
 
         ex_dict_dates = dict((k, str(datetime_to_str(min_max(v)))) for k, v in dates_dict.items())
 
         # Create Date Range Column
-        currency_ops['Range'] = _alpha2_to_alpha2_unpack(currency_ops['Alpha2'], ex_dict_dates)
+        currency_ops['Range'] = alpha2_to_alpha2_unpack(currency_ops['Alpha2'].astype(str), ex_dict_dates)
         all_date_ranges = np.array(currency_ops['Range'].tolist())
 
-        # Create Row for Europe
-        eur_row = pd.DataFrame({'Region': 'Europe', 'CurrencyCodes': 'EUR', 'Alpha2': np.nan, 'Alpha3': np.nan,
+        # Create Row for Europe -- min and max are the min and max of all other conversion data,
+        # because EUR is the base currency being used.
+        eur_row = pd.DataFrame({'Region': 'Europe', 'Currency': 'EUR', 'Alpha2': np.nan, 'Alpha3': np.nan,
                                 'Range': [[min(all_date_ranges[:,0]), max(all_date_ranges[:,1])]]},
                                  index = [0], columns = currency_ops.columns.tolist())
 
@@ -507,19 +509,17 @@ class Currency(object):
 
         :return:
         """
-        cpi_ops = cpi_df[['region', 'currency_code', 'alpha2', 'alpha3']].drop_duplicates()
-        cpi_ops.columns = ['Region', 'CurrencyCodes', 'Alpha2', 'Alpha3']
+
+        cpi_ops = self.cpi_df[['region', 'currency_code', 'alpha2', 'alpha3']].drop_duplicates()
+        cpi_ops.columns = ['Region', 'Currency', 'Alpha2', 'Alpha3']
         cpi_ops.index = range(cpi_ops.shape[0])
 
-        dates_dict = _date_options(  1, nested_date_dict = cpi_dict
-                                   , min_max_only = False
-                                   , keys_as_dates = False
-                                   , date_format = '%Y')
+        dates_dict = self._date_options(nested_date_dict = self.cpi_dict, keys_as_dates = False, date_format = '%Y')
 
         cpi_dict_years = dict((k, str(min_max([i.year for i in v]))) for k, v in dates_dict.items())
 
         # Hacking the living daylights out of the pandas API
-        cpi_ops['Range'] = _alpha2_to_alpha2_unpack(cpi_ops['Alpha2'], cpi_dict_years)
+        cpi_ops['Range'] = alpha2_to_alpha2_unpack(cpi_ops['Alpha2'], cpi_dict_years)
 
         # Sort by Region and Return
         cpi_ops.sort_values(['Region'], ascending = [1], inplace = True)
@@ -529,55 +529,191 @@ class Currency(object):
 
         return cpi_ops
 
-    def options(self, info = 'currency', rformat = 'table', pretty_table = True, pretty_print = True):
+    def _currency_inflation_options(self, currency_ops_df, cpi_ops_df):
         """
 
-        :param information: 'currency', 'inflation', 'curr_inflat' or 'dates'.
+        :param currency_ops_df:
+        :param cpi_ops_df:
+        :return:
+        """
+
+        # Use the cpi_ops_df as a base
+        data_frame = cpi_ops_df
+
+        # Make a dict of currency ranges from the currency_ops_df
+        currency_range = remove_from_dict(dict(zip(currency_ops_df['Alpha2'], [str(i) for i in currency_ops_df['Range']])))
+
+        # Create a pandas series that maps values in currency_range to the cpi Alpha2 col.
+        currency_cpi_mapping = alpha2_to_alpha2_unpack(data_frame['Alpha2'], currency_range)
+
+        data_frame.rename(columns = {'Range': 'InflationRange'}, inplace=True)
+
+        # Replace with NaNs those that could not be mapped
+        data_frame['CurrencyRange'] = currency_cpi_mapping.map(lambda x: x if "," in str(x) and len(x[0]) != 2 else np.NaN)
+
+        # Determine the Overlap in dates between CPI and Exchange
+        data_frame['Overlap'] = data_frame.apply(lambda row: date_bounds_floor([row['InflationRange'], row['CurrencyRange']]), axis = 1)
+
+        # Sort by mapping
+        data_frame['TempSort'] = data_frame.CurrencyRange.map(lambda x: 'A' if str(x) != 'nan' else 'B')
+
+        # Apply sorting
+        data_frame.sort_values(['TempSort', 'Region'], ascending=[1, 1], inplace=True)
+
+        # Drop the Sorting Column
+        data_frame.drop('TempSort', axis = 1, inplace = True)
+
+        # Refresh the index
+        data_frame.index = range(data_frame.shape[0])
+
+        return data_frame
+
+    def _list_option(self, info):
+        """
+
+        :param info:
+        :return:
+        """
+        if info == 'currency':
+            return sorted(self.currency_codes + ['EUR'])
+        elif info == 'inflation':
+            return sorted([i for i in self.cpi_df.alpha2.unique().tolist() if isinstance(i, str)])
+        elif info == 'all':
+            raise ValueError("Error in info: 'all' is only valid for when rformat is set to 'table'.")
+
+    def _table_option(self, info):
+        """
+
+        :param info:
+        :return:
+        """
+        if info == 'currency':
+            info_table = self._currency_options()
+        elif info == 'inflation':
+            info_table = self._inflation_options()
+        elif info == 'all':
+            info_table = self._currency_inflation_options(self._currency_options(), self._inflation_options())
+
+        # Add date when Countries Changed curriency (only to Euro for now).
+        # Note: Sadly, Pandas Series of dtype 'int' cannot contain NaNs.
+        #       Reverted to using an object with NaN replaced by empty strings.
+        info_table['CurrencyTransition'] = info_table['Alpha2'].replace(self.eu_join_dict).map(
+            lambda x: int(x) if floater(x, True) and str(x) != 'nan' else '')
+
+        return info_table
+
+    def options(self, info, rformat = 'table', pretty_table = True, pretty_print = True, overlap_only = False):
+        """
+
+        This function allows an easy inferface to explore all of the terminology EasyMoney understands
+        as well the the dates for which data is available.
+
+        :param info: 'currency', 'inflation' or 'all' ('all' requires rformat is set to 'table')
         :param rformat: 'table' for a table or 'list' for just the currecy codes, alone
-        :param pretty_table:
+        :param pretty_table: prettifies the options table
+        :param overlap_only: when info is set to 'all', only keep those rows for which
+                             Exchange Rate and Inflation Data Overlap
+        :param pretty_print: if True, prints the table otherwise returns the table as a pandas DataFrame.
         :return: Currency Information EasyMoney Understands
         :rtype: DataFrame
         """
 
-        # Add option to return only exchange infomation, CPI or both.
+        # This is a jumbo function.
+        # However, I've decided not to factor it any further (see all the 'option' functions above) because,
+        # despite it's size, it now it represent is a single (long) thought.
 
+        # Init
         list_to_return = None
-        table_to_return = None
+        info_table = None
+        date_columns_in_table = None
 
+        # Create a lambda to convert the InflationRange lists to lists of ints (from lists of strings).
+        year_to_int = lambda x: np.NaN if 'nan' in str(x) else [[floater(i, False, True) for i in x]][0]
+
+        # Create a lambda to convert the CurrencyRange and Overlap columns to datetime
+        full_date_to_datetime = lambda x: np.NaN if str(x) == 'nan' else str_to_datetime(x)
+
+        # Check value suppled to rformat
+        if rformat not in ['list', 'table']:
+            raise ValueError("'%s' is an invalid setting for rformat.\nPlease use 'table' for a table (pandas dataframe)"
+                             " or 'codes' for the currency codes as a list.")
+
+        # Check overlap_only has not been set to True inappropriately.
+        if (overlap_only and info != 'all') or (overlap_only and rformat == 'list'):
+            raise ValueError("overlap_only is only of utility when info = 'all' and rformat = 'table'.")
+
+        # Generate a (sorted) list
         if rformat == 'list':
+            list_to_return = self._list_option(info)
+            return list_to_return if not pretty_print else print(list_to_return)
 
-            if info == 'currency':
-                list_to_return =  sorted(self.currency_codes + ['EUR'])
-            elif info == 'inflation':
-                list_to_return =  sorted([i for i in cpi_df.alpha2.unique().tolist() if isinstance(i, str)])
-
-            if pretty_print:
-                for i in list_to_return: print(i)
-            else:
-                return list_to_return
-
+        # Generate a table
         elif rformat == 'table':
+            info_table = self._table_option(info)
+            # Limit to overlap, if requested
+            if overlap_only == True:
+                info_table.dropna(subset = ['Overlap'], how = 'all', inplace = True)
 
-            if info == 'currency':
-                table_to_return = _currency_options(1)
-
-            elif info == 'inflation':
-                table_to_return = _inflation_options(1)
-
-            # Remove indexes
-            if pretty_table:
-                table_to_return.index = ['' for i in range(currency_table.shape[0])]
-
-            # Print the full table
+            # Print the full table or return
             if pretty_print:
-                pandas_print_full(table_to_return)
-            else:
-                return table_to_return
+                # Replace number indexes with empty strings.
+                if pretty_table:
+                    info_table.index = ['' for i in range(info_table.shape[0])]
 
-        else:
-            raise ValueError("'%s' is an invalid setting for rformat.\n"
-                             "Please use 'table' for a table (pandas dataframe) or 'codes' for the currency codes"
-                             " as a list.")
+                # Pretty print the table
+                pandas_print_full(info_table)
+
+            elif not pretty_print:
+                # InflationRange --> list of ints
+                if 'InflationRange' in info_table.columns:
+                    info_table['InflationRange'] = info_table['InflationRange'].map(year_to_int)
+
+                # Replace the '' in the CurrencyTransition column with NaNs
+                info_table['CurrencyTransition'] = info_table['CurrencyTransition'].map(lambda x: np.NaN if str(x).strip() == '' else [x])
+
+                # CurrencyRange and Overlap columns --> list of datetimes
+                date_columns_in_table = [i for i in info_table.columns if i in ['CurrencyRange', 'Overlap']]
+                if len(date_columns_in_table) > 0:
+                    for col in date_columns_in_table:
+                        info_table[col] = info_table[col].map(full_date_to_datetime)
+
+                return info_table
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

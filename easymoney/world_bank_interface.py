@@ -149,7 +149,7 @@ class WorldBankParse(object):
         return data_frame[self.final_col_order]
 
 
-def world_bank_pull_wrapper(value_true_name, indicator, na_drop_col):
+def world_bank_pull_wrapper(value_true_name, indicator, na_drop_col = None):
     """
 
     :param value_true_name:
@@ -162,8 +162,9 @@ def world_bank_pull_wrapper(value_true_name, indicator, na_drop_col):
     data_frame.index = range(data_frame.shape[0])
 
     # Drop NaNs in Columns
-    for col in na_drop_col:
-        data_frame.drop(col, axis = 1, inplace = True)
+    if na_drop_col != None:
+        for col in na_drop_col:
+            data_frame.drop(col, axis = 1, inplace = True)
 
     return data_frame
 
