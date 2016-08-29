@@ -11,9 +11,11 @@ Python 3.5
 
 # Imports
 import numpy as np
+import pandas as pd
+import datetime
 
 
-def floater(input_to_process, just_check=False):
+def floater(input_to_process, just_check = False, override_to_int = False):
     """
 
     :param input_to_process:
@@ -23,7 +25,8 @@ def floater(input_to_process, just_check=False):
 
     try:
         float(input_to_process)
-        return float(input_to_process) if not just_check else True
+
+        return (int(float(input_to_process)) if override_to_int else float(input_to_process)) if not just_check else True
     except:
         return np.NaN if not just_check else False
 
@@ -56,17 +59,61 @@ def twoD_nested_dict(data_frame, nest_col_a, nest_col_b, nest_col_c, to_float = 
 
     return master_dict
 
-def dict_key_remove(input_dict, to_remove = np.nan, wrt = 'both'):
+def strlist_to_list(to_parse):
+    """
+
+    Eval() work around for: "[1992, '221-21', 2102, 'apples']" --> ['1992', '221-21', '2102', 'apples']
+
+    :param to_parse:
+    :return:
+    """
+    return [i.strip().replace("'", "") for i in [j.split(",") for j in [to_parse.replace("[", "").replace("]", "")]][0]]
+
+def alpha2_to_alpha2_unpack(pandas_series, unpack_dict):
+    """
+
+    :param pandas_series:
+    :param unpack_dict:
+    :return:
+    """
+
+    # Hacking the living daylights out of the pandas API
+    return pandas_series.replace(unpack_dict).map(lambda x: np.NaN if 'nan' in str(x) else strlist_to_list(str(x)))
+
+def _dict_key_remove(input_dict, to_remove = np.nan, wrt = 'both'):
     """
 
     :param input_dict:
     :param to_remove:
     :return:
     """
+
     if wrt in ['key', 'value']:
-        return {k: v for k, v in input_dict.items() if (k if wrt == 'key' else v) is not to_remove}
+        return {k: v for k, v in input_dict.items() if str((k if wrt == 'key' else v)) != str(to_remove)}
     elif wrt == 'both':
-        return {k: v for k, v in input_dict.items() if (k is not to_remove and v is not to_remove)}
+        return {k: v for k, v in input_dict.items() if (str(k) != str(to_remove) and str(v) != str(to_remove))}
+
+def remove_from_dict(input_dict, to_remove = [np.nan], wrt = 'both'):
+    """
+
+    :param input_dict:
+    :param to_remove:
+    :param wrt:
+    :return:
+    """
+
+    for r in to_remove:
+        input_dict = _dict_key_remove(input_dict, r, wrt)
+
+    return input_dict
+
+def key_value_flip(dictionary):
+    """
+
+    :param dictionary:
+    :return:
+    """
+    return dict([(v, k) for k, v in dictionary.items()])
 
 def money_printer(money, round_to):
     """
@@ -87,23 +134,152 @@ def money_printer(money, round_to):
     else:
         raise ValueError("Invalid money conversion requested.")
 
-# def _best_date_match(date):
-#     """
-#
-#     :param date: YYYY-MM-DD
-#     :return:
-#     """
-#
-#     if date in sorted_exchange_dates:
-#         return date
-#
-#     # Convert date str to datetime
-#     tstamp = datetime.datetime.strptime(date, "%Y-%m-%d")
-#
-#     # Restrict by year, month
-#     close_dates = [d for d in sorted_exchange_dates if (d.year == tstamp.year) and (d.month == tstamp.month) ]
-#
-#     # Closest Date to the one supplied by the user
-#     nearest_day = min([d.day for d in close_dates], key = lambda x: abs(x - tstamp.day))
-#
-#     return [d for d in close_dates if d.day == nearest_day][0].strftime('%Y-%m-%d')
+def min_max(input_list):
+    """
+
+    Gets min and max of a list.
+    Obviously, each of these are O(n).
+
+    :param input_list:
+    :return:
+    """
+    if not isinstance(input_list, list):
+        raise ValueError("input_list must be a list.")
+    try:
+        return [min(input_list), max(input_list)]
+    except:
+        return [np.NaN, np.NaN]
+
+def str_to_datetime(list_of_dates, date_format = "%Y-%m-%d"):
+    """
+
+    :param list_of_dates:
+    :param date_format:
+    :return:
+    """
+    return [datetime.datetime.strptime(d, date_format) for d in list_of_dates]
+
+def datetime_to_str(list_of_dates, date_format = "%Y-%m-%d"):
+    """
+
+    :param list_of_dates:
+    :param date_format:
+    :return:
+    """
+    return [d.strftime(date_format) for d in list_of_dates]
+
+def pandas_print_full(pd_df, full_rows = True, full_cols = True):
+    """
+
+    :param pd_df:
+    :return:
+    """
+
+    if full_rows:
+        pd.set_option('display.max_rows', len(pd_df))
+    if full_cols:
+        pd.set_option('expand_frame_repr', False)
+
+    # Print the data frame
+    print(pd_df)
+
+    if full_rows:
+        pd.reset_option('display.max_rows')
+    if full_cols:
+        pd.set_option('expand_frame_repr', True)
+
+def _floor_or_ceiling_date(year, dtype = 'floor'):
+    """
+
+    :param year:
+    :param dtype:
+    :return:
+    """
+    if not floater(year, just_check = True) or not len(year) == 4:
+        return year
+    if dtype == 'floor':
+        return year + "-01-01"
+    elif dtype == 'ceiling':
+        return year + "-12-31"
+
+def date_bounds_floor(date_ranges):
+    """
+
+    This function rounds dates to their poles, i.e., max: YYYY --> YYYY-12-31; min: YYYY --> YYYY-01-01.
+    and finds the floors maximum minimum date as well as the minimum maximum date (see date_ranges description).
+
+    :param date_ranges: format: [[minimum, maximum], [minimum, maximum], ...]
+    :return:
+    """
+
+    # Check for Nones and NaNs
+    if True in [str(i) in ['None', 'nan'] for i in date_ranges]:
+        return np.NaN
+
+    # Checks that date_ranges is a list of lists (not perfect, but should catch 99% of cases).
+    if False in [isinstance(i, list) for i in date_ranges] or \
+        True in [item for s in [[isinstance(j, list) for j in i] for i in date_ranges] for item in s]:
+        raise ValueError('date_ranges must be a list of lists.')
+
+    # Check all sublists in date_range are the same length
+    if len(set([len(l) for l in date_ranges])) != 1:
+        raise ValueError('All sublists in date_ranges must be of the same length')
+
+    # Convert date_ranges to a numpy array
+    dates = np.array(date_ranges)
+
+    # Round dates to their poles.
+    rounded_dates = [[_floor_or_ceiling_date(i, dtype = j[1]) for i in dates[:,j[0]]] for j in [[0, 'floor'], [1, 'ceiling']]]
+
+    # Compute the floors and return
+    return [max(rounded_dates[0]), min(rounded_dates[1])]
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
