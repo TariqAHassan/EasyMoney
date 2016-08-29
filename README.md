@@ -130,12 +130,12 @@ curr.options(info = 'exchange', pretty_print = True)
 curr.options(info = 'inflation', pretty_print = True)
 ```
 
-Data tables can be returned as a Pandas DataFrame.
+Additionally, instead of printing a given data table, it can be returned as Pandas DataFrame.
 ```python
 inflation_df = curr.options(info ='inflation')
 ```
 
-It is also possible to simply obtain a list of regions for which inflation information is available:
+It is also possible to simply obtain a list of regions for which inflation information is available.
 ```python
 inflation_list = curr.options(info = 'inflation', rformat = 'list')
 ```
