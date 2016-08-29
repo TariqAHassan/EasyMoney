@@ -8,10 +8,10 @@ EasyMoney is a set of tools for:
 - computing inflation
 - adjusting a given currency for inflation
 - converting from one currency to another
-- 'normalizing' a currency, i.e., adjust for inflation and then convert a base currency, e.g., USD.
+- 'normalizing' a currency, i.e., adjust for inflation and then convert a base currency (e.g., USD).
 - doing all of the above without having to memorize currency codes!
 
-**WARNING: Due to EasyMoney's Alpha Status, results are likely to contain inaccuracies.**
+**WARNING: Due to EasyMoney's Beta Status, results are likely to contain inaccuracies.**
 
 ------------------------------------------------------------------------
 
@@ -27,7 +27,7 @@ Internet Access Required.
 
 `$ pip3 install git+git://github.com/TariqAHassan/EasyMoney@master`
 
-*Note*: EasyMoney requires Python 3 (though Python 2 *should* work).
+*Note*: EasyMoney requires Python 3.
 
 ------------------------------------------------------------------------
 
@@ -92,6 +92,58 @@ curr.normalize(amount = 100, currency = "Germany", from_year = 2010, to_year = "
 ```
 
 EasyMoney also understands that, while these two nations may share a common currency, inflation may differ.
+
+####Options
+
+It's easy to explore the terminology EasyMoney understands.
+
+The following can be used interchangeably:
+
+- Region Names (as they appear in options())
+- ISO Alpha2 Codes
+- ISO Alpha3 Codes
+- Currency Codes*
+
+*This may fail when attempting to obtain inflation information about a country that uses a common currency. 
+
+```python
+curr.options(info = 'all', pretty_print = True, overlap_only = True)
+
+        Region Currency Alpha2 Alpha3 InflationRange             CurrencyRange                   Overlap CurrencyTransition
+     Australia      AUD     AU    AUS   [1960, 2015]  [1999-01-04, 2016-08-29]  [1999-01-04, 2015-12-31]                   
+        Canada      CAD     CA    CAN   [1960, 2015]  [1999-01-04, 2016-08-29]  [1999-01-04, 2015-12-31]                   
+        Cyprus      EUR     CY    CYP   [1960, 2015]  [1999-01-04, 2007-12-31]  [1999-01-04, 2007-12-31]               2008
+         ...        ...     ...   ...       ...                  ...                      ...                           ...
+```
+
+As can be seen above, the date ranges for which Inflation (InflationRange), Exchange Rate (CurrencyRange) as well as 
+when these two overlap is also provided. Additionally, the dates of (some) transitions from one currency to another 
+(CurrencyTransition) are noted.
+
+One can also gain access to *currency* and *inflation* information separately.
+```python
+# Currency Information Alone
+curr.options(info = 'exchange', pretty_print = True)
+
+# Inflation Infomation Alone
+curr.options(info = 'inflation', pretty_print = True)
+```
+
+Data tables can be returned as a Pandas DataFrame.
+```python
+inflation_df = curr.options(info ='inflation')
+```
+
+It is also possible to simply obtain a list of regions for which inflation information is available:
+```python
+inflation_list = curr.options(info = 'inflation', rformat = 'list')
+```
+This can also be done for exchange rate information.
+```python
+currency_list = curr.options(info = 'exchange', rformat = 'list')
+```
+
+*Note*: Errors may emerge when converting across currency transitions, e.g., CY (2005) → CY (2010).
 
 ------------------------------------------------------------------------
 
