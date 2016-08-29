@@ -200,7 +200,7 @@ class Currency(object):
             try:
                 cpi = floater(self.cpi_dict[cpi_region][str(int(float(year)))]) # Add linear interpolation
             except:
-                raise ValueError("Could not obtain CPI information for '%s' in %s." % (str(cpi_region), str(year)))
+                raise ValueError("Could not obtain CPI information for '%s' in %s." % (str(region), str(year)))
 
         return cpi
 
@@ -678,6 +678,20 @@ class Currency(object):
                         info_table[col] = info_table[col].map(full_date_to_datetime)
 
                 return info_table
+
+
+
+curr = Currency()
+
+curr.normalize(  amount = 100
+               , currency = "Europe"
+               , from_year = 1990
+               , to_year = "most_recent"
+               , base_currency = "USD"
+               , pretty_print = True
+)
+
+
 
 
 
