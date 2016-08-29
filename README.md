@@ -132,7 +132,7 @@ curr.options(info = 'inflation', pretty_print = True)
 
 Additionally, instead of printing a given data table, it can be returned as Pandas DataFrame.
 ```python
-inflation_df = curr.options(info ='inflation')
+inflation_df = curr.options(info = 'inflation')
 ```
 
 It is also possible to simply obtain a list of regions for which inflation information is available.
