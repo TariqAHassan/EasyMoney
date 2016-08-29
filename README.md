@@ -99,7 +99,7 @@ It's easy to explore the terminology EasyMoney understands.
 
 The following can be used interchangeably:
 
-- Region Names (as they appear in options())
+- Region Names (as they appear in `options()`)
 - ISO Alpha2 Codes
 - ISO Alpha3 Codes
 - Currency Codes*
