@@ -8,7 +8,7 @@ EasyMoney is a set of tools for:
 - computing inflation
 - adjusting a given currency for inflation
 - converting from one currency to another
-- 'normalizing' a currency, i.e., adjust for inflation and then convert a base currency (e.g., USD).
+- 'normalizing' a currency, i.e., adjust for inflation and then convert a base currency.
 - doing all of the above without having to memorize currency codes!
 
 **WARNING: Due to EasyMoney's Beta Status, results are likely to contain inaccuracies.**
