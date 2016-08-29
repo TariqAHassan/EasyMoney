@@ -197,7 +197,10 @@ class Currency(object):
             else:
                 raise AttributeError("EasyMoney could not obtain inflation (CPI) information for '%s' in '%s'" % (region, year))
         else:
-            cpi = floater(self.cpi_dict[cpi_region][str(int(float(year)))])
+            try:
+                cpi = floater(self.cpi_dict[cpi_region][str(int(float(year)))]) # Add linear interpolation
+            except:
+                raise ValueError("Could not obtain CPI information for '%s' in %s." % (str(cpi_region), str(year)))
 
         return cpi
 
@@ -366,6 +369,9 @@ class Currency(object):
 
         # Standardize currency input
         from_currency = self._iso_mapping(currency, map_to = "currency")
+
+        if from_currency not in self.currency_to_alpha2.keys():
+            raise ValueError("'%s' cannot be mapped to a specific region, and thus inflation cannot be determined." % (currency))
 
         # Ensure base_currrency is a valid currency code
         to_currency = self._iso_mapping(base_currency, map_to = 'currency')
@@ -672,10 +678,6 @@ class Currency(object):
                         info_table[col] = info_table[col].map(full_date_to_datetime)
 
                 return info_table
-
-
-
-
 
 
 
