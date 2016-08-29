@@ -681,17 +681,6 @@ class Currency(object):
 
 
 
-curr = Currency()
-
-curr.normalize(  amount = 100
-               , currency = "Europe"
-               , from_year = 1990
-               , to_year = "most_recent"
-               , base_currency = "USD"
-               , pretty_print = True
-)
-
-
 
 
 
