@@ -108,16 +108,17 @@ The following can be used interchangeably:
 
 ```python
 curr.options(info = 'all', pretty_print = True, overlap_only = True)
-
-        Region Currency Alpha2 Alpha3 InflationRange             CurrencyRange                   Overlap CurrencyTransition
-     Australia      AUD     AU    AUS   [1960, 2015]  [1999-01-04, 2016-08-29]  [1999-01-04, 2015-12-31]                   
-        Canada      CAD     CA    CAN   [1960, 2015]  [1999-01-04, 2016-08-29]  [1999-01-04, 2015-12-31]                   
-        Cyprus      EUR     CY    CYP   [1960, 2015]  [1999-01-04, 2007-12-31]  [1999-01-04, 2007-12-31]               2008
-         ...        ...     ...   ...       ...                  ...                      ...                           ...
 ```
 
-As can be seen above, the date ranges for which Inflation (InflationRange), Exchange Rate (CurrencyRange) as well as 
-when these two overlap is also provided. Additionally, the dates of (some) transitions from one currency to another 
+|   Region  | Currency | Alpha2 | Alpha3 | InflationRange |      CurrencyRange       |       Overlap            |CurrencyTransition |
+|:---------:|:--------:|:------:|:------:|:--------------:|:------------------------:|:------------------------:|:-----------------:|
+| Australia |  AUD     | AU     | AUS    |  [1960, 2015]  | [1999-01-04, 2016-08-29] | [1999-01-04, 2015-12-31] |                   |
+| Canada    |  CAD     | CA     | CAN    |  [1960, 2015]  | [1999-01-04, 2016-08-29] | [1999-01-04, 2015-12-31] |                   |
+| Cyprus    |  EUR     | CY     | CYP    |  [1960, 2015]  | [1999-01-04, 2007-12-31] | [1999-01-04, 2007-12-31] |              2008 |
+|   ...     |  ...     | ...    | ...    |      ...       |           ...            |           ...            |               ... |  
+
+As can be seen above, the date ranges for which Inflation (InflationRange) and Exchange Rate (CurrencyRange) data is available 
+(as well as when these two overlap) are provided. Additionally, the dates of (some) transitions from one currency to another 
 (CurrencyTransition) are noted.
 
 One can also gain access to *currency* and *inflation* information separately.
