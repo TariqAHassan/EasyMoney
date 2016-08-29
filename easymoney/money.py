@@ -46,23 +46,18 @@ DATA_PATH = pkg_resources.resource_filename('easymoney', 'data')
 class Currency(object):
     """
 
-    Tools to adjusting for inflation, converting to USD and normalizing (converting to USD and adjusting for inflation)
-    This will take a moment to initialize.
+    Tools for converting one currency to another and adjusting for inflation.
 
-    Functionality:
-        1) Get Inflation Rate
-        2) Convert Currency
-        3) Exchange rate
-        4) Normalize a currency with respect to a base currecny, e.g., EUROs.
-
+    :param precision: number of places to round to
+    :param fallback: fallback to closest possible date
     """
 
 
     def __init__(self, precision = 2, fallback = True):
         """
 
-        :param precision: number of places to round to
-        :param fallback: fallback to closest possible date
+        Initalize the Currency() class.
+
         """
 
         # Places of precision
@@ -574,7 +569,7 @@ class Currency(object):
         :param info:
         :return:
         """
-        if info == 'currency':
+        if info == 'exchange':
             return sorted(self.currency_codes + ['EUR'])
         elif info == 'inflation':
             return sorted([i for i in self.cpi_df.alpha2.unique().tolist() if isinstance(i, str)])
@@ -587,7 +582,7 @@ class Currency(object):
         :param info:
         :return:
         """
-        if info == 'currency':
+        if info == 'exchange':
             info_table = self._currency_options()
         elif info == 'inflation':
             info_table = self._inflation_options()
@@ -608,7 +603,7 @@ class Currency(object):
         This function allows an easy inferface to explore all of the terminology EasyMoney understands
         as well the the dates for which data is available.
 
-        :param info: 'currency', 'inflation' or 'all' ('all' requires rformat is set to 'table')
+        :param info: 'exchange', 'inflation' or 'all' ('all' requires rformat is set to 'table')
         :param rformat: 'table' for a table or 'list' for just the currecy codes, alone
         :param pretty_table: prettifies the options table
         :param overlap_only: when info is set to 'all', only keep those rows for which
@@ -636,7 +631,7 @@ class Currency(object):
         # Check value suppled to rformat
         if rformat not in ['list', 'table']:
             raise ValueError("'%s' is an invalid setting for rformat.\nPlease use 'table' for a table (pandas dataframe)"
-                             " or 'codes' for the currency codes as a list.")
+                             " or 'exchange' for the currency codes as a list.")
 
         # Check overlap_only has not been set to True inappropriately.
         if (overlap_only and info != 'all') or (overlap_only and rformat == 'list'):
@@ -669,7 +664,8 @@ class Currency(object):
                     info_table['InflationRange'] = info_table['InflationRange'].map(year_to_int)
 
                 # Replace the '' in the CurrencyTransition column with NaNs
-                info_table['CurrencyTransition'] = info_table['CurrencyTransition'].map(lambda x: np.NaN if str(x).strip() == '' else [x])
+                info_table['CurrencyTransition'] = \
+                    info_table['CurrencyTransition'].map(lambda x: np.NaN if str(x).strip() == '' else [x])
 
                 # CurrencyRange and Overlap columns --> list of datetimes
                 date_columns_in_table = [i for i in info_table.columns if i in ['CurrencyRange', 'Overlap']]
@@ -678,10 +674,6 @@ class Currency(object):
                         info_table[col] = info_table[col].map(full_date_to_datetime)
 
                 return info_table
-
-
-
-
 
 
 
