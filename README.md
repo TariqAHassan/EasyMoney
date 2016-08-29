@@ -132,16 +132,16 @@ curr.options(info = 'inflation', pretty_print = True)
 
 Additionally, instead of printing a given data table, it can be returned as Pandas DataFrame.
 ```python
-inflation_df = curr.options(info = 'inflation')
+inflation_df = curr.options(info = 'inflation', pretty_print = False)
 ```
 
 It is also possible to simply obtain a list of regions for which inflation information is available.
 ```python
-inflation_list = curr.options(info = 'inflation', rformat = 'list')
+inflation_list = curr.options(info = 'inflation', rformat = 'list', pretty_print = False)
 ```
 This can also be done for exchange rate information.
 ```python
-currency_list = curr.options(info = 'exchange', rformat = 'list')
+currency_list = curr.options(info = 'exchange', rformat = 'list', pretty_print = False)
 ```
 
 *Note*: Errors may emerge when converting across currency transitions, e.g., CY (2005) → CY (2010).
