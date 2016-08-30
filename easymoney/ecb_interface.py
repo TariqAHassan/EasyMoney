@@ -5,7 +5,6 @@
 Tools for Obtaining European Central Bank Data
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Python 3.5
 
 """
 
@@ -26,8 +25,9 @@ else:
 def _soup_from_url(url, parser = 'lxml'):
     """
 
-    :param xmlpath:
-    :return:
+    :param url: URL to parse with BeautifulSoup
+    :type url: str
+    :return: BeautifulSoup
     """
     if sys.version_info.major == 3:
         return BeautifulSoup(urllib.request.urlopen(url), parser)
@@ -42,7 +42,9 @@ def _ecb_exchange_data(return_as = 'dict', xmlpath = "http://www.ecb.europa.eu/s
     DO *NOT* WRITE PROCEDURES THAT SLAM THEIR SERVERS.
 
     :param return_as: 'dict' for dictionary (nested); 'df' for pandas dataframe.
+    :type return_as: str
     :param xmlpath: URL to the exchange XML
+    :type return_as: str
     :return: exchangerate w.r.t. EURO as the base-currency
     :rtype: dict or pandas dataframe
     """
@@ -79,7 +81,7 @@ def _ecb_exchange_data(return_as = 'dict', xmlpath = "http://www.ecb.europa.eu/s
         df = pd.melt(df, id_vars = ['date'], value_vars = [d for d in df.columns if d != 'date'])
         df.rename(columns = {"variable" : "ccode", "value" : "rate"}, inplace = True)
 
-        # Convert data column --> datetime
+        # Convert date column --> datetime
         df.date = pd.to_datetime(df.date, infer_datetime_format = True)
 
         return df, ccode
