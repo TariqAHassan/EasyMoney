@@ -41,18 +41,17 @@ def _ecb_exchange_data(return_as = 'dict', xmlpath = "http://www.ecb.europa.eu/s
     THIS GOES OUT TO THE EROPEAN CENTRAL BANK via THEIR GENEROUSLY PROVIDED API.
     DO *NOT* WRITE PROCEDURES THAT SLAM THEIR SERVERS.
 
+    :param return_as: 'dict' for dictionary (nested); 'df' for pandas dataframe.
     :param xmlpath: URL to the exchange XML
-    :param return_as: dict for dictionary (nested); df for pandas dataframe
     :return: exchangerate w.r.t. EURO as the base-currency
     :rtype: dict or pandas dataframe
     """
 
     # Parse with beautifulsoup
-    soup = _soup_from_url(xmlpath).find("gesmes:envelope")
-    soup = soup.find("cube")
+    soup = _soup_from_url(xmlpath)
 
     # Convert to string
-    ecb_hist_xml = str(soup.find_all("cube", attrs={"time":True})).split(",")
+    ecb_hist_xml = str(soup.find_all("cube", attrs = {"time" : True})).split(",")
 
     # Get all Dates
     exchange_rate_db = dict.fromkeys([re.findall(r'time="(.*?)">', i)[0] for i in ecb_hist_xml])
@@ -77,11 +76,11 @@ def _ecb_exchange_data(return_as = 'dict', xmlpath = "http://www.ecb.europa.eu/s
         df.index = range(df.shape[0])
 
         # Melt the dataframe
-        df = pd.melt(df, id_vars=['date'], value_vars = [d for d in df.columns if d != 'date'] )
+        df = pd.melt(df, id_vars = ['date'], value_vars = [d for d in df.columns if d != 'date'])
         df.rename(columns = {"variable" : "ccode", "value" : "rate"}, inplace = True)
 
         # Convert data column --> datetime
-        df.date = pd.to_datetime(df.date, infer_datetime_format=True)
+        df.date = pd.to_datetime(df.date, infer_datetime_format = True)
 
         return df, ccode
 
@@ -95,8 +94,6 @@ ecb_currency_to_alpha2_dict = {   "CYP": "CY"
                                 , "SKK": "SK"
                                 , "TRL": "TR"
 }
-
-
 
 
 
