@@ -50,8 +50,8 @@ def ecb_exchange_data(return_as = 'dict', ecb_extension = "/stats/eurofxref/euro
     :param ecb_extension: URL to the exchange rate XML data on "http://www.ecb.europa.eu".
                           Defaults to '/stats/eurofxref/eurofxref-hist.xml'.
     :type ecb_extension: str
-    :return: exchange rate w.r.t. EURO as the base-currency
-    :rtype: dict or pandas dataframe
+    :return: exchange rate with EUR as the base-currency.
+    :rtype: dict or Pandas DataFrame
     """
     xmlpath =  "http://www.ecb.europa.eu" + ecb_extension
 

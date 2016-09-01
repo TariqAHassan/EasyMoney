@@ -150,6 +150,12 @@ currency_list = curr.options(info = 'exchange', rformat = 'list', pretty_print =
 
 ------------------------------------------------------------------------
 
+##Documentation
+
+For complete documentation, please click [here].
+
+------------------------------------------------------------------------
+
 ##License
 
 This software is provided under a BSD License.
@@ -179,3 +185,4 @@ Indicators used:
   [pandas]: http://pandas.pydata.org
   [bs4]: https://www.crummy.com/software/BeautifulSoup/bs4/doc/
   [wbdata]: https://github.com/OliverSherouse/wbdata
+  [here]: https://tariqahassan.github.io/EasyMoney/index.html
