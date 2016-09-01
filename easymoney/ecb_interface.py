@@ -1,9 +1,10 @@
 #!/usr/bin/env python3
 
+
 """
 
-Tools for Obtaining European Central Bank Data
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    Tools for Obtaining Data from the European Central Bank
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 
 """
@@ -20,34 +21,39 @@ if sys.version_info.major == 3:
 elif sys.version_info.major == 2 and sys.version_info.minor >= 7:
     import urllib2
 else:
-    raise ImportError("Your Version of Python is too old. Please Consider upgrading to --at least-- Python 2.7.")
+    raise ImportError("Your Version of Python is too old. Please Consider upgrading to --at least-- Python 2.7.\n"
+                      "Python 3.5 is preferable.")
 
 def _soup_from_url(url, parser = 'lxml'):
     """
 
+    *Private Method*
     :param url: URL to parse with BeautifulSoup
     :type url: str
     :return: BeautifulSoup
+    :rtype: bs4 obj
     """
     if sys.version_info.major == 3:
         return BeautifulSoup(urllib.request.urlopen(url), parser)
     else:
         return BeautifulSoup(urllib2.Request(url), parser)
 
-def _ecb_exchange_data(return_as = 'dict', xmlpath = "http://www.ecb.europa.eu/stats/eurofxref/eurofxref-hist.xml"):
+def ecb_exchange_data(return_as = 'dict', ecb_extension = "/stats/eurofxref/eurofxref-hist.xml"):
     """
 
-    NOTE:
-    THIS GOES OUT TO THE EROPEAN CENTRAL BANK via THEIR GENEROUSLY PROVIDED API.
-    DO *NOT* WRITE PROCEDURES THAT SLAM THEIR SERVERS.
+    | This tool goes out to the European Central Bank via their generously provided API
+    | and coerces XML data into a dictionary.
+    | DO NOT WRITE PROCEDURES THAT SLAM THEIR SERVERS.
 
     :param return_as: 'dict' for dictionary (nested); 'df' for pandas dataframe.
     :type return_as: str
-    :param xmlpath: URL to the exchange XML
-    :type return_as: str
-    :return: exchangerate w.r.t. EURO as the base-currency
+    :param ecb_extension: URL to the exchange rate XML data on "http://www.ecb.europa.eu".
+                          Defaults to '/stats/eurofxref/eurofxref-hist.xml'.
+    :type ecb_extension: str
+    :return: exchange rate w.r.t. EURO as the base-currency
     :rtype: dict or pandas dataframe
     """
+    xmlpath =  "http://www.ecb.europa.eu" + extension
 
     # Parse with beautifulsoup
     soup = _soup_from_url(xmlpath)
@@ -96,6 +102,3 @@ ecb_currency_to_alpha2_dict = {   "CYP": "CY"
                                 , "SKK": "SK"
                                 , "TRL": "TR"
 }
-
-
-

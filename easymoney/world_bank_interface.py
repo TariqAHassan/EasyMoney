@@ -2,10 +2,9 @@
 
 '''
 
-Tools for Obtaining World Bank Data
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    Tools for Obtaining Data from the World Bank Group
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Python 3.5
 
 '''
 
@@ -18,24 +17,29 @@ import pandas as pd
 import pkg_resources
 
 
-DATA_PATH = pkg_resources.resource_filename('easymoney', 'data')
+from easymoney.support_money import DATA_PATH
 
 
 class WorldBankParse(object):
     """
 
-    Get indicator data from the World Bank.
+    | Tools to obtain indicator data from the World Bank's API.
+    | DO NOT WRITE PROCEDURES THAT SLAM THEIR SERVERS.
 
+    :param value_true_name: replacement name for the generic 'value' column, e.g., 'value' to 'cpi'.
+    :type value_true_name: str
+    :param indicator: a indicator used by the World Bank's API, e.g., "FP.CPI.TOTL" for CPI.
+    :type indicator: str
     """
 
 
     def __init__(self, value_true_name, indicator):
         """
 
-        :param value_true_name:
-        :param indicator:
-        """
+        *Private Method*
+        Int the WorldBankParse() class.
 
+        """
         self.indicator = indicator
         self.raw_data = wbdata.get_data(indicator)
         self.dict_keys = ['region', 'alpha2', 'indicator', value_true_name, 'year']
@@ -62,13 +66,14 @@ class WorldBankParse(object):
     def _wb_rowwise_extractor(self, wb_row):
         """
 
+        *Private Method*
         Extracts desired (see return) row information from the raw World Bank download.
 
-        :param wb_row:
+        :param wb_row: a row of the raw World Bank Data (as a dataframe).
+        :type wb_row: dict
         :return: dict with keys: region, region_id, indicator, cpi, year
         :rtype: dict
         """
-
         # dict with empty keys
         extracted_data_dict = dict.fromkeys(self.dict_keys)
 
@@ -84,14 +89,17 @@ class WorldBankParse(object):
     def _titler(self, data_frame, to_title):
         """
 
+        *Private Method*
         Titles entries in the column of a pandas dataframe.
         Includes some error handling.
 
-        :param to_title:
-        :param data_frame:
-        :return:
+        :param to_title: a list of columns to apply the following string operations: column.lower().title()
+        :type to_title: list
+        :param data_frame: a dataframe with columns to be titled.
+        :type data_frame: Pandas DataFrame
+        :return: DataFrame with the requested indicator information.
+        :rtype: Pandas DataFrame
         """
-
         df_cols = data_frame.columns.tolist()
 
         for t in to_title:
@@ -113,11 +121,10 @@ class WorldBankParse(object):
 
         Parse the information pulled from the world bank's API.
 
-        :param to_title: a list of column to title.
-        :return: a dataframe with
-        :rtype: pandas dataframe
+        :param to_title: a list of column to title. Defaults to None.
+        :return: DataFrame with the requested indicator information.
+        :rtype: Pandas Dataframe
         """
-
         if to_title != None and not isinstance(to_title, list):
             raise ValueError("title must be a list of column names (strings).")
 
@@ -152,10 +159,17 @@ class WorldBankParse(object):
 def world_bank_pull_wrapper(value_true_name, indicator, na_drop_col = None):
     """
 
-    :param value_true_name:
-    :param indicator:
-    :param na_drop_col: list of strs (columns)
-    :return:
+    Wrapper for the WorldBankParse().world_bank_pull() method.
+    Extracts world bank information based on a specific indicator and returns a Pandas DataFrame.
+
+    :param value_true_name: replacement name for the generic 'value' column, e.g., 'value' to 'cpi'.
+    :type value_true_name: str
+    :param indicator: a indicator used by the World Bank's API, e.g., "FP.CPI.TOTL" for CPI.
+    :type indicator: str
+    :param na_drop_col: list of columns (str) to drop from the final dataframe.
+    :type na_drop_col: list
+    :return: DataFrame with the requested indicator information.
+    :rtype: Pandas DateFrame
     """
     data_frame = WorldBankParse(value_true_name, indicator).world_bank_pull()
     data_frame = data_frame[data_frame[value_true_name].astype(str) != 'None']
@@ -167,6 +181,5 @@ def world_bank_pull_wrapper(value_true_name, indicator, na_drop_col = None):
             data_frame.drop(col, axis = 1, inplace = True)
 
     return data_frame
-
 
 

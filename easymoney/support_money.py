@@ -2,21 +2,26 @@
 
 """
 
-Support Tools
-~~~~~~~~~~~~~
+    Support Tools
+    ~~~~~~~~~~~~~
 
 
 """
 
 # Modules #
+import datetime
 import numpy as np
 import pandas as pd
-import datetime
+import pkg_resources
+
+
+DATA_PATH = pkg_resources.resource_filename('easymoney', 'data')
 
 
 def floater(input_to_process, just_check = False, override_to_int = False):
     """
 
+    *Private Method*
     Check if input can be converted to a floating point number.
 
     :param input_to_process: object.
@@ -25,7 +30,8 @@ def floater(input_to_process, just_check = False, override_to_int = False):
     :type just_check: bool
     :param override_to_int: override output to be an int. Defaults to False.
     :type override_to_int: bool
-    :return:
+    :return: input_to_process as a float, int or boolean (if just_check) if
+    :rtype: float or int
     """
     try:
         float(input_to_process)
@@ -36,6 +42,7 @@ def floater(input_to_process, just_check = False, override_to_int = False):
 def twoD_nested_dict(data_frame, nest_col_a, nest_col_b, nest_col_c, to_float = None, to_int = None):
     """
 
+    *Private Method*
     Generate a nested dictionary from the columns of a pandas dataframe.
 
     :param data_frame: a pandas dataframe.
@@ -47,12 +54,15 @@ def twoD_nested_dict(data_frame, nest_col_a, nest_col_b, nest_col_c, to_float = 
     :param nest_col_c: reference to column in the dataframe; to become the value to corresponding to the sub-key.
     :type nest_col_c: str
     :param to_float: a list items to float. Defaults to None.
-    :rtype to_float: str
+    :type to_float: str
     :param to_int: a list of the lists to convert to ints. Defaults to None.
-    :rtype to_int: str
+    :type to_int: str
     :return: nested dict.
     :rtype: dict
     """
+    # Initialize
+    df_slice = None
+
     # Convert selected columns to float
     if to_float != None:
         for i in to_float: data_frame[i] = data_frame[i].astype(float)
@@ -63,14 +73,15 @@ def twoD_nested_dict(data_frame, nest_col_a, nest_col_b, nest_col_c, to_float = 
 
     master_dict = dict.fromkeys(data_frame[nest_col_a].astype(str).str.upper().unique())
     for k in master_dict.keys():
-        slice = data_frame[data_frame[nest_col_a] == k]
-        master_dict[k] = dict(zip(slice[nest_col_b].astype(str), slice[nest_col_c]))
+        df_slice = data_frame[data_frame[nest_col_a] == k]
+        master_dict[k] = dict(zip(df_slice[nest_col_b].astype(str), df_slice[nest_col_c]))
 
     return master_dict
 
 def strlist_to_list(to_parse):
     """
 
+    *Private Method*
     Eval() work around for str(list) --> list.
     For example: "[1992, '221-21', 2102, 'apples']" --> ['1992', '221-21', '2102', 'apples']
 
@@ -81,11 +92,11 @@ def strlist_to_list(to_parse):
     """
     return [i.strip().replace("'", "") for i in [j.split(",") for j in [to_parse.replace("[", "").replace("]", "")]][0]]
 
-def alpha2_to_alpha2_unpack(pandas_series, unpack_dict):
+def pandas_dictkey_to_key_unpack(pandas_series, unpack_dict):
     """
 
-    Unpacks ISO Alpha2 --> Alpha2 ISO code Pandas Series
-    (could be applied more generally, but the need has not emerged).
+    *Private Method*
+    Unpacks ISO Alpha2 --> Alpha2 ISO code Pandas Series.
 
     :param pandas_series: a Series to replace the alpha2 codes with another set.
     :type pandas_series: Pandas Series
@@ -100,13 +111,14 @@ def alpha2_to_alpha2_unpack(pandas_series, unpack_dict):
 def _dict_key_remove(input_dict, to_remove = np.nan, wrt = 'both'):
     """
 
+    *Private Method*
     Remove a single item from a list.
 
     :param input_dict: any dictionary.
     :type input_dict: dict
     :param to_remove: object to remove.
     :type to_remove: any
-    :param wrt: with respect to: 'key' for dict keys, 'value' for dict values, 'both' for both key and value. Defaults to both.
+    :param wrt: with respect to: 'key' for dict keys, 'value' for dict values, 'both' for both key and value. Defaults to 'both'.
     :type wrt: str
     :return: a dictionary with the desired item removed.
     :rtype: dict
@@ -119,13 +131,14 @@ def _dict_key_remove(input_dict, to_remove = np.nan, wrt = 'both'):
 def remove_from_dict(input_dict, to_remove = [np.nan], wrt = 'both'):
     """
 
+    *Private Method*
     Remove a list of items from a dict; _dict_key_remove() wrapper.
 
     :param input_dict: any dictionary.
     :type input_dict: dict
     :param to_remove: a list of items to remove. Default to [np.nan].
     :type to_remove: list
-    :param wrt: with respect to: 'key' for dict keys, 'value' for dict values, 'both' for both key and value. Defaults to both.
+    :param wrt: with respect to: 'key' for dict keys, 'value' for dict values, 'both' for both key and value. Defaults to 'both'.
     :type wrt: str
     :return: dictionary with the to_remove items eliminated.
     :rtype: dict
@@ -138,6 +151,7 @@ def remove_from_dict(input_dict, to_remove = [np.nan], wrt = 'both'):
 def key_value_flip(dictionary):
     """
 
+    *Private Method*
     Reverse the keys and values in a dictionary.
 
     :param dictionary: any dictionary (cannot be nested).
@@ -150,13 +164,13 @@ def key_value_flip(dictionary):
 def money_printer(money, round_to):
     """
 
+    *Private Method*
     Pretty Prints an Amount of Money.
 
     :param money: a numeric amount.
     :type money: float or int
     :param round_to: places to round to after the desimal.
     :type round_to: int
-    :return:
     """
     money_to_handle = str(round(floater(money), round_to))
     split_money = money_to_handle.split(".")
@@ -173,6 +187,7 @@ def money_printer(money, round_to):
 def min_max(input_list):
     """
 
+    *Private Method*
     Gets min and max of a list.
 
     :param input_list: a list of values.
@@ -190,11 +205,12 @@ def min_max(input_list):
 def str_to_datetime(list_of_dates, date_format = "%Y-%m-%d"):
     """
 
+    *Private Method*
     Converts a string to a datetime object.
 
     :param list_of_dates: a list of strings (dates).
     :type list_of_dates: list
-    :param date_format: a date format; defaults to %Y-%m-%d.
+    :param date_format: a date format; defaults to '%Y-%m-%d'.
     :type date_format: str
     :return: a list of datetimes.
     :rtype: list
@@ -204,11 +220,12 @@ def str_to_datetime(list_of_dates, date_format = "%Y-%m-%d"):
 def datetime_to_str(list_of_dates, date_format = "%Y-%m-%d"):
     """
 
+    *Private Method*
     Convert a datetime.datetime object to a string.
 
     :param list_of_dates: a list of datetimes.
     :type list_of_dates: list
-    :param date_format: a date format; defaults to: %Y-%m-%d.
+    :param date_format: a date format; defaults to '%Y-%m-%d'.
     :type date_format: str
     :return: a string of the date, formatted according to date_format.
     :rtype: str
@@ -218,9 +235,11 @@ def datetime_to_str(list_of_dates, date_format = "%Y-%m-%d"):
 def pandas_print_full(pd_df, full_rows = True, full_cols = True):
     """
 
+    *Private Method*
     Print *all* of a Pandas DataFrame.
 
-    :param pd_df: Pandas DataFrame
+    :param pd_df: DataFrame to printed in its entirety.
+    :type pd_df: Pandas DataFrame
     :param full_rows: print all rows if True. Defaults to True.
     :type full_rows: bool
     :param full_cols: print all columns side-by-side if True. Defaults to True.
@@ -238,6 +257,7 @@ def pandas_print_full(pd_df, full_rows = True, full_cols = True):
 def _floor_or_ceiling_date(year, dtype = 'floor'):
     """
 
+    *Private Method*
     Floor (Jan 1) or Ceiling (Dec 31) a date.
 
     :param year: a year to convert to YYYY-MM-DD.
@@ -257,6 +277,7 @@ def _floor_or_ceiling_date(year, dtype = 'floor'):
 def date_bounds_floor(date_ranges):
     """
 
+    *Private Method*
     This function rounds dates to their poles, i.e., max: YYYY --> YYYY-12-31; min: YYYY --> YYYY-01-01.
     and finds the floors maximum minimum date as well as the minimum maximum date (see date_ranges description).
 
@@ -265,7 +286,6 @@ def date_bounds_floor(date_ranges):
     :return: min and max date.
     :rtype: list
     """
-
     # Check for Nones and NaNs
     if True in [str(i) in ['None', 'nan'] for i in date_ranges]:
         return np.NaN
@@ -287,12 +307,6 @@ def date_bounds_floor(date_ranges):
 
     # Compute the floors and return
     return [max(rounded_dates[0]), min(rounded_dates[1])]
-
-
-
-
-
-
 
 
 

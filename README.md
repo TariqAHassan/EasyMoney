@@ -19,7 +19,9 @@ EasyMoney is a set of tools for:
 
 EasyMoney requires: [numpy], [pandas], [bs4] and [wbdata]<sup>†</sup>.
 
-Internet Access Required.
+Internet access is required to create an instance of the main `Currency()` class.
+However, once EasyMoney has cashed the latest data from online databases (see below), internet
+access is no longer required.
 
 ------------------------------------------------------------------------
 
@@ -55,7 +57,7 @@ curr.currency_converter(amount = 100, from_currency = "USD", to_currency = "EUR"
 
 #####Adjust for Inflation and Convert
 ```python
-curr.normalize(amount = 100, currency = "USD", from_year = 2010, to_year = "most_recent", base_currency = "CAD", pretty_print = True)
+curr.normalize(amount = 100, currency = "USD", from_year = 2010, to_year = "latest", base_currency = "CAD", pretty_print = True)
 
 # 140.66 CAD
 ```
@@ -80,13 +82,13 @@ EasyMoney understands that these two nations share a common currency.
 #####2. Normalization
 
 ```python
-curr.normalize(amount = 100, currency = "France", from_year = 2010, to_year = "most_recent", base_currency = "USD", pretty_print = True)
+curr.normalize(amount = 100, currency = "France", from_year = 2010, to_year = "latest", base_currency = "USD", pretty_print = True)
 
 # 118.98 USD
 ```
 
 ```python
-curr.normalize(amount = 100, currency = "Germany", from_year = 2010, to_year = "most_recent", base_currency = "USD", pretty_print = True)
+curr.normalize(amount = 100, currency = "Germany", from_year = 2010, to_year = "latest", base_currency = "USD", pretty_print = True)
 
 # 120.45 USD
 ```

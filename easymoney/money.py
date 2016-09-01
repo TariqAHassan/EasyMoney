@@ -2,10 +2,9 @@
 
 '''
 
-Money Conversions
-~~~~~~~~~~~~~~~~~
+    Main API Functionality
+    ~~~~~~~~~~~~~~~~~~~~~~
 
-Python 3.5
 
 '''
 
@@ -21,35 +20,36 @@ import pkg_resources
 
 from collections import defaultdict
 
-from easymoney.support_money import twoD_nested_dict
-from easymoney.support_money import alpha2_to_alpha2_unpack
+from easymoney.support_money import pandas_dictkey_to_key_unpack
+from easymoney.support_money import date_bounds_floor
+from easymoney.support_money import datetime_to_str
 from easymoney.support_money import floater
-from easymoney.support_money import remove_from_dict
-from easymoney.support_money import money_printer
 from easymoney.support_money import key_value_flip
 from easymoney.support_money import min_max
-from easymoney.support_money import datetime_to_str
-from easymoney.support_money import str_to_datetime
-from easymoney.support_money import strlist_to_list
-from easymoney.support_money import alpha2_to_alpha2_unpack
+from easymoney.support_money import money_printer
 from easymoney.support_money import pandas_print_full
-from easymoney.support_money import date_bounds_floor
+from easymoney.support_money import remove_from_dict
+from easymoney.support_money import strlist_to_list
+from easymoney.support_money import str_to_datetime
+from easymoney.support_money import twoD_nested_dict
 
-from easymoney.ecb_interface import _ecb_exchange_data
+from easymoney.ecb_interface import ecb_exchange_data
 from easymoney.ecb_interface import ecb_currency_to_alpha2_dict
 from easymoney.world_bank_interface import world_bank_pull_wrapper
 
 
-DATA_PATH = pkg_resources.resource_filename('easymoney', 'data')
+from easymoney.support_money import DATA_PATH
 
 
 class Currency(object):
     """
 
-    Tools for converting one currency to another and adjusting for inflation.
+    Tools for converting one currency to another, looking up inflation information, adjusting for inflation, and more!
 
-    :param precision: number of places to round to
-    :param fallback: fallback to closest possible date
+    :param precision: number of places to round to. Defaults to 2.
+    :type precision: int
+    :param fallback: if True, fallback to closest possible date. Defaults to True.
+    :type fallback: bool
     """
 
 
@@ -59,7 +59,6 @@ class Currency(object):
         Initalize the Currency() class.
 
         """
-
         # Places of precision
         self.round_to = precision
 
@@ -73,7 +72,8 @@ class Currency(object):
         self.cpi_dict = twoD_nested_dict(self.cpi_df, 'alpha2', 'year', 'cpi', to_float = ['cpi'], to_int = ['year'])
 
         # Get Exchange Rate Data
-        self.ex_dict, self.currency_codes = _ecb_exchange_data(return_as = 'dict')
+        # TO DO: get currency codes by extracting them from every date key
+        self.ex_dict, self.currency_codes = ecb_exchange_data(return_as = 'dict')
         self.ex_dict_keys_series = pd.Series(sorted(list(self.ex_dict.keys())))
 
         # Import EU join Data
@@ -104,16 +104,26 @@ class Currency(object):
     def _closest_date(self, list_of_dates, date, problem_domain = ''):
         """
 
-        :param list_of_dates:
-        :param date:
-        :return:
-        """
+        *Private Method*
+        Determines the closest date for which data is avaliable.
 
-        # Block fallback behaviour if it's not permitted
+        :param list_of_dates: a list of datetimes
+        :type list_of_dates: list
+        :param date: a date
+        :type date: datetime
+        :param problem_domain: domain of the problem _closet_date() is tryping to solve. Information for error message.
+                              Defaults to empty string.
+        :type problem_domain: str
+        :return: the closet date, as ranked by the standard python sorting algo. (sorted() method).
+        :rtype: list
+        :raises AttributeError: if fallback is set to False
+        :raises ValueError: if an element in list_of_dates is not of class datetime.datetime.
+        """
+        # Block fallback behaviour if it's not permitted.
         if not self.fallback:
             raise AttributeError("EasyMoney could not obtain '%s' information for %s" % (problem_domain, date))
 
-        # Ensure dates are of type datetime
+        # Ensure dates are of type datetime.
         if False in [isinstance(i, datetime.datetime) for i in list_of_dates]:
             raise ValueError("Dates must be of type: datetime.datetime")
 
@@ -123,12 +133,15 @@ class Currency(object):
     def _region_type(self, region):
         """
 
-        Standardize Currency, Alpha3 and Natural Name to Alpha2.
+        *Private Method*
+        Standardize Currency Code, Alpha3 and Natural Name (e.g., 'Canada') to Alpha2.
 
-        :param region:
-        :return:
+        :param region: a region (Alpha2, Alpha3, Natural Name or currency code).
+        :type region: str
+        :return: ISO Alpha2 code
+        :rtype: str
+        :raises ValueError: if `region` is not recognized by EasyMoney (see `options()`).
         """
-
         if region in ecb_currency_to_alpha2_dict.keys():
             return ecb_currency_to_alpha2_dict[region], "currency"
         elif region in self.alpha3_to_alpha2.values():
@@ -145,14 +158,27 @@ class Currency(object):
     def _iso_mapping(self, region, map_to = 'alpha2'):
         """
 
-        :param region: a region as denoted by a 'alpha2', 'alpha3' or 'currency'
-        :param map_to: 'alpha2', 'alpha3', 'currency' or 'natural'.
-        :return:
+        *Private Method*
+        Map a region to ISO Alpha2 and Alpha3, as well as Currency Code and Natural Name.
+
+        :param region: a region in the format of a currency code, natural name or ISO Alpha2/3
+        :type region: str
+        :param map_to: 'alpha2', 'alpha3', 'currency' or 'natural'. Defaults to 'alpha2'.
+        :type map_to: str
+        :return: the desired mapping from region to ISO Alpha2
+        :rtype: str
+        :raises ValueError: if map_to is not one of 'alpha2', 'alpha3', 'currency' or 'natural'.
         """
+        # Define legal map_to options
+        map_to_options = ['alpha2', 'alpha3', 'currency', 'natural']
+
+        if map_to not in map_to_options:
+            map_to_options = ["'" + m + "'" for m in map_to_options]
+            raise ValueError("map_to must be one of: %s" % (", ".join(map_to_options[:-1])+" or "+map_to_options[-1]+"."))
 
         # Block EUR and Europe handling by the below _iso_mapping() code
         if region.upper() == 'EUR' or region.lower().title() == 'Europe':
-            if map_to in ['alpha2', 'alpha3', 'currency']:
+            if map_to in map_to_options[:-1]:
                 return 'EUR'
             else:
                 return 'Europe'
@@ -168,60 +194,86 @@ class Currency(object):
             return "EUR" if alpha2_mapping in self.eu_join_dict.keys() else self.alpha2_to_currency[alpha2_mapping]
         elif map_to == 'natural':
             return self.alpha2_to_region[alpha2_mapping]
-        else:
-            raise ValueError('Invalid map_to request.')
 
     def _try_to_get_CPI(self, region, year):
         """
 
-        :param region:
-        :param year:
-        :return:
-        """
+        *Private Method*
+        Function to look up CPI information in the cached database information.
 
-        # Init
+        :param region:
+        :type region:
+        :param year:
+        :type year:
+        :return: CPI information in the requested region for the requested year.
+        :rtype: float
+        :raises LookupError: if cannot obtain CPI information from the database.
+        :raises AttributeError: if not fallback
+        """
+        # Initalize
         cpi = None
+        inflation_error_message = "EasyMoney could not obtain inflation (CPI) information for '%s' in '%s'" % (str(region), str(year))
 
         # convert region to alpha2
         cpi_region = self._iso_mapping(region, map_to = 'alpha2')
 
         # Get most recent CPI year avaliable
+        if cpi_region not in self.cpi_dict.keys():
+            raise LookupError("Could not find inflation information for '%s'." % (str(region)))
+
         max_cpi_year = str(int(max([float(i) for i in self.cpi_dict[cpi_region].keys()])))
 
         if float(year) > float(max_cpi_year):
             if self.fallback:
-                warnings.warn("Could not obtain required inflation (CPI) information for '%s' in %s."
-                              " Using %s instead." % \
-                             (self._iso_mapping(region, map_to = 'natural'), str(int(float(year))), max_cpi_year))
-                cpi = floater(self.cpi_dict[cpi_region][str(int(float(max_cpi_year)))])
+                try:
+                    cpi = floater(self.cpi_dict[cpi_region][str(int(float(max_cpi_year)))]) # add Error handling?
+                    warnings.warn("Could not obtain required inflation (CPI) information for '%s' in %s."
+                                  " Using %s instead." % \
+                                  (self._iso_mapping(region, map_to = 'natural'), str(int(float(year))), max_cpi_year))
+                except:
+                    raise LookupError(inflation_error_message)
             else:
-                raise AttributeError("EasyMoney could not obtain inflation (CPI) information for '%s' in '%s'" % (region, year))
+                raise AttributeError(inflation_error_message)
         else:
             try:
                 cpi = floater(self.cpi_dict[cpi_region][str(int(float(year)))]) # Add linear interpolation
             except:
-                raise ValueError("Could not obtain CPI information for '%s' in %s." % (str(region), str(year)))
+                raise LookupError(inflation_error_message)
 
         return cpi
 
-    def inflation_rate(self, region, year_a, year_b, return_raw_cpi_dict = False):
+    def inflation_rate(self, region, year_a, year_b = None, return_raw_cpi_dict = False):
         """
 
-        :param region:
-        :param year_a:
-        :param year_b:
-        :return:
-        """
+        Calculator to compute the inflation rate from Consumer Price Index (CPI) information.
 
+        :param region: a region (currency codes may work, provided they are not common curriencies, e.g., Euro).
+        :type region: str
+        :param year_a: start year
+        :type year_a: int
+        :param year_b: end year. Defaults to None -- can only be left to this default if return_raw_cpi_dict is True.
+        :type year_b: int
+        :param return_raw_cpi_dict:
+        :type return_raw_cpi_dict: bool
+        :return: the rate of inflation between year_a and year_h. Defaults to False.
+        :rtype: float
+        :raises ValueError: if year_b is None and return_raw_cpi_dict is False.
+        """
         # Get the CPI for year_b and year_a
-        c1 = self._try_to_get_CPI(region, year_b)
+        c1 = self._try_to_get_CPI(region, year_b) if year_b != None else None
         c2 = self._try_to_get_CPI(region, year_a)
 
+        # Dict
         if return_raw_cpi_dict:
-            return dict(zip([str(year_b), str(year_a)], [c1, c2]))
-        if any([np.isnan(c1), np.isnan(c2)]):
-            return np.NaN
-        if c2 == 0.0:
+            if year_b != None:
+                return dict(zip([str(year_b), str(year_a)], [c1, c2]))
+            elif year_b == None:
+                return dict(zip([str(year_a), [c2]]))
+        elif return_raw_cpi_dict != False and year_b == None:
+            raise ValueError("year_b cannot be left to its default (None) when return_raw_cpi_dict is False.")
+
+        # Inflation Rate Calculation
+        if (any([np.isnan(c1), np.isnan(c2)])) or (c2 == 0.0):
             return np.NaN
 
         return ((c1 - c2) / c2) * 100
@@ -229,13 +281,21 @@ class Currency(object):
     def inflation_calculator(self, amount, region, year_a, year_b):
         """
 
-        :param amount: a montary amount, e.g., 5
-        :param region: a geographical region, e.g., US
-        :param year_a: start year
-        :param year_b: end year
-        :return:
-        """
+        Adjusts a given amount of money for inflation.
 
+        :param amount: a montary amount, e.g., 5
+        :type amount: float or int
+        :param region: a geographical region, e.g., US
+        :type region: str
+        :param year_a: start year
+        :type year_a: int
+        :param year_b: end year
+        :type year_b: int
+        :return: amount * inflation rate.
+        :rtype: float
+        :raises ValueError: if  year_a occurs after year_b
+        :raises KeyError: if inflation (CPI) information cannot be found in the inflation database.
+        """
         # Input checking
         if floater(year_a) == floater(year_b):
             return amount
@@ -268,13 +328,20 @@ class Currency(object):
         # Round and Return
         return round(adjusted_amount, self.round_to)
 
-    def _eur_to_lcu(self, currency, date = 'most_recent'):
+    def _eur_to_lcu(self, currency, date = "latest"):
         """
 
-        :param currency:
-        :param date: MUST be of the form: YYYY-MM-DD; defaults to 'most recent'.
+        *Private Method*
+        Convert from Euros to a local currency unit, e.g., CAD.
+
+        :param currency: a currency code or region
+        :param date: MUST be of the form: YYYY-MM-DD; defaults to "latest".
         :return: exchange_rate w.r.t. the EURO (as a base currency).
+
+        :raises AttributeError: if exchange rate information cannot be found in the exchange rate database.
         """
+        # Initialize
+        date_key = None
 
         # Convert currency arg. to a currency code.
         currency_to_convert = self._iso_mapping(currency, 'currency')
@@ -283,15 +350,12 @@ class Currency(object):
         if currency_to_convert == "EUR":
             return 1.0
 
-        # Initialize
-        date_key = None
-
         # Get the current date
-        if date == 'most_recent':
+        if date == "latest":
             try:
                 date_key = str(max([d.date() for d in pd.to_datetime(list(self.ex_dict.keys()))]))
             except:
-                raise ValueError("Could not obtain most recent exchange information from the European Central Bank.")
+                raise AttributeError("Could not obtain most recent exchange information from the European Central Bank.")
         else:
             if date in self.ex_dict.keys():
                 date_key = date
@@ -302,23 +366,34 @@ class Currency(object):
 
         return self.ex_dict[date_key][currency_to_convert.upper()]
 
-    def currency_converter(self, amount, from_currency, to_currency, date = 'most_recent', pretty_print = False):
+    def currency_converter(self, amount, from_currency, to_currency, date = "latest", pretty_print = False):
         """
 
-        :param amount:
-        :param from_currency:
-        :param to_currency:
-        :param date:
-        :return:
-        """
+        Function to convert an amount of money from one currency to another.
 
+        :param amount: an amount of money to be converted
+        :type amount: float or int
+        :param from_currency: the currency of the amount
+        :type from_currency: str
+        :param to_currency: the currency the amount is to be converted into
+        :type to_currency: str
+        :param date: date of data to perform the conversion with. Dates must be of the form: YYYY-MM-DD.
+                     Defaults to "latest" (which will use to most recent data avaliable).
+        :type date: str
+        :param pretty_print: if True, prints the table otherwise returns the table as a pandas DataFrame. Defaults to False.
+        :type pretty_print: bool
+        :return: converted currency
+        :rtype: float
+        :raises ValueError: if amount is not numeric (float or int).
+        :raises AttributeError: Conversion would result in division by zero (rare).
+        """
         # Initialize variables
         conversion_to_invert = None
         converted_amount = None
 
         # Check amount is float
         if not isinstance(amount, (float, int)):
-            raise ValueError("Amount must be numeric (intiger or float).")
+            raise ValueError("amount must be numeric (intiger or float).")
 
         # Correct from_currency
         from_currency_fn = self._iso_mapping(from_currency, map_to = "currency")
@@ -327,11 +402,11 @@ class Currency(object):
         if self._iso_mapping(from_currency_fn) == self._iso_mapping(to_currency):
             return round(amount, self.round_to) if not pretty_print else print(money_printer(amount, self.round_to), to_currency)
 
-        # To some currency from EURO
+        # To some currency from Euro
         if from_currency_fn == "EUR":
             converted_amount = self._eur_to_lcu(to_currency, date) * float(amount)
 
-        # From some currency to EURO
+        # From some currency to Euro
         elif self._eur_to_lcu(to_currency) == "EUR":
             conversion_to_invert = self._eur_to_lcu(from_currency, date)
 
@@ -339,7 +414,7 @@ class Currency(object):
                 raise AttributeError("Cannot converted to '%s'." % (to_currency))
             converted_amount = conversion_to_invert**-1 * float(amount)
 
-        # from_currency --> EURO --> to_currency
+        # from_currency --> Euro --> to_currency
         else:
             conversion_to_invert = self._eur_to_lcu(from_currency_fn , date)
             if conversion_to_invert == 0.0:
@@ -356,17 +431,28 @@ class Currency(object):
         else:
             print(money_printer(rounded_amount, self.round_to), self._iso_mapping(to_currency, "currency"))
 
-    def normalize(self, amount, currency, from_year, to_year = "most_recent", base_currency = "EUR", pretty_print = False):
+    def normalize(self, amount, currency, from_year, to_year = "latest", base_currency = "EUR", pretty_print = False):
         """
 
-        :param amount:
-        :param currency:
-        :param from_year:
-        :param to_year:
-        :param base_currency:
-        :return:
-        """
+        Convert a Nominal Amount to a Real Amount in the same, or another, currency.
 
+        :param amount: a numeric amount of money
+        :type amount: float or int
+        :param currency: a region or currency. Legal: Region Name, ISO Alpha2, Alpha3 or Currency Code (see `options()`).
+        :type currency: str
+        :param from_year: a year. For legal values see `options()`.
+        :type from_year: int
+        :param to_year: a year. For legal values see `options()`.
+        :type to_year: int
+        :param base_currency:  a region or currency. Legal: Region Name, ISO Alpha2, Alpha3 or Currency Code (see `options()`). Defaults to 'EUR'.
+        :type base_currency: str
+        :param pretty_print: Pretty Print the result if True; return amount if False. Defaults to False.
+        :type pretty_print: bool
+        :return: adjusted_amount
+        :type: float
+        :raises ValueError: if from_currency does not map onto a specific region.
+                            If you'd like to convert from EUR, please specify a specific nation (may be fixed in a future update).
+        """
         # Standardize currency input
         from_currency = self._iso_mapping(currency, map_to = "currency")
 
@@ -383,7 +469,7 @@ class Currency(object):
         most_recent_cpi_record = self.cpi_df[(self.cpi_df.alpha2 == self.currency_to_alpha2[from_currency]) & \
                                              (~pd.isnull(self.cpi_df.cpi))].year.max()
 
-        if to_year != "most_recent" and float(to_year) < float(most_recent_cpi_record):
+        if to_year != "latest" and float(to_year) < float(most_recent_cpi_record):
             if floater(to_year):
                 inflation_year_b = to_year
             else:
@@ -404,21 +490,30 @@ class Currency(object):
     def _date_options(self, nested_date_dict, keys_as_dates = False, date_format = "%Y-%m-%d"):
         """
 
-
+        *Private Method*
         Function that figures out how to return dates for which data is avaliable.
 
-        :param nested_date_dict: expected structures:
-                                 1. {KEY: {DATE: VALUE}, KEY: {DATE: VALUE}...}; keys_as_dates = False; DATE = YYYY
-                                 2. {DATE: {KEY: VALUE}, DATE: {KEY: VALUE}...}; keys_as_dates = True; DATE = YYYY-MM-DD
-        :param keys_as_dates:
-        :param rformat: 'str' or 'datetime'
-        :return: dict
-        """
+        Expected structures:
+            1. keys_as_dates = True:  {DATE: {KEY: VALUE}, DATE: {KEY: VALUE}...}; DATE = YYYY-MM-DD
+            2. keys_as_dates = False: {KEY: {DATE: VALUE}, KEY: {DATE: VALUE}...}; DATE = YYYY
 
-        # Init
+        :param nested_date_dict: nested dictionary
+        :type nested_date_dict: dict
+        :param keys_as_dates: whether or not the date information exists as the key or the key of the nested dict. Defaults to False.
+        :type keys_as_dates: bool
+        :param date_format: a date format. Defaults to "%Y-%m-%d".
+        :type date_format: str
+        :return: a date options dict
+        :rtype: dict
+        :raises ValueError: keys_as_dates is not boolean (True or False).
+        """
+        # Initalize
         date_values = None
         date_ranges_dict = dict()
         key_corrected_dict = dict()
+        key_key_dict = None
+        zipped_key_key = None
+        flattened_key_key = None
 
         # Input Check
         if not isinstance(keys_as_dates, bool):
@@ -460,9 +555,12 @@ class Currency(object):
     def _currency_options(self):
         """
 
-        :return:
-        """
+        *Private Method*
+        Function to construct a dataframe of currencies for which EasyMoney has data on.
 
+        :return: DataFrame with all the currencies for which EasyMoney has data.
+        :rtype: Pandas DataFrame
+        """
         # Make a currency code of possible currency codes
         currency_ops = pd.DataFrame(self.currency_codes, columns = ["Currency"])
 
@@ -483,7 +581,7 @@ class Currency(object):
         ex_dict_dates = dict((k, str(datetime_to_str(min_max(v)))) for k, v in dates_dict.items())
 
         # Create Date Range Column
-        currency_ops['Range'] = alpha2_to_alpha2_unpack(currency_ops['Alpha2'].astype(str), ex_dict_dates)
+        currency_ops['Range'] = pandas_dictkey_to_key_unpack(currency_ops['Alpha2'].astype(str), ex_dict_dates)
         all_date_ranges = np.array(currency_ops['Range'].tolist())
 
         # Create Row for Europe -- min and max are the min and max of all other conversion data,
@@ -506,9 +604,12 @@ class Currency(object):
     def _inflation_options(self):
         """
 
-        :return:
-        """
+        *Private Method*
+        Determines the inflation (CPI) information cached.
 
+        :return: a dataframe with all CPI information EasyMoney has, as well as date ranges the date exists for.
+        :rtype: Pandas DataFrame
+        """
         cpi_ops = self.cpi_df[['region', 'currency_code', 'alpha2', 'alpha3']].drop_duplicates()
         cpi_ops.columns = ['Region', 'Currency', 'Alpha2', 'Alpha3']
         cpi_ops.index = range(cpi_ops.shape[0])
@@ -518,7 +619,7 @@ class Currency(object):
         cpi_dict_years = dict((k, str(min_max([i.year for i in v]))) for k, v in dates_dict.items())
 
         # Hacking the living daylights out of the pandas API
-        cpi_ops['Range'] = alpha2_to_alpha2_unpack(cpi_ops['Alpha2'], cpi_dict_years)
+        cpi_ops['Range'] = pandas_dictkey_to_key_unpack(cpi_ops['Alpha2'], cpi_dict_years)
 
         # Sort by Region and Return
         cpi_ops.sort_values(['Region'], ascending = [1], inplace = True)
@@ -531,11 +632,14 @@ class Currency(object):
     def _currency_inflation_options(self, currency_ops_df, cpi_ops_df):
         """
 
+        *Private Method*
+        Exchange Rate and Inflation information merged together.
+
         :param currency_ops_df:
         :param cpi_ops_df:
-        :return:
+        :return: a DataFrame with both Currency and Inflation information
+        :rtype: Pandas DataFrame
         """
-
         # Use the cpi_ops_df as a base
         data_frame = cpi_ops_df
 
@@ -543,9 +647,9 @@ class Currency(object):
         currency_range = remove_from_dict(dict(zip(currency_ops_df['Alpha2'], [str(i) for i in currency_ops_df['Range']])))
 
         # Create a pandas series that maps values in currency_range to the cpi Alpha2 col.
-        currency_cpi_mapping = alpha2_to_alpha2_unpack(data_frame['Alpha2'], currency_range)
+        currency_cpi_mapping = pandas_dictkey_to_key_unpack(data_frame['Alpha2'], currency_range)
 
-        data_frame.rename(columns = {'Range': 'InflationRange'}, inplace=True)
+        data_frame.rename(columns = {'Range': 'InflationRange'}, inplace = True)
 
         # Replace with NaNs those that could not be mapped
         data_frame['CurrencyRange'] = currency_cpi_mapping.map(lambda x: x if "," in str(x) and len(x[0]) != 2 else np.NaN)
@@ -557,7 +661,7 @@ class Currency(object):
         data_frame['TempSort'] = data_frame.CurrencyRange.map(lambda x: 'A' if str(x) != 'nan' else 'B')
 
         # Apply sorting
-        data_frame.sort_values(['TempSort', 'Region'], ascending=[1, 1], inplace=True)
+        data_frame.sort_values(['TempSort', 'Region'], ascending = [1, 1], inplace = True)
 
         # Drop the Sorting Column
         data_frame.drop('TempSort', axis = 1, inplace = True)
@@ -570,8 +674,14 @@ class Currency(object):
     def _list_option(self, info):
         """
 
-        :param info:
-        :return:
+        *Private Method*
+        Generates a list of 'exchange' (Currency Codes) and 'inflation' (CPI) references EasyMoney Understands.
+
+        :param info: 'exchange' for exchange rate; 'inflation' for inflation information; 'all' for both.
+        :type info: str
+        :return: a list of 'exchange' (currency codes) or 'inflation' (regions) EasyMoney recognizes.
+        :rtype: list
+        :raises ValueError: if info is not either 'exchange' or 'inflation'.
         """
         if info == 'exchange':
             return sorted(self.currency_codes + ['EUR'])
@@ -583,8 +693,13 @@ class Currency(object):
     def _table_option(self, info):
         """
 
-        :param info:
-        :return:
+        *Private Method*
+        Wrapper for _currency_options()
+
+        :param info: 'exchange' for exchange rate; 'inflation' for inflation information; 'all' for both.
+        :type info: str
+        :return: DataFrame with the requested information
+        :rtype: Pandas DataFrame
         """
         if info == 'exchange':
             info_table = self._currency_options()
@@ -594,8 +709,7 @@ class Currency(object):
             info_table = self._currency_inflation_options(self._currency_options(), self._inflation_options())
 
         # Add date when Countries Changed curriency (only to Euro for now).
-        # Note: Sadly, Pandas Series of dtype 'int' cannot contain NaNs.
-        #       Reverted to using an object with NaN replaced by empty strings.
+        # Note: Sadly, Pandas Series of dtype 'int' cannot contain NaNs. Using the 'object' dtype instead.
         info_table['CurrencyTransition'] = info_table['Alpha2'].replace(self.eu_join_dict).map(
             lambda x: int(x) if floater(x, True) and str(x) != 'nan' else '')
 
@@ -604,24 +718,32 @@ class Currency(object):
     def options(self, info, rformat = 'table', pretty_table = True, pretty_print = True, overlap_only = False):
         """
 
-        This function allows an easy inferface to explore all of the terminology EasyMoney understands
-        as well the the dates for which data is available.
+        An easy inferface to explore all of the terminology EasyMoney understands
+        as well the dates for which data is available.
 
         :param info: 'exchange', 'inflation' or 'all' ('all' requires rformat is set to 'table')
-        :param rformat: 'table' for a table or 'list' for just the currecy codes, alone
-        :param pretty_table: prettifies the options table
-        :param overlap_only: when info is set to 'all', only keep those rows for which
-                             Exchange Rate and Inflation Data Overlap
-        :param pretty_print: if True, prints the table otherwise returns the table as a pandas DataFrame.
-        :return: Currency Information EasyMoney Understands
-        :rtype: DataFrame
-        """
+        :type info: str
+        :param rformat: 'table' for a table or 'list' for just the currecy codes, alone. Defaults to 'table'.
+        :type rformat: str
+        :param pretty_table: prettifies the options table. Defaults to True.
+        :type pretty_table: bool
+        :param pretty_print: if True, prints the list or table. If False, returns the list or table (as a Pandas DataFrame).
+                             Defaults to True.
+        :type pretty_print: bool
+        :param overlap_only: when info is set to 'all', only keep those rows for which exchange rate and inflation data
+                             overlap.
+        :type overlap_only: bool
+        :return: DataFrame of Currency Information EasyMoney Understands.
+        :rtype: Pandas DataFrame
+        :raises ValueError: if a. rformat is not either 'list' or 'table' or b. `overlap_only` is True
+                            while info is not 'all' and rformat is not 'table'.
 
+        """
         # This is a jumbo function.
         # However, I've decided not to factor it any further (see all the 'option' functions above) because,
         # despite it's size, it now it represent is a single (long) thought.
 
-        # Init
+        # Initalize
         list_to_return = None
         info_table = None
         date_columns_in_table = None
