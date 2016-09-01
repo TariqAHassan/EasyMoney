@@ -337,7 +337,6 @@ class Currency(object):
         :param currency: a currency code or region
         :param date: MUST be of the form: YYYY-MM-DD; defaults to "latest".
         :return: exchange_rate w.r.t. the EURO (as a base currency).
-
         :raises AttributeError: if exchange rate information cannot be found in the exchange rate database.
         """
         # Initialize
