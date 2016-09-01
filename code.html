@@ -1,0 +1,487 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Code Documentation &mdash; EasyMoney 1.0.0 documentation</title>
+  
+
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+    <link rel="top" title="EasyMoney 1.0.0 documentation" href="index.html"/>
+        <link rel="prev" title="EasyMoney" href="index.html"/> 
+
+  
+  <script src="_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="index.html" class="icon icon-home"> EasyMoney
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                1.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+                <ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Code Documentation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#main-api-functionality">Main API Functionality</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#tools-for-obtaining-data-from-the-european-central-bank">Tools for Obtaining Data from the European Central Bank</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#tools-for-obtaining-data-from-the-world-bank-group">Tools for Obtaining Data from the World Bank Group</a></li>
+</ul>
+</li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="index.html">EasyMoney</a>
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+ 
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="index.html">Docs</a> &raquo;</li>
+      
+    <li>Code Documentation</li>
+      <li class="wy-breadcrumbs-aside">
+        
+          
+            <a href="_sources/code.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="module-easymoney.money">
+<span id="code-documentation"></span><h1>Code Documentation<a class="headerlink" href="#module-easymoney.money" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="main-api-functionality">
+<h2>Main API Functionality<a class="headerlink" href="#main-api-functionality" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="easymoney.money.Currency">
+<em class="property">class </em><code class="descclassname">easymoney.money.</code><code class="descname">Currency</code><span class="sig-paren">(</span><em>precision=2</em>, <em>fallback=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/easymoney/money.html#Currency"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#easymoney.money.Currency" title="Permalink to this definition">¶</a></dt>
+<dd><p>Tools for converting one currency to another, looking up inflation information, adjusting for inflation, and more!</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>precision</strong> (<em>int</em>) &#8211; number of places to round to. Defaults to 2.</li>
+<li><strong>fallback</strong> (<em>bool</em>) &#8211; if True, fallback to closest possible date. Defaults to True.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="easymoney.money.Currency.currency_converter">
+<code class="descname">currency_converter</code><span class="sig-paren">(</span><em>amount</em>, <em>from_currency</em>, <em>to_currency</em>, <em>date='latest'</em>, <em>pretty_print=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/easymoney/money.html#Currency.currency_converter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#easymoney.money.Currency.currency_converter" title="Permalink to this definition">¶</a></dt>
+<dd><p>Function to convert an amount of money from one currency to another.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>amount</strong> (<em>float or int</em>) &#8211; an amount of money to be converted</li>
+<li><strong>from_currency</strong> (<em>str</em>) &#8211; the currency of the amount</li>
+<li><strong>to_currency</strong> (<em>str</em>) &#8211; the currency the amount is to be converted into</li>
+<li><strong>date</strong> (<em>str</em>) &#8211; date of data to perform the conversion with. Dates must be of the form: YYYY-MM-DD.
+Defaults to &#8220;latest&#8221; (which will use to most recent data avaliable).</li>
+<li><strong>pretty_print</strong> (<em>bool</em>) &#8211; if True, prints the table otherwise returns the table as a pandas DataFrame. Defaults to False.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">converted currency</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first">float</p>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><ul class="first last simple">
+<li><strong>ValueError</strong> &#8211; if amount is not numeric (float or int).</li>
+<li><strong>AttributeError</strong> &#8211; Conversion would result in division by zero (rare).</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="easymoney.money.Currency.inflation_calculator">
+<code class="descname">inflation_calculator</code><span class="sig-paren">(</span><em>amount</em>, <em>region</em>, <em>year_a</em>, <em>year_b</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/easymoney/money.html#Currency.inflation_calculator"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#easymoney.money.Currency.inflation_calculator" title="Permalink to this definition">¶</a></dt>
+<dd><p>Adjusts a given amount of money for inflation.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>amount</strong> (<em>float or int</em>) &#8211; a montary amount, e.g., 5</li>
+<li><strong>region</strong> (<em>str</em>) &#8211; a geographical region, e.g., US</li>
+<li><strong>year_a</strong> (<em>int</em>) &#8211; start year</li>
+<li><strong>year_b</strong> (<em>int</em>) &#8211; end year</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">amount * inflation rate.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first">float</p>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><ul class="first last simple">
+<li><strong>ValueError</strong> &#8211; if  year_a occurs after year_b</li>
+<li><strong>KeyError</strong> &#8211; if inflation (CPI) information cannot be found in the inflation database.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="easymoney.money.Currency.inflation_rate">
+<code class="descname">inflation_rate</code><span class="sig-paren">(</span><em>region</em>, <em>year_a</em>, <em>year_b=None</em>, <em>return_raw_cpi_dict=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/easymoney/money.html#Currency.inflation_rate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#easymoney.money.Currency.inflation_rate" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculator to compute the inflation rate from Consumer Price Index (CPI) information.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>region</strong> (<em>str</em>) &#8211; a region (currency codes may work, provided they are not common curriencies, e.g., Euro).</li>
+<li><strong>year_a</strong> (<em>int</em>) &#8211; start year</li>
+<li><strong>year_b</strong> (<em>int</em>) &#8211; end year. Defaults to None &#8211; can only be left to this default if return_raw_cpi_dict is True.</li>
+<li><strong>return_raw_cpi_dict</strong> (<em>bool</em>) &#8211; </li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">the rate of inflation between year_a and year_h. Defaults to False.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first">float</p>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><p class="first last"><strong>ValueError</strong> &#8211; if year_b is None and return_raw_cpi_dict is False.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="easymoney.money.Currency.normalize">
+<code class="descname">normalize</code><span class="sig-paren">(</span><em>amount</em>, <em>currency</em>, <em>from_year</em>, <em>to_year='latest'</em>, <em>base_currency='EUR'</em>, <em>pretty_print=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/easymoney/money.html#Currency.normalize"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#easymoney.money.Currency.normalize" title="Permalink to this definition">¶</a></dt>
+<dd><p>Convert a Nominal Amount to a Real Amount in the same, or another, currency.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>amount</strong> (<em>float or int</em>) &#8211; a numeric amount of money</li>
+<li><strong>currency</strong> (<em>str</em>) &#8211; a region or currency. Legal: Region Name, ISO Alpha2, Alpha3 or Currency Code (see <cite>options()</cite>).</li>
+<li><strong>from_year</strong> (<em>int</em>) &#8211; a year. For legal values see <cite>options()</cite>.</li>
+<li><strong>to_year</strong> (<em>int</em>) &#8211; a year. For legal values see <cite>options()</cite>.</li>
+<li><strong>base_currency</strong> (<em>str</em>) &#8211; a region or currency. Legal: Region Name, ISO Alpha2, Alpha3 or Currency Code (see <cite>options()</cite>). Defaults to &#8216;EUR&#8217;.</li>
+<li><strong>pretty_print</strong> (<em>bool</em>) &#8211; Pretty Print the result if True; return amount if False. Defaults to False.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">adjusted_amount</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body"><p class="first">float</p>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><p class="first last"><strong>ValueError</strong> &#8211; if from_currency does not map onto a specific region.
+If you&#8217;d like to convert from EUR, please specify a specific nation (may be fixed in a future update).</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="easymoney.money.Currency.options">
+<code class="descname">options</code><span class="sig-paren">(</span><em>info</em>, <em>rformat='table'</em>, <em>pretty_table=True</em>, <em>pretty_print=True</em>, <em>overlap_only=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/easymoney/money.html#Currency.options"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#easymoney.money.Currency.options" title="Permalink to this definition">¶</a></dt>
+<dd><p>An easy inferface to explore all of the terminology EasyMoney understands
+as well the dates for which data is available.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>info</strong> (<em>str</em>) &#8211; &#8216;exchange&#8217;, &#8216;inflation&#8217; or &#8216;all&#8217; (&#8216;all&#8217; requires rformat is set to &#8216;table&#8217;)</li>
+<li><strong>rformat</strong> (<em>str</em>) &#8211; &#8216;table&#8217; for a table or &#8216;list&#8217; for just the currecy codes, alone. Defaults to &#8216;table&#8217;.</li>
+<li><strong>pretty_table</strong> (<em>bool</em>) &#8211; prettifies the options table. Defaults to True.</li>
+<li><strong>pretty_print</strong> (<em>bool</em>) &#8211; if True, prints the list or table. If False, returns the list or table (as a Pandas DataFrame).
+Defaults to True.</li>
+<li><strong>overlap_only</strong> (<em>bool</em>) &#8211; when info is set to &#8216;all&#8217;, only keep those rows for which exchange rate and inflation data
+overlap.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">DataFrame of Currency Information EasyMoney Understands.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first">Pandas DataFrame</p>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><p class="first last"><strong>ValueError</strong> &#8211; if a. rformat is not either &#8216;list&#8217; or &#8216;table&#8217; or b. <cite>overlap_only</cite> is True
+while info is not &#8216;all&#8217; and rformat is not &#8216;table&#8217;.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<span class="target" id="module-easymoney.ecb_interface"></span><div class="section" id="tools-for-obtaining-data-from-the-european-central-bank">
+<h2>Tools for Obtaining Data from the European Central Bank<a class="headerlink" href="#tools-for-obtaining-data-from-the-european-central-bank" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt id="easymoney.ecb_interface.ecb_exchange_data">
+<code class="descclassname">easymoney.ecb_interface.</code><code class="descname">ecb_exchange_data</code><span class="sig-paren">(</span><em>return_as='dict'</em>, <em>ecb_extension='/stats/eurofxref/eurofxref-hist.xml'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/easymoney/ecb_interface.html#ecb_exchange_data"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#easymoney.ecb_interface.ecb_exchange_data" title="Permalink to this definition">¶</a></dt>
+<dd><div class="line-block">
+<div class="line">This tool goes out to the European Central Bank via their generously provided API</div>
+<div class="line">and coerces XML data into a dictionary.</div>
+<div class="line">DO NOT WRITE PROCEDURES THAT SLAM THEIR SERVERS.</div>
+</div>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>return_as</strong> (<em>str</em>) &#8211; &#8216;dict&#8217; for dictionary (nested); &#8216;df&#8217; for pandas dataframe.</li>
+<li><strong>ecb_extension</strong> (<em>str</em>) &#8211; URL to the exchange rate XML data on &#8220;<a class="reference external" href="http://www.ecb.europa.eu">http://www.ecb.europa.eu</a>&#8221;.
+Defaults to &#8216;/stats/eurofxref/eurofxref-hist.xml&#8217;.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">exchange rate with EUR as the base-currency.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">dict or Pandas DataFrame</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+<span class="target" id="module-easymoney.world_bank_interface"></span><div class="section" id="tools-for-obtaining-data-from-the-world-bank-group">
+<h2>Tools for Obtaining Data from the World Bank Group<a class="headerlink" href="#tools-for-obtaining-data-from-the-world-bank-group" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="easymoney.world_bank_interface.WorldBankParse">
+<em class="property">class </em><code class="descclassname">easymoney.world_bank_interface.</code><code class="descname">WorldBankParse</code><span class="sig-paren">(</span><em>value_true_name</em>, <em>indicator</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/easymoney/world_bank_interface.html#WorldBankParse"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#easymoney.world_bank_interface.WorldBankParse" title="Permalink to this definition">¶</a></dt>
+<dd><div class="line-block">
+<div class="line">Tools to obtain indicator data from the World Bank&#8217;s API.</div>
+<div class="line">DO NOT WRITE PROCEDURES THAT SLAM THEIR SERVERS.</div>
+</div>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>value_true_name</strong> (<em>str</em>) &#8211; replacement name for the generic &#8216;value&#8217; column, e.g., &#8216;value&#8217; to &#8216;cpi&#8217;.</li>
+<li><strong>indicator</strong> (<em>str</em>) &#8211; a indicator used by the World Bank&#8217;s API, e.g., &#8220;FP.CPI.TOTL&#8221; for CPI.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="easymoney.world_bank_interface.WorldBankParse.world_bank_pull">
+<code class="descname">world_bank_pull</code><span class="sig-paren">(</span><em>to_title=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/easymoney/world_bank_interface.html#WorldBankParse.world_bank_pull"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#easymoney.world_bank_interface.WorldBankParse.world_bank_pull" title="Permalink to this definition">¶</a></dt>
+<dd><p>Parse the information pulled from the world bank&#8217;s API.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>to_title</strong> &#8211; a list of column to title. Defaults to None.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">DataFrame with the requested indicator information.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">Pandas Dataframe</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="easymoney.world_bank_interface.world_bank_pull_wrapper">
+<code class="descclassname">easymoney.world_bank_interface.</code><code class="descname">world_bank_pull_wrapper</code><span class="sig-paren">(</span><em>value_true_name</em>, <em>indicator</em>, <em>na_drop_col=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/easymoney/world_bank_interface.html#world_bank_pull_wrapper"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#easymoney.world_bank_interface.world_bank_pull_wrapper" title="Permalink to this definition">¶</a></dt>
+<dd><p>Wrapper for the WorldBankParse().world_bank_pull() method.
+Extracts world bank information based on a specific indicator and returns a Pandas DataFrame.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>value_true_name</strong> (<em>str</em>) &#8211; replacement name for the generic &#8216;value&#8217; column, e.g., &#8216;value&#8217; to &#8216;cpi&#8217;.</li>
+<li><strong>indicator</strong> (<em>str</em>) &#8211; a indicator used by the World Bank&#8217;s API, e.g., &#8220;FP.CPI.TOTL&#8221; for CPI.</li>
+<li><strong>na_drop_col</strong> (<em>list</em>) &#8211; list of columns (str) to drop from the final dataframe.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">DataFrame with the requested indicator information.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">Pandas DateFrame</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+</div>
+
+
+           </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+      
+        <a href="index.html" class="btn btn-neutral" title="EasyMoney" accesskey="p"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2016, Tariq A. Hassan.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'./',
+            VERSION:'1.0.0',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true
+        };
+    </script>
+      <script type="text/javascript" src="_static/jquery.js"></script>
+      <script type="text/javascript" src="_static/underscore.js"></script>
+      <script type="text/javascript" src="_static/doctools.js"></script>
+      <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>
