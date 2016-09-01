@@ -53,7 +53,7 @@ def ecb_exchange_data(return_as = 'dict', ecb_extension = "/stats/eurofxref/euro
     :return: exchange rate w.r.t. EURO as the base-currency
     :rtype: dict or pandas dataframe
     """
-    xmlpath =  "http://www.ecb.europa.eu" + extension
+    xmlpath =  "http://www.ecb.europa.eu" + ecb_extension
 
     # Parse with beautifulsoup
     soup = _soup_from_url(xmlpath)

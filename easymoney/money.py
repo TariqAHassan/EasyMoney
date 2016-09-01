@@ -842,8 +842,3 @@ class Currency(object):
 
 
 
-
-
-
-
-
