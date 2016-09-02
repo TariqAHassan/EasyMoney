@@ -20,7 +20,7 @@ EasyMoney is a set of tools for:
 EasyMoney requires: [numpy], [pandas], [bs4] and [wbdata]<sup>†</sup>.
 
 Internet access is required to create an instance of the main `Currency()` class.
-However, once EasyMoney has cashed the latest data from online databases (see below), internet
+However, once EasyMoney has cached the latest data from online databases (see below), internet
 access is no longer required.
 
 ------------------------------------------------------------------------
