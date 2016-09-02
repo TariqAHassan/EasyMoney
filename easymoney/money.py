@@ -734,7 +734,7 @@ class Currency(object):
         :type overlap_only: bool
         :return: DataFrame of Currency Information EasyMoney Understands.
         :rtype: Pandas DataFrame
-        :raises ValueError: if a. rformat is not either 'list' or 'table' or b. `overlap_only` is True
+        :raises ValueError: if (a) rformat is not either 'list' or 'table' or (b) `overlap_only` is True
                             while info is not 'all' and rformat is not 'table'.
 
         """
