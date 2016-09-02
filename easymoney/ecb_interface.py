@@ -70,7 +70,7 @@ def ecb_exchange_data(return_as = 'dict', ecb_extension = "/stats/eurofxref/euro
     # Convert to string
     ecb_hist_xml = str(soup.find_all("cube", attrs = {"time": True})).split(",")
 
-    # Get all Dates
+    # Construct Dict
     exchange_rate_db = dict()
 
     # Extract time, currency and rate information
