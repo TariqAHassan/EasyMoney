@@ -1,0 +1,488 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>EasyMoney &mdash; EasyMoney 1.0.0 documentation</title>
+  
+
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+    <link rel="top" title="EasyMoney 1.0.0 documentation" href="index.html"/>
+        <link rel="prev" title="Code Documentation" href="code.html"/> 
+
+  
+  <script src="_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="index.html" class="icon icon-home"> EasyMoney
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                1.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+                <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="code.html">Code Documentation</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">EasyMoney</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#overview">Overview</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#dependencies">Dependencies</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#installation">Installation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#examples">Examples</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#import-the-tool">Import the tool</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#create-an-instance-of-the-currency-class">Create an instance of the Currency Class</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#prototypical-conversion-problems">Prototypical Conversion Problems</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#currency-converter">Currency Converter</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#adjust-for-inflation-and-convert">Adjust for Inflation and Convert</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#convert-currency-in-a-more-natural-way">Convert Currency in a more Natural Way</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#handling-common-currencies">Handling Common Currencies</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#currency-conversion">1. Currency Conversion:</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#normalization">2. Normalization</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#options">Options</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="index.html">EasyMoney</a>
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+ 
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="index.html">Docs</a> &raquo;</li>
+      
+    <li>EasyMoney</li>
+      <li class="wy-breadcrumbs-aside">
+        
+          
+            <a href="_sources/README.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="easymoney">
+<h1>EasyMoney<a class="headerlink" href="#easymoney" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="overview">
+<h2>Overview<a class="headerlink" href="#overview" title="Permalink to this headline">¶</a></h2>
+<p>EasyMoney is a set of tools for:</p>
+<ul class="simple">
+<li>computing inflation</li>
+<li>adjusting a given currency for inflation</li>
+<li>converting from one currency to another</li>
+<li>&#8216;normalizing&#8217; a currency, i.e., adjust for inflation and then convert
+a base currency.</li>
+<li>doing all of the above without having to memorize currency codes!</li>
+</ul>
+</div>
+<hr class="docutils" />
+<div class="section" id="dependencies">
+<h2>Dependencies<a class="headerlink" href="#dependencies" title="Permalink to this headline">¶</a></h2>
+<p>EasyMoney requires: <a class="reference external" href="http://www.numpy.org">numpy</a>,
+<a class="reference external" href="http://pandas.pydata.org">pandas</a>,
+<a class="reference external" href="https://www.crummy.com/software/BeautifulSoup/bs4/doc/">bs4</a> and
+<a class="reference external" href="https://github.com/OliverSherouse/wbdata">wbdata</a>†.</p>
+<p>Internet access is required to create an instance of the main
+<code class="docutils literal"><span class="pre">Currency()</span></code> class. However, once EasyMoney has cached the latest data
+from online databases (see below), internet access is no longer
+required.</p>
+</div>
+<hr class="docutils" />
+<div class="section" id="installation">
+<h2>Installation<a class="headerlink" href="#installation" title="Permalink to this headline">¶</a></h2>
+<p><code class="docutils literal"><span class="pre">$</span> <span class="pre">pip3</span> <span class="pre">install</span> <span class="pre">git+git://github.com/TariqAHassan/EasyMoney&#64;master</span></code></p>
+<p><em>Note</em>: EasyMoney requires Python 3.</p>
+</div>
+<hr class="docutils" />
+<div class="section" id="examples">
+<h2>Examples<a class="headerlink" href="#examples" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="import-the-tool">
+<h3>Import the tool<a class="headerlink" href="#import-the-tool" title="Permalink to this headline">¶</a></h3>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">easymoney.money</span> <span class="k">import</span> <span class="n">Currency</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="create-an-instance-of-the-currency-class">
+<h3>Create an instance of the Currency Class<a class="headerlink" href="#create-an-instance-of-the-currency-class" title="Permalink to this headline">¶</a></h3>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">curr</span> <span class="o">=</span> <span class="n">Currency</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>Note: this may take a moment, depending on the speed of your internet
+connection.</p>
+<div class="section" id="prototypical-conversion-problems">
+<h4>Prototypical Conversion Problems<a class="headerlink" href="#prototypical-conversion-problems" title="Permalink to this headline">¶</a></h4>
+</div>
+</div>
+<div class="section" id="currency-converter">
+<h3>Currency Converter<a class="headerlink" href="#currency-converter" title="Permalink to this headline">¶</a></h3>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">curr</span><span class="o">.</span><span class="n">currency_converter</span><span class="p">(</span><span class="n">amount</span> <span class="o">=</span> <span class="mi">100</span><span class="p">,</span> <span class="n">from_currency</span> <span class="o">=</span> <span class="s2">&quot;USD&quot;</span><span class="p">,</span> <span class="n">to_currency</span> <span class="o">=</span> <span class="s2">&quot;EUR&quot;</span><span class="p">,</span> <span class="n">pretty_print</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span>
+
+<span class="c1"># 88.75 EUR</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="adjust-for-inflation-and-convert">
+<h3>Adjust for Inflation and Convert<a class="headerlink" href="#adjust-for-inflation-and-convert" title="Permalink to this headline">¶</a></h3>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">curr</span><span class="o">.</span><span class="n">normalize</span><span class="p">(</span><span class="n">amount</span> <span class="o">=</span> <span class="mi">100</span><span class="p">,</span> <span class="n">currency</span> <span class="o">=</span> <span class="s2">&quot;USD&quot;</span><span class="p">,</span> <span class="n">from_year</span> <span class="o">=</span> <span class="mi">2010</span><span class="p">,</span> <span class="n">to_year</span> <span class="o">=</span> <span class="s2">&quot;latest&quot;</span><span class="p">,</span> <span class="n">base_currency</span> <span class="o">=</span> <span class="s2">&quot;CAD&quot;</span><span class="p">,</span> <span class="n">pretty_print</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span>
+
+<span class="c1"># 140.66 CAD</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="convert-currency-in-a-more-natural-way">
+<h3>Convert Currency in a more Natural Way<a class="headerlink" href="#convert-currency-in-a-more-natural-way" title="Permalink to this headline">¶</a></h3>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">curr</span><span class="o">.</span><span class="n">currency_converter</span><span class="p">(</span><span class="n">amount</span> <span class="o">=</span> <span class="mi">100</span><span class="p">,</span> <span class="n">from_currency</span> <span class="o">=</span> <span class="s2">&quot;Canada&quot;</span><span class="p">,</span> <span class="n">to_currency</span> <span class="o">=</span> <span class="s2">&quot;Ireland&quot;</span><span class="p">,</span> <span class="n">pretty_print</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span>
+
+<span class="c1"># 68.58 EUR</span>
+</pre></div>
+</div>
+<div class="section" id="handling-common-currencies">
+<h4>Handling Common Currencies<a class="headerlink" href="#handling-common-currencies" title="Permalink to this headline">¶</a></h4>
+</div>
+</div>
+<div class="section" id="currency-conversion">
+<h3>1. Currency Conversion:<a class="headerlink" href="#currency-conversion" title="Permalink to this headline">¶</a></h3>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">curr</span><span class="o">.</span><span class="n">currency_converter</span><span class="p">(</span><span class="n">amount</span> <span class="o">=</span> <span class="mi">100</span><span class="p">,</span> <span class="n">from_currency</span> <span class="o">=</span> <span class="s2">&quot;France&quot;</span><span class="p">,</span> <span class="n">to_currency</span> <span class="o">=</span> <span class="s2">&quot;Germany&quot;</span><span class="p">,</span> <span class="n">pretty_print</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span>
+
+<span class="c1"># 100.00 EUR</span>
+</pre></div>
+</div>
+<p>EasyMoney understands that these two nations share a common currency.</p>
+</div>
+<div class="section" id="normalization">
+<h3>2. Normalization<a class="headerlink" href="#normalization" title="Permalink to this headline">¶</a></h3>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">curr</span><span class="o">.</span><span class="n">normalize</span><span class="p">(</span><span class="n">amount</span> <span class="o">=</span> <span class="mi">100</span><span class="p">,</span> <span class="n">currency</span> <span class="o">=</span> <span class="s2">&quot;France&quot;</span><span class="p">,</span> <span class="n">from_year</span> <span class="o">=</span> <span class="mi">2010</span><span class="p">,</span> <span class="n">to_year</span> <span class="o">=</span> <span class="s2">&quot;latest&quot;</span><span class="p">,</span> <span class="n">base_currency</span> <span class="o">=</span> <span class="s2">&quot;USD&quot;</span><span class="p">,</span> <span class="n">pretty_print</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span>
+
+<span class="c1"># 118.98 USD</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">curr</span><span class="o">.</span><span class="n">normalize</span><span class="p">(</span><span class="n">amount</span> <span class="o">=</span> <span class="mi">100</span><span class="p">,</span> <span class="n">currency</span> <span class="o">=</span> <span class="s2">&quot;Germany&quot;</span><span class="p">,</span> <span class="n">from_year</span> <span class="o">=</span> <span class="mi">2010</span><span class="p">,</span> <span class="n">to_year</span> <span class="o">=</span> <span class="s2">&quot;latest&quot;</span><span class="p">,</span> <span class="n">base_currency</span> <span class="o">=</span> <span class="s2">&quot;USD&quot;</span><span class="p">,</span> <span class="n">pretty_print</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span>
+
+<span class="c1"># 120.45 USD</span>
+</pre></div>
+</div>
+<p>EasyMoney also understands that, while these two nations may share a
+common currency, inflation may differ.</p>
+<div class="section" id="options">
+<h4>Options<a class="headerlink" href="#options" title="Permalink to this headline">¶</a></h4>
+<p>It&#8217;s easy to explore the terminology EasyMoney understands.</p>
+<p>The following can be used interchangeably:</p>
+<ul class="simple">
+<li>Region Names (as they appear in <code class="docutils literal"><span class="pre">options()</span></code>)</li>
+<li>ISO Alpha2 Codes</li>
+<li>ISO Alpha3 Codes</li>
+<li>Currency Codes*</li>
+</ul>
+<p>*This may fail when attempting to obtain inflation information about a
+country that uses a common currency.</p>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">curr</span><span class="o">.</span><span class="n">options</span><span class="p">(</span><span class="n">info</span> <span class="o">=</span> <span class="s1">&#39;all&#39;</span><span class="p">,</span> <span class="n">pretty_print</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">overlap_only</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span>
+</pre></div>
+</div>
+<table border="1" class="docutils">
+<colgroup>
+<col width="10%" />
+<col width="10%" />
+<col width="7%" />
+<col width="7%" />
+<col width="13%" />
+<col width="19%" />
+<col width="19%" />
+<col width="14%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Region</th>
+<th class="head">Curren
+cy</th>
+<th class="head">Alph
+a2</th>
+<th class="head">Alph
+a3</th>
+<th class="head">Inflation
+Range</th>
+<th class="head">CurrencyRange</th>
+<th class="head">Overlap</th>
+<th class="head">CurrencyTr
+ansition</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>Austra
+lia</td>
+<td>AUD</td>
+<td>AU</td>
+<td>AUS</td>
+<td>[1960,
+2015]</td>
+<td>[1999-01-04,
+2016-08-29]</td>
+<td>[1999-01-04,
+2015-12-31]</td>
+<td>&nbsp;</td>
+</tr>
+<tr class="row-odd"><td>Canada</td>
+<td>CAD</td>
+<td>CA</td>
+<td>CAN</td>
+<td>[1960,
+2015]</td>
+<td>[1999-01-04,
+2016-08-29]</td>
+<td>[1999-01-04,
+2015-12-31]</td>
+<td>&nbsp;</td>
+</tr>
+<tr class="row-even"><td>Cyprus</td>
+<td>EUR</td>
+<td>CY</td>
+<td>CYP</td>
+<td>[1960,
+2015]</td>
+<td>[1999-01-04,
+2007-12-31]</td>
+<td>[1999-01-04,
+2007-12-31]</td>
+<td>2008</td>
+</tr>
+<tr class="row-odd"><td>...</td>
+<td>...</td>
+<td>...</td>
+<td>...</td>
+<td>...</td>
+<td>...</td>
+<td>...</td>
+<td>...</td>
+</tr>
+</tbody>
+</table>
+<p>As can be seen above, the date ranges for which Inflation
+(InflationRange) and Exchange Rate (CurrencyRange) data is available (as
+well as when these two overlap) are provided. Additionally, the dates of
+(some) transitions from one currency to another (CurrencyTransition) are
+noted.</p>
+<p>One can also gain access to <em>currency</em> and <em>inflation</em> information
+separately.</p>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="c1"># Currency Information Alone</span>
+<span class="n">curr</span><span class="o">.</span><span class="n">options</span><span class="p">(</span><span class="n">info</span> <span class="o">=</span> <span class="s1">&#39;exchange&#39;</span><span class="p">,</span> <span class="n">pretty_print</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span>
+
+<span class="c1"># Inflation Infomation Alone</span>
+<span class="n">curr</span><span class="o">.</span><span class="n">options</span><span class="p">(</span><span class="n">info</span> <span class="o">=</span> <span class="s1">&#39;inflation&#39;</span><span class="p">,</span> <span class="n">pretty_print</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Additionally, instead of printing a given data table, it can be returned
+as Pandas DataFrame.</p>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">inflation_df</span> <span class="o">=</span> <span class="n">curr</span><span class="o">.</span><span class="n">options</span><span class="p">(</span><span class="n">info</span> <span class="o">=</span> <span class="s1">&#39;inflation&#39;</span><span class="p">,</span> <span class="n">pretty_print</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>It is also possible to simply obtain a list of regions for which
+inflation information is available.</p>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">inflation_list</span> <span class="o">=</span> <span class="n">curr</span><span class="o">.</span><span class="n">options</span><span class="p">(</span><span class="n">info</span> <span class="o">=</span> <span class="s1">&#39;inflation&#39;</span><span class="p">,</span> <span class="n">rformat</span> <span class="o">=</span> <span class="s1">&#39;list&#39;</span><span class="p">,</span> <span class="n">pretty_print</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>This can also be done for exchange rate information.</p>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">currency_list</span> <span class="o">=</span> <span class="n">curr</span><span class="o">.</span><span class="n">options</span><span class="p">(</span><span class="n">info</span> <span class="o">=</span> <span class="s1">&#39;exchange&#39;</span><span class="p">,</span> <span class="n">rformat</span> <span class="o">=</span> <span class="s1">&#39;list&#39;</span><span class="p">,</span> <span class="n">pretty_print</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span>
+</pre></div>
+</div>
+<p><em>Note</em>: Errors may emerge when converting across currency transitions,
+e.g., CY (2005) → CY (2010).</p>
+<hr class="docutils" />
+<div class="section" id="license">
+<h5>License<a class="headerlink" href="#license" title="Permalink to this headline">¶</a></h5>
+<p>This software is provided under a BSD License.</p>
+</div>
+<hr class="docutils" />
+<div class="section" id="references">
+<h5>References<a class="headerlink" href="#references" title="Permalink to this headline">¶</a></h5>
+<p>Indicators used:</p>
+<ol class="arabic simple">
+<li><a class="reference external" href="http://data.worldbank.org/indicator/FP.CPI.TOTL">Consumer price index (2010 =
+100)</a><ul>
+<li>Source: International Monetary Fund, International Financial
+Statistics.</li>
+</ul>
+</li>
+<li><a class="reference external" href="https://www.ecb.europa.eu/stats/exchange/eurofxref/html/index.en.html">Euro foreign exchange reference rates - European Central
+Bank</a><ul>
+<li>Source: European Central Bank (ECB).<ul>
+<li>Notes:<ol class="arabic">
+<li>The ECB data used here can be obtained directly from the
+link provided above.</li>
+<li>Rates are updated by the ECB around 16:00 CET.</li>
+<li>The ECB states, clearly, that usage for transaction purposes
+is strongly discouraged. This sentiment is echoed here;
+<strong>*this tool is intended to be for information-purposes
+only*</strong>.</li>
+<li>ALL EXCHANGE RESULTS OBTAINED FROM EASYMONEY ARE THE RESULT
+OF CALCULATIONS BASED ON ECB DATA. THAT IS, THESE RESULTS
+ARE NOT A DIRECT REPORTING OF ECB-PROVIDED DATA.</li>
+</ol>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ol>
+<p>†Sherouse, Oliver (2014). Wbdata. Arlington, VA.</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+
+
+           </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+      
+        <a href="code.html" class="btn btn-neutral" title="Code Documentation" accesskey="p"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2016, Tariq A. Hassan.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'./',
+            VERSION:'1.0.0',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true
+        };
+    </script>
+      <script type="text/javascript" src="_static/jquery.js"></script>
+      <script type="text/javascript" src="_static/underscore.js"></script>
+      <script type="text/javascript" src="_static/doctools.js"></script>
+      <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>
