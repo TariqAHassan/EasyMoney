@@ -91,4 +91,3 @@ ecb_currency_to_alpha2_dict = {   "CYP": "CY"
                                 , "TRL": "TR"
 }
 
-ecb_xml_exchange_data('df')[0]
