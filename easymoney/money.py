@@ -854,7 +854,6 @@ class Currency(object):
                 return info_table
 
 
-curr = Currency()
 
 
 
