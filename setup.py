@@ -5,7 +5,8 @@ try:
     import pypandoc
     markdown_reader = lambda md: pypandoc.convert(md, 'rst')
 except:
-    warn("could not convert README.md to README.rst")
+    warn("Could not convert README.md to README.rst.\n"
+         "If you'd like to refer to a local copy of EasyMoney's README, please install 'pypandocs'.")
     markdown_reader = lambda md: open(md, 'r').read()
 
 setup(
@@ -32,7 +33,6 @@ setup(
     ],
     include_package_data = True
 )
-
 
 
 

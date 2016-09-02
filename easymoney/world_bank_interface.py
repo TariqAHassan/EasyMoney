@@ -36,7 +36,6 @@ class WorldBankParse(object):
     def __init__(self, value_true_name, indicator):
         """
 
-        *Private Method*
         Int the WorldBankParse() class.
 
         """

@@ -161,7 +161,7 @@ def key_value_flip(dictionary):
     """
     return dict([(v, k) for k, v in dictionary.items()])
 
-def money_printer(money, round_to):
+def money_printer(money, currency = None, year = None, round_to = 2):
     """
 
     *Private Method*
@@ -172,17 +172,27 @@ def money_printer(money, round_to):
     :param round_to: places to round to after the desimal.
     :type round_to: int
     """
+    # Initialize
     money_to_handle = str(round(floater(money), round_to))
     split_money = money_to_handle.split(".")
+    to_return = None
 
     if len(split_money[1]) == 1:
-        return money_to_handle + "0"
+        to_return = money_to_handle + "0"
     elif len(split_money[1]) == 2:
-        return money_to_handle
+        to_return =  money_to_handle
     elif len(split_money[1]) > 2:
-        return ".".join([split_money[0], str(round(float(split_money[1]), -3))[:2]])
+        to_return =  ".".join([split_money[0], str(round(float(split_money[1]), -3))[:2]])
     else:
         raise ValueError("Invalid money conversion requested.")
+
+    if currency != None or year != None:
+        tail = (str(year) if year != None else '')  + \
+               (" " if isinstance(currency, str) and year != None else '') + \
+               (str(currency) if isinstance(currency, str) else '')
+        return to_return + (" " + tail if isinstance(currency, str) and year == None else " (" + tail + ")")
+    else:
+        return to_return
 
 def min_max(input_list):
     """
@@ -215,7 +225,9 @@ def str_to_datetime(list_of_dates, date_format = "%Y-%m-%d"):
     :return: a list of datetimes.
     :rtype: list
     """
-    return [datetime.datetime.strptime(d, date_format) for d in list_of_dates]
+    date_str = datetime.datetime.strptime
+    datetimes = [date_str(d, date_format) for d in ([list_of_dates] if isinstance(list_of_dates, str) else list_of_dates)]
+    return datetimes[0] if isinstance(list_of_dates, str) else datetimes
 
 def datetime_to_str(list_of_dates, date_format = "%Y-%m-%d"):
     """
@@ -230,7 +242,8 @@ def datetime_to_str(list_of_dates, date_format = "%Y-%m-%d"):
     :return: a string of the date, formatted according to date_format.
     :rtype: str
     """
-    return [d.strftime(date_format) for d in list_of_dates]
+    datetimes = [d.strftime(date_format) for d in ([list_of_dates] if isinstance(list_of_dates, datetime.datetime) else list_of_dates)]
+    return datetimes[0] if isinstance(list_of_dates, str) else datetimes
 
 def pandas_print_full(pd_df, full_rows = True, full_cols = True):
     """
