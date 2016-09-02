@@ -71,7 +71,7 @@ def ecb_exchange_data(return_as = 'dict', ecb_extension = "/stats/eurofxref/euro
     ecb_hist_xml = str(soup.find_all("cube", attrs = {"time": True})).split(",")
 
     # Get all Dates
-    exchange_rate_db = dict.fromkeys([re.findall(r'time="(.*?)">', i)[0] for i in ecb_hist_xml])
+    exchange_rate_db = dict()
 
     # Extract time, currency and rate information
     for j in ecb_hist_xml:
@@ -94,10 +94,16 @@ def ecb_exchange_data(return_as = 'dict', ecb_extension = "/stats/eurofxref/euro
 
         # Melt the dataframe
         df = pd.melt(df, id_vars = ['date'], value_vars = [d for d in df.columns if d != 'date'])
-        df.rename(columns = {"variable" : "ccode", "value" : "rate"}, inplace = True)
+        df.rename(columns = {"variable" : "currency", "value" : "rate"}, inplace = True)
 
         # Convert date column --> datetime
         df.date = pd.to_datetime(df.date, infer_datetime_format = True)
+
+        # Sort by currency code
+        df.sort_values(['date', 'currency'], ascending = [1, 1], inplace = True)
+
+        # Refresh index
+        df.index = range(df.shape[0])
 
         return df, all_currency_codes
 
