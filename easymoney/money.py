@@ -34,7 +34,7 @@ from easymoney.support_money import strlist_to_list
 from easymoney.support_money import str_to_datetime
 from easymoney.support_money import twoD_nested_dict
 
-from easymoney.ecb_interface import ecb_exchange_data
+from easymoney.ecb_interface import ecb_xml_exchange_data
 from easymoney.ecb_interface import ecb_currency_to_alpha2_dict
 from easymoney.world_bank_interface import world_bank_pull_wrapper
 
@@ -74,7 +74,7 @@ class Currency(object):
 
         # Get Exchange Rate Data
         # TO DO: get currency codes by extracting them from every date key
-        self.ex_dict, self.currency_codes = ecb_exchange_data(return_as = 'dict')
+        self.ex_dict, self.currency_codes = ecb_xml_exchange_data(return_as = 'dict')
         self.ex_dict_keys_series = pd.Series(sorted(list(self.ex_dict.keys())))
 
         # Import EU join Data
@@ -852,7 +852,6 @@ class Currency(object):
                         info_table[col] = info_table[col].map(full_date_to_datetime)
 
                 return info_table
-
 
 
 
