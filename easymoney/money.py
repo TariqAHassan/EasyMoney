@@ -81,7 +81,7 @@ class Currency(object):
         eu_join = pd.read_csv(DATA_PATH + "/JoinEuro.csv")
         self.eu_join_dict = dict(zip(eu_join.alpha2, eu_join.join_year))
 
-        alpha2_alpha3_df = pd.read_csv(DATA_PATH + "/CountryAlpha2_and_3.csv")
+        alpha2_alpha3_df = pd.read_csv(DATA_PATH + "/CountryAlpha2_and_3.csv", keep_default_na = False)
 
         # Create Alpha3 --> Alpha2 Dict
         self.alpha3_to_alpha2 = remove_from_dict(dict(zip(alpha2_alpha3_df.Alpha3, alpha2_alpha3_df.Alpha2)))
@@ -292,17 +292,17 @@ class Currency(object):
 
         Adjusts a given amount of money for inflation.
 
-        :param amount: a montary amount, e.g., 5
+        :param amount: a montary amount, e.g., 5.23.
         :type amount: float or int
-        :param region: a geographical region, e.g., US
+        :param region: a geographical region, e.g., US.
         :type region: str
-        :param year_a: start year
+        :param year_a: start year.
         :type year_a: int
-        :param year_b: end year
+        :param year_b: end year.
         :type year_b: int
         :return: amount * inflation rate.
         :rtype: float
-        :raises ValueError: if  year_a occurs after year_b
+        :raises ValueError: if  year_a occurs after year_b.
         :raises KeyError: if inflation (CPI) information cannot be found in the inflation database.
         """
         # Input checking

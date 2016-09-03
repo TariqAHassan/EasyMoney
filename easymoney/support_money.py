@@ -30,7 +30,7 @@ def floater(input_to_process, just_check = False, override_to_int = False):
     :type just_check: bool
     :param override_to_int: override output to be an int. Defaults to False.
     :type override_to_int: bool
-    :return: input_to_process as a float, int or boolean (if just_check) if
+    :return: input_to_process as a float, int or boolean (if just_check is True).
     :rtype: float or int
     """
     try:
