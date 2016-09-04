@@ -1,4 +1,4 @@
-EasyMoney https://travis-ci.org/TariqAHassan/EasyMoney.svg?branch=master
+EasyMoney [![Build Status](https://travis-ci.org/TariqAHassan/EasyMoney.svg?branch=master)](https://travis-ci.org/TariqAHassan/EasyMoney)
 ==========================
 
 ###Overview
