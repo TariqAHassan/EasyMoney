@@ -295,8 +295,8 @@ class EasyPeasy(object):
         .. math:: Inflation_{region} = \dfrac{c_{1} - c_{2}}{c_{2}} \cdot 100
 
         | :math:`where`:
-        |   :math:`c_{1}` = CPI of the region in year_b.
-        |   :math:`c_{2}` = CPI of the region in year_a.
+        |   :math:`c_{1}` = CPI of the region in *year_b*.
+        |   :math:`c_{2}` = CPI of the region in *year_a*.
 
         :param region: a region (currency codes may work, provided they are not common curriencies, e.g., Euro).
         :type region: str
@@ -349,7 +349,7 @@ class EasyPeasy(object):
 
         :param amount: a montary amount, e.g., 5.23.
         :type amount: float or int
-        :param region: a geographical region, e.g., US.
+        :param region: a geographical region, e.g., 'US'.
         :type region: str
         :param year_a: start year.
         :type year_a: int
@@ -523,7 +523,7 @@ class EasyPeasy(object):
         :type pretty_print: bool
         :return: converted currency.
         :rtype: float
-        :raises ValueError: if (a) pretty_print is not a boolean (b) amount is not numeric (float or int).
+        :raises ValueError: if (a) pretty_print is not a boolean (b) amount is not numeric (``float`` or ``int``).
         :raises AttributeError: Conversion would result in division by zero (rare).
         """
         # Initialize
