@@ -18,7 +18,7 @@ setup(
     long_description = markdown_reader('README.md'),
     license = "BSD",
     keywords = 'economics, finance',
-    url = "https://github.com/TariqAHassan/NewMoney.git",
+    url = "https://github.com/TariqAHassan/EasyMoney.git",
     packages = find_packages(),
     package_data = {'': ['*.csv', '*.p'],},
     data_files = [('', ["LICENSE.txt"])],
