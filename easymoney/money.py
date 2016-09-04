@@ -15,7 +15,6 @@ import numpy as np
 import pandas as pd
 
 from warnings import warn
-from statistics import mean
 from collections import defaultdict
 
 from easymoney.support_money import pandas_dictkey_to_key_unpack
@@ -448,8 +447,7 @@ class EasyPeasy(object):
         else:
             if floater(date, just_check = True) and len(str(date).strip()) == 4:
                 # Compute the average conversion rate over the whole year
-                return mean([v[currency_to_convert]
-                             for k, v in self.ex_dict.items()
+                return np.mean([v[currency_to_convert] for k, v in self.ex_dict.items()
                                 if currency_to_convert in v and str(str_to_datetime(k).year) == str(date)])
             elif date in self.ex_dict.keys():
                 date_key = date
@@ -989,8 +987,6 @@ class EasyPeasy(object):
                         info_table[col] = info_table[col].map(full_date_to_datetime)
 
                 return info_table
-
-
 
 
 
