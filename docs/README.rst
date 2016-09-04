@@ -199,6 +199,14 @@ e.g., CY (2005) → CY (2010).
 
 --------------
 
+Documentation
+-------------
+
+For complete documentation, please click
+`here <https://tariqahassan.github.io/EasyMoney/index.html>`__.
+
+--------------
+
 License
 -------
 

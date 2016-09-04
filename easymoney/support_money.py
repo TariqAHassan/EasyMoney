@@ -167,6 +167,7 @@ def dict_list_unpack(dictionary):
     Flips keys and values when values are lists.
 
     :param dictionary: {key1: ['a','b'], key2: ['c', 'd']...}
+    :type dictionary: dict
     :return: {'a': key1, 'b': key1, 'c': key2, 'd': key2}
     """
 
