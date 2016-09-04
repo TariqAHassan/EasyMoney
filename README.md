@@ -8,7 +8,7 @@ EasyMoney is a set of tools for:
 - computing inflation
 - adjusting a given currency for inflation
 - converting from one currency to another
-- 'normalizing' a currency, i.e., adjust for inflation and then convert a base currency.
+- 'normalizing' a currency, i.e., adjust for inflation and then convert to a base currency.
 - doing all of the above without having to memorize currency codes!
 
 **WARNING: Due to EasyMoney's Beta Status, results are likely to contain inaccuracies.**
@@ -19,7 +19,7 @@ EasyMoney is a set of tools for:
 
 EasyMoney requires: [numpy], [pandas] and [wbdata]<sup>†</sup>.
 
-Internet access is required to create an instance of the main `Currency()` class.
+Internet access is required to create an instance of the main `EasyPeasy()` class.
 However, once EasyMoney has cached the latest data from online databases (see below), internet
 access is no longer required.
 
@@ -40,9 +40,9 @@ access is no longer required.
 from easymoney.money import Currency
 ```
 
-#####Create an instance of the Currency Class
+#####Create an instance of the EasyPeasy Class
 ```python
-curr = Currency()
+ep = EasyPeasy()
 ```
 Note: this may take a moment, depending on the speed of your internet connection.
 
@@ -50,21 +50,21 @@ Note: this may take a moment, depending on the speed of your internet connection
 
 #####Currency Converter
 ```python
-curr.currency_converter(amount = 100, from_currency = "USD", to_currency = "EUR", pretty_print = True)
+ep.currency_converter(amount = 100, from_currency = "USD", to_currency = "EUR", pretty_print = True)
 
 # 88.75 EUR
 ```
 
 #####Adjust for Inflation and Convert
 ```python
-curr.normalize(amount = 100, currency = "USD", from_year = 2010, to_year = "latest", base_currency = "CAD", pretty_print = True)
+ep.normalize(amount = 100, currency = "USD", from_year = 2010, to_year = "latest", base_currency = "CAD", pretty_print = True)
 
 # 140.66 CAD
 ```
 
 #####Convert Currency in a more Natural Way
 ```python
-curr.currency_converter(amount = 100, from_currency = "Canada", to_currency = "Ireland", pretty_print = True)
+ep.currency_converter(amount = 100, from_currency = "Canada", to_currency = "Ireland", pretty_print = True)
 
 # 68.58 EUR
 ```
@@ -73,7 +73,7 @@ curr.currency_converter(amount = 100, from_currency = "Canada", to_currency = "I
 
 #####1. Currency Conversion:
 ```python
-curr.currency_converter(amount = 100, from_currency = "France", to_currency = "Germany", pretty_print = True)
+ep.currency_converter(amount = 100, from_currency = "France", to_currency = "Germany", pretty_print = True)
 
 # 100.00 EUR
 ```
@@ -82,13 +82,13 @@ EasyMoney understands that these two nations share a common currency.
 #####2. Normalization
 
 ```python
-curr.normalize(amount = 100, currency = "France", from_year = 2010, to_year = "latest", base_currency = "USD", pretty_print = True)
+ep.normalize(amount = 100, currency = "France", from_year = 2010, to_year = "latest", base_currency = "USD", pretty_print = True)
 
 # 118.98 USD
 ```
 
 ```python
-curr.normalize(amount = 100, currency = "Germany", from_year = 2010, to_year = "latest", base_currency = "USD", pretty_print = True)
+ep.normalize(amount = 100, currency = "Germany", from_year = 2010, to_year = "latest", base_currency = "USD", pretty_print = True)
 
 # 120.45 USD
 ```
@@ -109,7 +109,7 @@ The following can be used interchangeably:
 *This may fail when attempting to obtain inflation information about a country that uses a common currency. 
 
 ```python
-curr.options(info = 'all', pretty_print = True, overlap_only = True)
+ep.options(info = 'all', pretty_print = True, overlap_only = True)
 ```
 
 |   Region  | Currency | Alpha2 | Alpha3 | InflationRange |      CurrencyRange       |       Overlap            |CurrencyTransition |
@@ -126,24 +126,24 @@ As can be seen above, the date ranges for which Inflation (InflationRange) and E
 One can also gain access to *currency* and *inflation* information separately.
 ```python
 # Currency Information Alone
-curr.options(info = 'exchange', pretty_print = True)
+ep.options(info = 'exchange', pretty_print = True)
 
 # Inflation Infomation Alone
-curr.options(info = 'inflation', pretty_print = True)
+ep.options(info = 'inflation', pretty_print = True)
 ```
 
 Additionally, instead of printing a given data table, it can be returned as Pandas DataFrame.
 ```python
-inflation_df = curr.options(info = 'inflation', pretty_print = False)
+inflation_df = ep.options(info = 'inflation', pretty_print = False)
 ```
 
 It is also possible to simply obtain a list of regions for which inflation information is available.
 ```python
-inflation_list = curr.options(info = 'inflation', rformat = 'list', pretty_print = False)
+inflation_list = ep.options(info = 'inflation', rformat = 'list', pretty_print = False)
 ```
 This can also be done for exchange rate information.
 ```python
-currency_list = curr.options(info = 'exchange', rformat = 'list', pretty_print = False)
+currency_list = ep.options(info = 'exchange', rformat = 'list', pretty_print = False)
 ```
 
 *Note*: Errors may emerge when converting across currency transitions, e.g., CY (2005) → CY (2010).
