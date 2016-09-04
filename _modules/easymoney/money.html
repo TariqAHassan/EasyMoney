@@ -425,8 +425,8 @@
 <span class="sd">        .. math:: Inflation_{region} = \dfrac{c_{1} - c_{2}}{c_{2}} \cdot 100</span>
 
 <span class="sd">        | :math:`where`:</span>
-<span class="sd">        |   :math:`c_{1}` = CPI of the region in year_b.</span>
-<span class="sd">        |   :math:`c_{2}` = CPI of the region in year_a.</span>
+<span class="sd">        |   :math:`c_{1}` = CPI of the region in *year_b*.</span>
+<span class="sd">        |   :math:`c_{2}` = CPI of the region in *year_a*.</span>
 
 <span class="sd">        :param region: a region (currency codes may work, provided they are not common curriencies, e.g., Euro).</span>
 <span class="sd">        :type region: str</span>
@@ -479,7 +479,7 @@
 
 <span class="sd">        :param amount: a montary amount, e.g., 5.23.</span>
 <span class="sd">        :type amount: float or int</span>
-<span class="sd">        :param region: a geographical region, e.g., US.</span>
+<span class="sd">        :param region: a geographical region, e.g., &#39;US&#39;.</span>
 <span class="sd">        :type region: str</span>
 <span class="sd">        :param year_a: start year.</span>
 <span class="sd">        :type year_a: int</span>
@@ -653,7 +653,7 @@
 <span class="sd">        :type pretty_print: bool</span>
 <span class="sd">        :return: converted currency.</span>
 <span class="sd">        :rtype: float</span>
-<span class="sd">        :raises ValueError: if (a) pretty_print is not a boolean (b) amount is not numeric (float or int).</span>
+<span class="sd">        :raises ValueError: if (a) pretty_print is not a boolean (b) amount is not numeric (``float`` or ``int``).</span>
 <span class="sd">        :raises AttributeError: Conversion would result in division by zero (rare).</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># Initialize</span>
