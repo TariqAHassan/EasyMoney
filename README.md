@@ -11,7 +11,7 @@ EasyMoney is a set of tools for:
 - 'normalizing' a currency, i.e., adjust for inflation and then convert to a base currency.
 - doing all of the above without having to memorize currency codes!
 
-**WARNING: Due to EasyMoney's Beta Status, results are likely to contain inaccuracies.**
+**WARNING: Results may Contain Inaccuracies. See Below.**
 
 ------------------------------------------------------------------------
 
