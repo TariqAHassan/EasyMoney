@@ -31,7 +31,7 @@ access is no longer required.
 
 `$ pip3 install git+git://github.com/TariqAHassan/EasyMoney@master`
 
-*Note*: EasyMoney requires Python 3.
+*Note*: EasyMoney requires Python 3.4 or later.
 
 ------------------------------------------------------------------------
 
