@@ -31,7 +31,8 @@
 
   
     <link rel="top" title="EasyMoney 1.0.0 documentation" href="index.html"/>
-        <link rel="prev" title="Code Documentation" href="code.html"/> 
+        <link rel="next" title="Code Documentation" href="code.html"/>
+        <link rel="prev" title="EasyMoney" href="index.html"/> 
 
   
   <script src="_static/js/modernizr.min.js"></script>
@@ -81,14 +82,13 @@
             
             
                 <ul class="current">
-<li class="toctree-l1"><a class="reference internal" href="code.html">Code Documentation</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">EasyMoney</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#overview">Overview</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#dependencies">Dependencies</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#installation">Installation</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#examples">Examples</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#import-the-tool">Import the tool</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#create-an-instance-of-the-currency-class">Create an instance of the Currency Class</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#create-an-instance-of-the-easypeasy-class">Create an instance of the EasyPeasy Class</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#prototypical-conversion-problems">Prototypical Conversion Problems</a></li>
 </ul>
 </li>
@@ -107,6 +107,7 @@
 </li>
 </ul>
 </li>
+<li class="toctree-l1"><a class="reference internal" href="code.html">Code Documentation</a></li>
 </ul>
 
             
@@ -161,20 +162,20 @@
 <li>adjusting a given currency for inflation</li>
 <li>converting from one currency to another</li>
 <li>&#8216;normalizing&#8217; a currency, i.e., adjust for inflation and then convert
-a base currency.</li>
+to a base currency.</li>
 <li>doing all of the above without having to memorize currency codes!</li>
 </ul>
+<p><strong>WARNING: Results may Contain Inaccuracies. See Below.</strong></p>
 </div>
 <hr class="docutils" />
 <div class="section" id="dependencies">
 <h2>Dependencies<a class="headerlink" href="#dependencies" title="Permalink to this headline">¶</a></h2>
 <p>EasyMoney requires: <a class="reference external" href="http://www.numpy.org">numpy</a>,
-<a class="reference external" href="http://pandas.pydata.org">pandas</a>,
-<a class="reference external" href="https://www.crummy.com/software/BeautifulSoup/bs4/doc/">bs4</a> and
+<a class="reference external" href="http://pandas.pydata.org">pandas</a> and
 <a class="reference external" href="https://github.com/OliverSherouse/wbdata">wbdata</a>†.</p>
 <p>Internet access is required to create an instance of the main
-<code class="docutils literal"><span class="pre">Currency()</span></code> class. However, once EasyMoney has cached the latest data
-from online databases (see below), internet access is no longer
+<code class="docutils literal"><span class="pre">EasyPeasy()</span></code> class. However, once EasyMoney has cached the latest
+data from online databases (see below), internet access is no longer
 required.</p>
 </div>
 <hr class="docutils" />
@@ -188,13 +189,13 @@ required.</p>
 <h2>Examples<a class="headerlink" href="#examples" title="Permalink to this headline">¶</a></h2>
 <div class="section" id="import-the-tool">
 <h3>Import the tool<a class="headerlink" href="#import-the-tool" title="Permalink to this headline">¶</a></h3>
-<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">easymoney.money</span> <span class="k">import</span> <span class="n">Currency</span>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">easymoney.money</span> <span class="k">import</span> <span class="n">EasyPeasy</span>
 </pre></div>
 </div>
 </div>
-<div class="section" id="create-an-instance-of-the-currency-class">
-<h3>Create an instance of the Currency Class<a class="headerlink" href="#create-an-instance-of-the-currency-class" title="Permalink to this headline">¶</a></h3>
-<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">curr</span> <span class="o">=</span> <span class="n">Currency</span><span class="p">()</span>
+<div class="section" id="create-an-instance-of-the-easypeasy-class">
+<h3>Create an instance of the EasyPeasy Class<a class="headerlink" href="#create-an-instance-of-the-easypeasy-class" title="Permalink to this headline">¶</a></h3>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">ep</span> <span class="o">=</span> <span class="n">EasyPeasy</span><span class="p">()</span>
 </pre></div>
 </div>
 <p>Note: this may take a moment, depending on the speed of your internet
@@ -205,7 +206,7 @@ connection.</p>
 </div>
 <div class="section" id="currency-converter">
 <h3>Currency Converter<a class="headerlink" href="#currency-converter" title="Permalink to this headline">¶</a></h3>
-<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">curr</span><span class="o">.</span><span class="n">currency_converter</span><span class="p">(</span><span class="n">amount</span> <span class="o">=</span> <span class="mi">100</span><span class="p">,</span> <span class="n">from_currency</span> <span class="o">=</span> <span class="s2">&quot;USD&quot;</span><span class="p">,</span> <span class="n">to_currency</span> <span class="o">=</span> <span class="s2">&quot;EUR&quot;</span><span class="p">,</span> <span class="n">pretty_print</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">ep</span><span class="o">.</span><span class="n">currency_converter</span><span class="p">(</span><span class="n">amount</span> <span class="o">=</span> <span class="mi">100</span><span class="p">,</span> <span class="n">from_currency</span> <span class="o">=</span> <span class="s2">&quot;USD&quot;</span><span class="p">,</span> <span class="n">to_currency</span> <span class="o">=</span> <span class="s2">&quot;EUR&quot;</span><span class="p">,</span> <span class="n">pretty_print</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span>
 
 <span class="c1"># 88.75 EUR</span>
 </pre></div>
@@ -213,7 +214,7 @@ connection.</p>
 </div>
 <div class="section" id="adjust-for-inflation-and-convert">
 <h3>Adjust for Inflation and Convert<a class="headerlink" href="#adjust-for-inflation-and-convert" title="Permalink to this headline">¶</a></h3>
-<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">curr</span><span class="o">.</span><span class="n">normalize</span><span class="p">(</span><span class="n">amount</span> <span class="o">=</span> <span class="mi">100</span><span class="p">,</span> <span class="n">currency</span> <span class="o">=</span> <span class="s2">&quot;USD&quot;</span><span class="p">,</span> <span class="n">from_year</span> <span class="o">=</span> <span class="mi">2010</span><span class="p">,</span> <span class="n">to_year</span> <span class="o">=</span> <span class="s2">&quot;latest&quot;</span><span class="p">,</span> <span class="n">base_currency</span> <span class="o">=</span> <span class="s2">&quot;CAD&quot;</span><span class="p">,</span> <span class="n">pretty_print</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">ep</span><span class="o">.</span><span class="n">normalize</span><span class="p">(</span><span class="n">amount</span> <span class="o">=</span> <span class="mi">100</span><span class="p">,</span> <span class="n">currency</span> <span class="o">=</span> <span class="s2">&quot;USD&quot;</span><span class="p">,</span> <span class="n">from_year</span> <span class="o">=</span> <span class="mi">2010</span><span class="p">,</span> <span class="n">to_year</span> <span class="o">=</span> <span class="s2">&quot;latest&quot;</span><span class="p">,</span> <span class="n">base_currency</span> <span class="o">=</span> <span class="s2">&quot;CAD&quot;</span><span class="p">,</span> <span class="n">pretty_print</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span>
 
 <span class="c1"># 140.66 CAD</span>
 </pre></div>
@@ -221,7 +222,7 @@ connection.</p>
 </div>
 <div class="section" id="convert-currency-in-a-more-natural-way">
 <h3>Convert Currency in a more Natural Way<a class="headerlink" href="#convert-currency-in-a-more-natural-way" title="Permalink to this headline">¶</a></h3>
-<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">curr</span><span class="o">.</span><span class="n">currency_converter</span><span class="p">(</span><span class="n">amount</span> <span class="o">=</span> <span class="mi">100</span><span class="p">,</span> <span class="n">from_currency</span> <span class="o">=</span> <span class="s2">&quot;Canada&quot;</span><span class="p">,</span> <span class="n">to_currency</span> <span class="o">=</span> <span class="s2">&quot;Ireland&quot;</span><span class="p">,</span> <span class="n">pretty_print</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">ep</span><span class="o">.</span><span class="n">currency_converter</span><span class="p">(</span><span class="n">amount</span> <span class="o">=</span> <span class="mi">100</span><span class="p">,</span> <span class="n">from_currency</span> <span class="o">=</span> <span class="s2">&quot;Canada&quot;</span><span class="p">,</span> <span class="n">to_currency</span> <span class="o">=</span> <span class="s2">&quot;Ireland&quot;</span><span class="p">,</span> <span class="n">pretty_print</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span>
 
 <span class="c1"># 68.58 EUR</span>
 </pre></div>
@@ -232,7 +233,7 @@ connection.</p>
 </div>
 <div class="section" id="currency-conversion">
 <h3>1. Currency Conversion:<a class="headerlink" href="#currency-conversion" title="Permalink to this headline">¶</a></h3>
-<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">curr</span><span class="o">.</span><span class="n">currency_converter</span><span class="p">(</span><span class="n">amount</span> <span class="o">=</span> <span class="mi">100</span><span class="p">,</span> <span class="n">from_currency</span> <span class="o">=</span> <span class="s2">&quot;France&quot;</span><span class="p">,</span> <span class="n">to_currency</span> <span class="o">=</span> <span class="s2">&quot;Germany&quot;</span><span class="p">,</span> <span class="n">pretty_print</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">ep</span><span class="o">.</span><span class="n">currency_converter</span><span class="p">(</span><span class="n">amount</span> <span class="o">=</span> <span class="mi">100</span><span class="p">,</span> <span class="n">from_currency</span> <span class="o">=</span> <span class="s2">&quot;France&quot;</span><span class="p">,</span> <span class="n">to_currency</span> <span class="o">=</span> <span class="s2">&quot;Germany&quot;</span><span class="p">,</span> <span class="n">pretty_print</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span>
 
 <span class="c1"># 100.00 EUR</span>
 </pre></div>
@@ -241,12 +242,12 @@ connection.</p>
 </div>
 <div class="section" id="normalization">
 <h3>2. Normalization<a class="headerlink" href="#normalization" title="Permalink to this headline">¶</a></h3>
-<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">curr</span><span class="o">.</span><span class="n">normalize</span><span class="p">(</span><span class="n">amount</span> <span class="o">=</span> <span class="mi">100</span><span class="p">,</span> <span class="n">currency</span> <span class="o">=</span> <span class="s2">&quot;France&quot;</span><span class="p">,</span> <span class="n">from_year</span> <span class="o">=</span> <span class="mi">2010</span><span class="p">,</span> <span class="n">to_year</span> <span class="o">=</span> <span class="s2">&quot;latest&quot;</span><span class="p">,</span> <span class="n">base_currency</span> <span class="o">=</span> <span class="s2">&quot;USD&quot;</span><span class="p">,</span> <span class="n">pretty_print</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">ep</span><span class="o">.</span><span class="n">normalize</span><span class="p">(</span><span class="n">amount</span> <span class="o">=</span> <span class="mi">100</span><span class="p">,</span> <span class="n">currency</span> <span class="o">=</span> <span class="s2">&quot;France&quot;</span><span class="p">,</span> <span class="n">from_year</span> <span class="o">=</span> <span class="mi">2010</span><span class="p">,</span> <span class="n">to_year</span> <span class="o">=</span> <span class="s2">&quot;latest&quot;</span><span class="p">,</span> <span class="n">base_currency</span> <span class="o">=</span> <span class="s2">&quot;USD&quot;</span><span class="p">,</span> <span class="n">pretty_print</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span>
 
 <span class="c1"># 118.98 USD</span>
 </pre></div>
 </div>
-<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">curr</span><span class="o">.</span><span class="n">normalize</span><span class="p">(</span><span class="n">amount</span> <span class="o">=</span> <span class="mi">100</span><span class="p">,</span> <span class="n">currency</span> <span class="o">=</span> <span class="s2">&quot;Germany&quot;</span><span class="p">,</span> <span class="n">from_year</span> <span class="o">=</span> <span class="mi">2010</span><span class="p">,</span> <span class="n">to_year</span> <span class="o">=</span> <span class="s2">&quot;latest&quot;</span><span class="p">,</span> <span class="n">base_currency</span> <span class="o">=</span> <span class="s2">&quot;USD&quot;</span><span class="p">,</span> <span class="n">pretty_print</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">ep</span><span class="o">.</span><span class="n">normalize</span><span class="p">(</span><span class="n">amount</span> <span class="o">=</span> <span class="mi">100</span><span class="p">,</span> <span class="n">currency</span> <span class="o">=</span> <span class="s2">&quot;Germany&quot;</span><span class="p">,</span> <span class="n">from_year</span> <span class="o">=</span> <span class="mi">2010</span><span class="p">,</span> <span class="n">to_year</span> <span class="o">=</span> <span class="s2">&quot;latest&quot;</span><span class="p">,</span> <span class="n">base_currency</span> <span class="o">=</span> <span class="s2">&quot;USD&quot;</span><span class="p">,</span> <span class="n">pretty_print</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span>
 
 <span class="c1"># 120.45 USD</span>
 </pre></div>
@@ -265,7 +266,7 @@ common currency, inflation may differ.</p>
 </ul>
 <p>*This may fail when attempting to obtain inflation information about a
 country that uses a common currency.</p>
-<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">curr</span><span class="o">.</span><span class="n">options</span><span class="p">(</span><span class="n">info</span> <span class="o">=</span> <span class="s1">&#39;all&#39;</span><span class="p">,</span> <span class="n">pretty_print</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">overlap_only</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">ep</span><span class="o">.</span><span class="n">options</span><span class="p">(</span><span class="n">info</span> <span class="o">=</span> <span class="s1">&#39;all&#39;</span><span class="p">,</span> <span class="n">pretty_print</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">overlap_only</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span>
 </pre></div>
 </div>
 <table border="1" class="docutils">
@@ -352,24 +353,24 @@ noted.</p>
 <p>One can also gain access to <em>currency</em> and <em>inflation</em> information
 separately.</p>
 <div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="c1"># Currency Information Alone</span>
-<span class="n">curr</span><span class="o">.</span><span class="n">options</span><span class="p">(</span><span class="n">info</span> <span class="o">=</span> <span class="s1">&#39;exchange&#39;</span><span class="p">,</span> <span class="n">pretty_print</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span>
+<span class="n">ep</span><span class="o">.</span><span class="n">options</span><span class="p">(</span><span class="n">info</span> <span class="o">=</span> <span class="s1">&#39;exchange&#39;</span><span class="p">,</span> <span class="n">pretty_print</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span>
 
 <span class="c1"># Inflation Infomation Alone</span>
-<span class="n">curr</span><span class="o">.</span><span class="n">options</span><span class="p">(</span><span class="n">info</span> <span class="o">=</span> <span class="s1">&#39;inflation&#39;</span><span class="p">,</span> <span class="n">pretty_print</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span>
+<span class="n">ep</span><span class="o">.</span><span class="n">options</span><span class="p">(</span><span class="n">info</span> <span class="o">=</span> <span class="s1">&#39;inflation&#39;</span><span class="p">,</span> <span class="n">pretty_print</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>Additionally, instead of printing a given data table, it can be returned
 as Pandas DataFrame.</p>
-<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">inflation_df</span> <span class="o">=</span> <span class="n">curr</span><span class="o">.</span><span class="n">options</span><span class="p">(</span><span class="n">info</span> <span class="o">=</span> <span class="s1">&#39;inflation&#39;</span><span class="p">,</span> <span class="n">pretty_print</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">inflation_df</span> <span class="o">=</span> <span class="n">ep</span><span class="o">.</span><span class="n">options</span><span class="p">(</span><span class="n">info</span> <span class="o">=</span> <span class="s1">&#39;inflation&#39;</span><span class="p">,</span> <span class="n">pretty_print</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>It is also possible to simply obtain a list of regions for which
 inflation information is available.</p>
-<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">inflation_list</span> <span class="o">=</span> <span class="n">curr</span><span class="o">.</span><span class="n">options</span><span class="p">(</span><span class="n">info</span> <span class="o">=</span> <span class="s1">&#39;inflation&#39;</span><span class="p">,</span> <span class="n">rformat</span> <span class="o">=</span> <span class="s1">&#39;list&#39;</span><span class="p">,</span> <span class="n">pretty_print</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">inflation_list</span> <span class="o">=</span> <span class="n">ep</span><span class="o">.</span><span class="n">options</span><span class="p">(</span><span class="n">info</span> <span class="o">=</span> <span class="s1">&#39;inflation&#39;</span><span class="p">,</span> <span class="n">rformat</span> <span class="o">=</span> <span class="s1">&#39;list&#39;</span><span class="p">,</span> <span class="n">pretty_print</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>This can also be done for exchange rate information.</p>
-<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">currency_list</span> <span class="o">=</span> <span class="n">curr</span><span class="o">.</span><span class="n">options</span><span class="p">(</span><span class="n">info</span> <span class="o">=</span> <span class="s1">&#39;exchange&#39;</span><span class="p">,</span> <span class="n">rformat</span> <span class="o">=</span> <span class="s1">&#39;list&#39;</span><span class="p">,</span> <span class="n">pretty_print</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">currency_list</span> <span class="o">=</span> <span class="n">ep</span><span class="o">.</span><span class="n">options</span><span class="p">(</span><span class="n">info</span> <span class="o">=</span> <span class="s1">&#39;exchange&#39;</span><span class="p">,</span> <span class="n">rformat</span> <span class="o">=</span> <span class="s1">&#39;list&#39;</span><span class="p">,</span> <span class="n">pretty_print</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span>
 </pre></div>
 </div>
 <p><em>Note</em>: Errors may emerge when converting across currency transitions,
@@ -425,8 +426,10 @@ ARE NOT A DIRECT REPORTING OF ECB-PROVIDED DATA.</li>
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
+        <a href="code.html" class="btn btn-neutral float-right" title="Code Documentation" accesskey="n">Next <span class="fa fa-arrow-circle-right"></span></a>
       
-        <a href="code.html" class="btn btn-neutral" title="Code Documentation" accesskey="p"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+        <a href="index.html" class="btn btn-neutral" title="EasyMoney" accesskey="p"><span class="fa fa-arrow-circle-left"></span> Previous</a>
       
     </div>
   
