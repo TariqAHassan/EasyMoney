@@ -83,7 +83,7 @@ def strlist_to_list(to_parse):
 
     *Private Method*
     Eval() work around for str(list) --> list.
-    For example: "[1992, '221-21', 2102, 'apples']" --> ['1992', '221-21', '2102', 'apples']
+    For example: "[1992, '221-21', 2102, 'apples']" --> ['1992', '221-21', '2102', 'apples'].
 
     :param to_parse: a string of a list.
     :type to_parse: str
@@ -160,6 +160,23 @@ def key_value_flip(dictionary):
     :rtype: dict
     """
     return dict([(v, k) for k, v in dictionary.items()])
+
+def dict_list_unpack(dictionary):
+    """
+
+    Flips keys and values when values are lists.
+
+    :param dictionary: {key1: ['a','b'], key2: ['c', 'd']...}
+    :return: {'a': key1, 'b': key1, 'c': key2, 'd': key2}
+    """
+
+    # Create alpha2_to_currency dict and populate using the currency_to_alpha2 dict.
+    # If the below code seems dense, it's the same result as produced by this:
+    # for k, v in currency_to_alpha2.items():
+    #     for i in v: alpha2_to_currency[i] = k
+    # but more fun!
+
+    return dict([item for s in [[(i, k) for i in v] for k, v in dictionary.items()] for item in s])
 
 def money_printer(money, currency = None, year = None, round_to = 2):
     """
@@ -320,6 +337,42 @@ def date_bounds_floor(date_ranges):
 
     # Compute the floors and return
     return [max(rounded_dates[0]), min(rounded_dates[1])]
+
+def prettify_list_of_strings(input_list, final_join = "and", all_commas_override = False):
+    """
+
+    Convert a list of strings into a sentence-like format.
+
+    :param input_list: a list of strings.
+    :type input_list: str
+    :param final_join: string to join the final list items when then length of the input list is greater than one.
+    :type final_join: str
+    :param all_commas_override: join the list on commas.
+    :type all_commas_override: bool
+    :return: a joined list.
+    :rtype: str
+    """
+    # Initialize
+    final_join_with_tails = " " + final_join + " "
+
+    # Error Handling
+    if not isinstance(input_list, list):
+        raise ValueError('input_list must be a list')
+    if len(input_list) == 0:
+        raise ValueError("input_list is empty.")
+
+    # Combine into a single string
+    if len(input_list) == 1:
+        return input_list[0]
+    elif all_commas_override:
+        return ", ".join(input_list)
+    elif len(input_list) == 2:
+        return final_join_with_tails.join(input_list)
+    elif len(input_list) > 2:
+        return ", ".join(input_list[:-1]) + final_join_with_tails + input_list[-1]
+
+
+
 
 
 
