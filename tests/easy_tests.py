@@ -12,14 +12,14 @@ import unittest
 import pandas as pd
 
 # Move up to the correct directory
-sys.path.append('../../EasyMoney')
+sys.path.append('../')
 
 # Import the tool
 from easymoney.money import EasyPeasy
 
 # Create an Instance of the EasyPeasy class.
 # It's *MUCH*, faster if this exists globaly rather than
-# initialized inside EasyMoneyTests()...not clear why.
+# initialized inside FunctionalityTests()...not clear why.
 ep = EasyPeasy()
 
 
