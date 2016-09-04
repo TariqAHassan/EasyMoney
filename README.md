@@ -1,5 +1,5 @@
-EasyMoney
-=========
+EasyMoney https://travis-ci.org/TariqAHassan/EasyMoney.svg?branch=master
+==========================
 
 ###Overview
 
