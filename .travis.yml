@@ -4,5 +4,7 @@ python:
 # command to install dependencies
 cache: pip3
 install: "pip3 install numpy pandas wbdata"
+virtualenv:
+    system_site_packages: true
 # command to run tests
 script: python3 tests/easy_tests.py
