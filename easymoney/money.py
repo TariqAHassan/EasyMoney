@@ -22,6 +22,7 @@ from easymoney.support_money import pandas_dictkey_to_key_unpack
 from easymoney.support_money import date_bounds_floor
 from easymoney.support_money import datetime_to_str
 from easymoney.support_money import dict_list_unpack
+from easymoney.support_money import dict_merge
 from easymoney.support_money import floater
 from easymoney.support_money import key_value_flip
 from easymoney.support_money import min_max
@@ -746,7 +747,7 @@ class EasyPeasy(object):
 
         # Make the Alpha2 Column
         currency_ops['Alpha2'] = currency_ops["Currency"].replace(
-            {**self.currency_to_alpha2, **ecb_currency_to_alpha2_dict})
+            dict_merge(self.currency_to_alpha2, ecb_currency_to_alpha2_dict))
 
         # Make the Alpha3 and Region Columns
         currency_ops['Alpha3'] = currency_ops["Alpha2"].replace(self.alpha2_to_alpha3)
@@ -881,6 +882,9 @@ class EasyPeasy(object):
         :return: DataFrame with the requested information
         :rtype: Pandas DataFrame
         """
+        # Initialize
+        info_table = None
+
         if info == 'exchange':
             info_table = self._currency_options()
         elif info == 'inflation':
@@ -927,6 +931,11 @@ class EasyPeasy(object):
         info_table = None
         list_options = None
         date_columns_in_table = None
+        info_options = ['exchange', 'inflation', 'all']
+
+        # Check options request
+        if info not in info_options:
+            raise ValueError("info must be one of: %s" % (prettify_list_of_strings(info_options, 'or')))
 
         # Create a lambda to convert the InflationRange lists to lists of ints (from lists of strings).
         year_to_int = lambda x: np.NaN if 'nan' in str(x) else [[floater(i, False, True) for i in x]][0]
@@ -980,9 +989,6 @@ class EasyPeasy(object):
                         info_table[col] = info_table[col].map(full_date_to_datetime)
 
                 return info_table
-
-
-
 
 
 

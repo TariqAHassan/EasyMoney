@@ -14,6 +14,8 @@ import numpy as np
 import pandas as pd
 import pkg_resources
 
+from copy import deepcopy
+
 
 DATA_PATH = pkg_resources.resource_filename('easymoney', 'data')
 
@@ -372,9 +374,26 @@ def prettify_list_of_strings(input_list, final_join = "and", all_commas_override
     elif len(input_list) > 2:
         return ", ".join(input_list[:-1]) + final_join_with_tails + input_list[-1]
 
+def dict_merge(first_dict, second_dict):
+    """
 
+    Merge two dictionaries.
 
+    :param first_dict:
+    :type first_dict:
+    :param second_dict:
+    :type second_dict:
+    :return: a merged dict
+    :rtype: dict
+    """
 
+    # Create deepcopies of the input
+    new_dict = deepcopy(first_dict)
+    dict2 = deepcopy(second_dict)
 
+    # Merge
+    new_dict.update(dict2)
 
+    # Return
+    return new_dict
 
