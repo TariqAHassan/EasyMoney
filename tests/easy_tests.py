@@ -7,12 +7,14 @@
 
 """
 # Import the tool
+import os
 import sys
 import unittest
 import pandas as pd
 
-# Move up to the correct directory
-sys.path.append('../')
+# Allow access to modules
+sys.path.insert(0, os.path.abspath("."))
+sys.path.insert(0, os.path.abspath("../"))
 
 # Import the tool
 from easymoney.money import EasyPeasy
