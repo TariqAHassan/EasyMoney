@@ -11,7 +11,7 @@ except:
 
 setup(
     name = "easymoney",
-    version = "0.9",
+    version = "0.9.5",
     author = "Tariq A. Hassan",
     author_email = "laterallattice@gmail.com",
     description = ("Tools for common monetary problems."),
