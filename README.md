@@ -37,7 +37,7 @@ access is no longer required.
 
 #####Import the tool
 ```python
-from easymoney.money import Currency
+from easymoney.money import EasyPeasy
 ```
 
 #####Create an instance of the EasyPeasy Class
