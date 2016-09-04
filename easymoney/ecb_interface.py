@@ -21,7 +21,7 @@ def ecb_xml_exchange_data(return_as = 'dict', ecb_extension = "/stats/eurofxref/
     | This tool goes out to the European Central Bank via their generously provided API
     | and coerces XML data into a dictionary.
     | Expects 'time', 'currency', 'rate' in the XML data.
-    | Returns a nested dictionary of the form: {time: {currency: rate}}.
+    | Returns a nested dictionary of the form: ``{time: {currency: rate}}``.
     | DO NOT WRITE PROCEDURES THAT SLAM THEIR SERVERS.
 
     :param return_as: 'dict' for dictionary (nested); 'df' for pandas dataframe.

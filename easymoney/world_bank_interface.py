@@ -92,7 +92,7 @@ class WorldBankParse(object):
         Titles entries in the column of a pandas dataframe.
         Includes some error handling.
 
-        :param to_title: a list of columns to apply the following string operations: column.lower().title()
+        :param to_title: a list of columns to apply the following string operations: ``column.lower().title()``
         :type to_title: list
         :param data_frame: a dataframe with columns to be titled.
         :type data_frame: Pandas DataFrame
@@ -158,7 +158,7 @@ class WorldBankParse(object):
 def world_bank_pull_wrapper(value_true_name, indicator, na_drop_col = None):
     """
 
-    Wrapper for the WorldBankParse().world_bank_pull() method.
+    Wrapper for the ``WorldBankParse().world_bank_pull()`` method.
     Extracts world bank information based on a specific indicator and returns a Pandas DataFrame.
 
     :param value_true_name: replacement name for the generic 'value' column, e.g., 'value' to 'cpi'.
