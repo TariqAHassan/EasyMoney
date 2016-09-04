@@ -147,10 +147,10 @@ class FunctionalityTests(unittest.TestCase):
         self.assertEqual(CAD_alpha2, 'CA')
 
         # (2) Request 'CAD' be mapped to its ISO ALpha3 Code.
-        CAD_alpah2 = ep.region_map(region = 'CAD', map_to = 'alpha3')
+        CAD_alpah3 = ep.region_map(region = 'CAD', map_to = 'alpha3')
 
         # Assert (2) is 'CAN'
-        self.assertEqual(CAD_alpah2, 'CAN')
+        self.assertEqual(CAD_alpah3, 'CAN')
 
         # (3) Request 'FR' be mapped to its Currency Code.
         FR_currency = ep.region_map(region = 'FR', map_to = 'currency')

@@ -1,0 +1,8 @@
+language: python
+python:
+  - "3.5"
+# command to install dependencies
+cache: pip3
+install: "pip3 install numpy pandas wbdata"
+# command to run tests
+script: tests/easy_tests.py
