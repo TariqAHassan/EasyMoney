@@ -10,12 +10,9 @@
 
 # Modules #
 import os
-import six
-import datetime
 import datetime
 import numpy as np
 import pandas as pd
-import pkg_resources
 
 from warnings import warn
 from statistics import mean
@@ -32,7 +29,6 @@ from easymoney.support_money import money_printer
 from easymoney.support_money import pandas_print_full
 from easymoney.support_money import prettify_list_of_strings
 from easymoney.support_money import remove_from_dict
-from easymoney.support_money import strlist_to_list
 from easymoney.support_money import str_to_datetime
 from easymoney.support_money import twoD_nested_dict
 
@@ -59,7 +55,7 @@ class EasyPeasy(object):
     def __init__(self, precision = 2, fall_back = True):
         """
 
-        Initalize the EasyPeasy() class.
+        Initialize the EasyPeasy() class.
 
         """
         # Places of precision
@@ -215,15 +211,13 @@ class EasyPeasy(object):
         if map_to not in map_to_options:
             raise ValueError("map_to must be one of: %s." % (prettify_list_of_strings(map_to_options, 'or')))
 
-        # Seperately handle requests for map_to == 'currency'
-        # when region is a currency used by several nations.
-        if region in self.currency_to_alpha2.keys():
-            if len(self.currency_to_alpha2[region]) > 1:
-                if map_to == 'currency':
-                    return region
-                else:
-                    raise ValueError("The '%s' currency is used in multiple nations thus cannot be mapped to a single one." \
-                     % (region))
+        # Seperately handle requests for map_to == 'currency' when region is a currency used by several nations.
+        if region in self.currency_to_alpha2.keys() and len(self.currency_to_alpha2[region]) > 1:
+            if map_to == 'currency':
+                return region
+            else:
+                raise ValueError("The '%s' currency is used in multiple nations thus cannot be mapped to a single one." \
+                 % (region))
 
         # Get the Alpha2 Mapping
         alpha2_mapping, raw_region_type = self._region_type(region)
@@ -253,7 +247,7 @@ class EasyPeasy(object):
         :raises LookupError: if cannot obtain CPI information from the database.
         :raises AttributeError: if not fall_back
         """
-        # Initalize
+        # Initialize
         cpi = None
         inflation_error_message = "EasyMoney could not obtain inflation (CPI) information for '%s' in '%s'." % (str(region), str(year))
 
@@ -630,7 +624,6 @@ class EasyPeasy(object):
         # Initialize
         most_recent_cpi_record = None
         inflation_year_b = None
-        adjusted_amount = None
 
         # Standardize currency input
         from_currency = self.region_map(currency, map_to = 'currency')
@@ -695,10 +688,9 @@ class EasyPeasy(object):
         :rtype: dict
         :raises ValueError: keys_as_dates is not boolean (True or False).
         """
-        # Initalize
+        # Initialize
         date_values = None
         date_ranges_dict = dict()
-        key_corrected_dict = dict()
         key_key_dict = None
         zipped_key_key = None
         flattened_key_key = None
@@ -928,10 +920,10 @@ class EasyPeasy(object):
 
         """
         # This is a jumbo function.
-        # However, I've decided not to factor it any further (see all the 'option' functions above) because,
-        # despite it's size, it now it represent is a single (long) thought.
+        # However, at this time it will not be factored it any further (see all the 'option' functions above)
+        # because, despite its size, it now it represent is a single (long) thought.
 
-        # Initalize
+        # Initialize
         info_table = None
         list_options = None
         date_columns_in_table = None
@@ -988,9 +980,6 @@ class EasyPeasy(object):
                         info_table[col] = info_table[col].map(full_date_to_datetime)
 
                 return info_table
-
-
-
 
 
 
