@@ -166,7 +166,6 @@
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value_true_name</span><span class="p">,</span> <span class="n">indicator</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 
-<span class="sd">        *Private Method*</span>
 <span class="sd">        Int the WorldBankParse() class.</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -223,7 +222,7 @@
 <span class="sd">        Titles entries in the column of a pandas dataframe.</span>
 <span class="sd">        Includes some error handling.</span>
 
-<span class="sd">        :param to_title: a list of columns to apply the following string operations: column.lower().title()</span>
+<span class="sd">        :param to_title: a list of columns to apply the following string operations: ``column.lower().title()``</span>
 <span class="sd">        :type to_title: list</span>
 <span class="sd">        :param data_frame: a dataframe with columns to be titled.</span>
 <span class="sd">        :type data_frame: Pandas DataFrame</span>
@@ -289,7 +288,7 @@
 <div class="viewcode-block" id="world_bank_pull_wrapper"><a class="viewcode-back" href="../../source/easymoney.html#easymoney.world_bank_interface.world_bank_pull_wrapper">[docs]</a><span class="k">def</span> <span class="nf">world_bank_pull_wrapper</span><span class="p">(</span><span class="n">value_true_name</span><span class="p">,</span> <span class="n">indicator</span><span class="p">,</span> <span class="n">na_drop_col</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 
-<span class="sd">    Wrapper for the WorldBankParse().world_bank_pull() method.</span>
+<span class="sd">    Wrapper for the ``WorldBankParse().world_bank_pull()`` method.</span>
 <span class="sd">    Extracts world bank information based on a specific indicator and returns a Pandas DataFrame.</span>
 
 <span class="sd">    :param value_true_name: replacement name for the generic &#39;value&#39; column, e.g., &#39;value&#39; to &#39;cpi&#39;.</span>

@@ -142,28 +142,31 @@
 <span class="kn">import</span> <span class="nn">os</span>
 <span class="kn">import</span> <span class="nn">six</span>
 <span class="kn">import</span> <span class="nn">datetime</span>
-<span class="kn">import</span> <span class="nn">warnings</span>
 <span class="kn">import</span> <span class="nn">datetime</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
 <span class="kn">import</span> <span class="nn">pkg_resources</span>
 
+<span class="kn">from</span> <span class="nn">warnings</span> <span class="k">import</span> <span class="n">warn</span>
+<span class="kn">from</span> <span class="nn">statistics</span> <span class="k">import</span> <span class="n">mean</span>
 <span class="kn">from</span> <span class="nn">collections</span> <span class="k">import</span> <span class="n">defaultdict</span>
 
 <span class="kn">from</span> <span class="nn">easymoney.support_money</span> <span class="k">import</span> <span class="n">pandas_dictkey_to_key_unpack</span>
 <span class="kn">from</span> <span class="nn">easymoney.support_money</span> <span class="k">import</span> <span class="n">date_bounds_floor</span>
 <span class="kn">from</span> <span class="nn">easymoney.support_money</span> <span class="k">import</span> <span class="n">datetime_to_str</span>
+<span class="kn">from</span> <span class="nn">easymoney.support_money</span> <span class="k">import</span> <span class="n">dict_list_unpack</span>
 <span class="kn">from</span> <span class="nn">easymoney.support_money</span> <span class="k">import</span> <span class="n">floater</span>
 <span class="kn">from</span> <span class="nn">easymoney.support_money</span> <span class="k">import</span> <span class="n">key_value_flip</span>
 <span class="kn">from</span> <span class="nn">easymoney.support_money</span> <span class="k">import</span> <span class="n">min_max</span>
 <span class="kn">from</span> <span class="nn">easymoney.support_money</span> <span class="k">import</span> <span class="n">money_printer</span>
 <span class="kn">from</span> <span class="nn">easymoney.support_money</span> <span class="k">import</span> <span class="n">pandas_print_full</span>
+<span class="kn">from</span> <span class="nn">easymoney.support_money</span> <span class="k">import</span> <span class="n">prettify_list_of_strings</span>
 <span class="kn">from</span> <span class="nn">easymoney.support_money</span> <span class="k">import</span> <span class="n">remove_from_dict</span>
 <span class="kn">from</span> <span class="nn">easymoney.support_money</span> <span class="k">import</span> <span class="n">strlist_to_list</span>
 <span class="kn">from</span> <span class="nn">easymoney.support_money</span> <span class="k">import</span> <span class="n">str_to_datetime</span>
 <span class="kn">from</span> <span class="nn">easymoney.support_money</span> <span class="k">import</span> <span class="n">twoD_nested_dict</span>
 
-<span class="kn">from</span> <span class="nn">easymoney.ecb_interface</span> <span class="k">import</span> <span class="n">ecb_exchange_data</span>
+<span class="kn">from</span> <span class="nn">easymoney.ecb_interface</span> <span class="k">import</span> <span class="n">ecb_xml_exchange_data</span>
 <span class="kn">from</span> <span class="nn">easymoney.ecb_interface</span> <span class="k">import</span> <span class="n">ecb_currency_to_alpha2_dict</span>
 <span class="kn">from</span> <span class="nn">easymoney.world_bank_interface</span> <span class="k">import</span> <span class="n">world_bank_pull_wrapper</span>
 
@@ -171,29 +174,29 @@
 <span class="kn">from</span> <span class="nn">easymoney.support_money</span> <span class="k">import</span> <span class="n">DATA_PATH</span>
 
 
-<div class="viewcode-block" id="Currency"><a class="viewcode-back" href="../../source/easymoney.html#easymoney.money.Currency">[docs]</a><span class="k">class</span> <span class="nc">Currency</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+<div class="viewcode-block" id="EasyPeasy"><a class="viewcode-back" href="../../source/easymoney.html#easymoney.money.EasyPeasy">[docs]</a><span class="k">class</span> <span class="nc">EasyPeasy</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 
 <span class="sd">    Tools for converting one currency to another, looking up inflation information, adjusting for inflation, and more!</span>
 
 <span class="sd">    :param precision: number of places to round to. Defaults to 2.</span>
 <span class="sd">    :type precision: int</span>
-<span class="sd">    :param fallback: if True, fallback to closest possible date. Defaults to True.</span>
-<span class="sd">    :type fallback: bool</span>
+<span class="sd">    :param fall_back: if True, fall back to closest possible date. Defaults to True.</span>
+<span class="sd">    :type fall_back: bool</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
 
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">precision</span> <span class="o">=</span> <span class="mi">2</span><span class="p">,</span> <span class="n">fallback</span> <span class="o">=</span> <span class="kc">True</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">precision</span> <span class="o">=</span> <span class="mi">2</span><span class="p">,</span> <span class="n">fall_back</span> <span class="o">=</span> <span class="kc">True</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 
-<span class="sd">        Initalize the Currency() class.</span>
+<span class="sd">        Initalize the EasyPeasy() class.</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># Places of precision</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">round_to</span> <span class="o">=</span> <span class="n">precision</span>
 
         <span class="c1"># Fall back boolean</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">fallback</span> <span class="o">=</span> <span class="n">fallback</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fall_back</span> <span class="o">=</span> <span class="n">fall_back</span>
 
         <span class="c1"># Get CPI Data</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">cpi_df</span> <span class="o">=</span> <span class="n">world_bank_pull_wrapper</span><span class="p">(</span><span class="n">value_true_name</span> <span class="o">=</span> <span class="s2">&quot;cpi&quot;</span><span class="p">,</span> <span class="n">indicator</span> <span class="o">=</span> <span class="s2">&quot;FP.CPI.TOTL&quot;</span><span class="p">)</span> <span class="c1"># add an NA col drop?</span>
@@ -203,14 +206,14 @@
 
         <span class="c1"># Get Exchange Rate Data</span>
         <span class="c1"># TO DO: get currency codes by extracting them from every date key</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">ex_dict</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">currency_codes</span> <span class="o">=</span> <span class="n">ecb_exchange_data</span><span class="p">(</span><span class="n">return_as</span> <span class="o">=</span> <span class="s1">&#39;dict&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ex_dict</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">currency_codes</span> <span class="o">=</span> <span class="n">ecb_xml_exchange_data</span><span class="p">(</span><span class="n">return_as</span> <span class="o">=</span> <span class="s1">&#39;dict&#39;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">ex_dict_keys_series</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">(</span><span class="nb">sorted</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ex_dict</span><span class="o">.</span><span class="n">keys</span><span class="p">())))</span>
 
         <span class="c1"># Import EU join Data</span>
         <span class="n">eu_join</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">DATA_PATH</span> <span class="o">+</span> <span class="s2">&quot;/JoinEuro.csv&quot;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">eu_join_dict</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">eu_join</span><span class="o">.</span><span class="n">alpha2</span><span class="p">,</span> <span class="n">eu_join</span><span class="o">.</span><span class="n">join_year</span><span class="p">))</span>
 
-        <span class="n">alpha2_alpha3_df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">DATA_PATH</span> <span class="o">+</span> <span class="s2">&quot;/CountryAlpha2_and_3.csv&quot;</span><span class="p">)</span>
+        <span class="n">alpha2_alpha3_df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">DATA_PATH</span> <span class="o">+</span> <span class="s2">&quot;/CountryAlpha2_and_3.csv&quot;</span><span class="p">,</span> <span class="n">keep_default_na</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span>
 
         <span class="c1"># Create Alpha3 --&gt; Alpha2 Dict</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">alpha3_to_alpha2</span> <span class="o">=</span> <span class="n">remove_from_dict</span><span class="p">(</span><span class="nb">dict</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">alpha2_alpha3_df</span><span class="o">.</span><span class="n">Alpha3</span><span class="p">,</span> <span class="n">alpha2_alpha3_df</span><span class="o">.</span><span class="n">Alpha2</span><span class="p">)))</span>
@@ -218,12 +221,16 @@
         <span class="c1"># Create Alpha2 --&gt; Alpha3 Dict</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">alpha2_to_alpha3</span> <span class="o">=</span> <span class="n">key_value_flip</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">alpha3_to_alpha2</span><span class="p">)</span>
 
-        <span class="c1"># Create Currency --&gt; Alpha2 Dict</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">currency_to_alpha2</span> <span class="o">=</span> <span class="n">remove_from_dict</span><span class="p">(</span><span class="nb">dict</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cpi_df</span><span class="o">.</span><span class="n">currency_code</span><span class="o">.</span><span class="n">tolist</span><span class="p">(),</span> <span class="bp">self</span><span class="o">.</span><span class="n">cpi_df</span><span class="o">.</span><span class="n">alpha2</span><span class="o">.</span><span class="n">tolist</span><span class="p">()))</span>
-                                                   <span class="p">,</span> <span class="n">to_remove</span> <span class="o">=</span> <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">NaN</span><span class="p">,</span> <span class="s2">&quot;EUR&quot;</span><span class="p">])</span>
+        <span class="c1"># Create the dict and populate using uniques in the cpi_df.</span>
+        <span class="n">currency_to_alpha2</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">cpi_df</span><span class="o">.</span><span class="n">currency_code</span><span class="o">.</span><span class="n">unique</span><span class="p">()</span><span class="o">.</span><span class="n">tolist</span><span class="p">():</span>
+            <span class="n">currency_to_alpha2</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cpi_df</span><span class="o">.</span><span class="n">alpha2</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">cpi_df</span><span class="o">.</span><span class="n">currency_code</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">str</span><span class="p">)</span> <span class="o">==</span> <span class="n">k</span><span class="p">]</span><span class="o">.</span><span class="n">unique</span><span class="p">()</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
 
-        <span class="c1"># Create Alpha2 --&gt; Currency</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">alpha2_to_currency</span> <span class="o">=</span> <span class="n">key_value_flip</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">currency_to_alpha2</span><span class="p">)</span>
+        <span class="c1"># Drop NaNs</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">currency_to_alpha2</span> <span class="o">=</span> <span class="n">remove_from_dict</span><span class="p">(</span><span class="n">currency_to_alpha2</span><span class="p">)</span>
+
+        <span class="c1"># Create a flipped dict from currency_to_alpha2.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">alpha2_to_currency</span> <span class="o">=</span> <span class="n">dict_list_unpack</span><span class="p">(</span><span class="n">currency_to_alpha2</span><span class="p">)</span>
 
         <span class="c1"># Create Region Name --&gt; Alpha2 Dict</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">region_to_alpha2</span> <span class="o">=</span> <span class="n">remove_from_dict</span><span class="p">(</span><span class="nb">dict</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cpi_df</span><span class="o">.</span><span class="n">region</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">cpi_df</span><span class="o">.</span><span class="n">alpha2</span><span class="p">)))</span>
@@ -231,26 +238,29 @@
         <span class="c1"># Create Alpha2 --&gt; Region Name Dict</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">alpha2_to_region</span> <span class="o">=</span> <span class="n">key_value_flip</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">region_to_alpha2</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">_closest_date</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">list_of_dates</span><span class="p">,</span> <span class="n">date</span><span class="p">,</span> <span class="n">problem_domain</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">_closest_date</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">list_of_dates</span><span class="p">,</span> <span class="n">date</span><span class="p">,</span> <span class="n">problem_domain</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">date_format</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 
 <span class="sd">        *Private Method*</span>
 <span class="sd">        Determines the closest date for which data is avaliable.</span>
 
-<span class="sd">        :param list_of_dates: a list of datetimes</span>
+<span class="sd">        :param list_of_dates: a list of datetimes.</span>
 <span class="sd">        :type list_of_dates: list</span>
-<span class="sd">        :param date: a date</span>
+<span class="sd">        :param date: a date of the form YYYY-MM-DD.</span>
 <span class="sd">        :type date: datetime</span>
 <span class="sd">        :param problem_domain: domain of the problem _closet_date() is tryping to solve. Information for error message.</span>
-<span class="sd">                              Defaults to empty string.</span>
+<span class="sd">                               Defaults to empty string.</span>
 <span class="sd">        :type problem_domain: str</span>
+<span class="sd">        :param date_format: a date format. Defaults to None (which results in a datetime.datetime object being returned),</span>
+<span class="sd">                           instead of a string.</span>
+<span class="sd">        :type date_format: str</span>
 <span class="sd">        :return: the closet date, as ranked by the standard python sorting algo. (sorted() method).</span>
 <span class="sd">        :rtype: list</span>
-<span class="sd">        :raises AttributeError: if fallback is set to False</span>
+<span class="sd">        :raises AttributeError: if fall_back is set to False.</span>
 <span class="sd">        :raises ValueError: if an element in list_of_dates is not of class datetime.datetime.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="c1"># Block fallback behaviour if it&#39;s not permitted.</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">fallback</span><span class="p">:</span>
+        <span class="c1"># Block fall_back behaviour if it&#39;s not permitted.</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">fall_back</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">AttributeError</span><span class="p">(</span><span class="s2">&quot;EasyMoney could not obtain &#39;</span><span class="si">%s</span><span class="s2">&#39; information for </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">problem_domain</span><span class="p">,</span> <span class="n">date</span><span class="p">))</span>
 
         <span class="c1"># Ensure dates are of type datetime.</span>
@@ -258,7 +268,12 @@
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Dates must be of type: datetime.datetime&quot;</span><span class="p">)</span>
 
         <span class="c1"># Return best match</span>
-        <span class="k">return</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">list_of_dates</span><span class="p">,</span> <span class="n">key</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">date_in_list</span><span class="p">:</span> <span class="nb">abs</span><span class="p">(</span><span class="n">date</span> <span class="o">-</span> <span class="n">date_in_list</span><span class="p">))[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">best_match</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">list_of_dates</span><span class="p">,</span> <span class="n">key</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">date_in_list</span><span class="p">:</span> <span class="nb">abs</span><span class="p">(</span><span class="n">date</span> <span class="o">-</span> <span class="n">date_in_list</span><span class="p">))[</span><span class="mi">0</span><span class="p">]</span>
+
+        <span class="k">if</span> <span class="n">date_format</span> <span class="o">==</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">best_match</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">datetime_to_str</span><span class="p">([</span><span class="n">best_match</span><span class="p">],</span> <span class="n">date_format</span> <span class="o">=</span> <span class="n">date_format</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
 
     <span class="k">def</span> <span class="nf">_region_type</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">region</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -268,10 +283,13 @@
 
 <span class="sd">        :param region: a region (Alpha2, Alpha3, Natural Name or currency code).</span>
 <span class="sd">        :type region: str</span>
-<span class="sd">        :return: ISO Alpha2 code</span>
+<span class="sd">        :return: ISO Alpha2 code.</span>
 <span class="sd">        :rtype: str</span>
-<span class="sd">        :raises ValueError: if `region` is not recognized by EasyMoney (see `options()`).</span>
+<span class="sd">        :raises ValueError: if ``region`` is not recognized by EasyMoney (see ``options()``).</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Initialize</span>
+        <span class="n">currency_region</span> <span class="o">=</span> <span class="kc">None</span>
+
         <span class="k">if</span> <span class="n">region</span> <span class="ow">in</span> <span class="n">ecb_currency_to_alpha2_dict</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
             <span class="k">return</span> <span class="n">ecb_currency_to_alpha2_dict</span><span class="p">[</span><span class="n">region</span><span class="p">],</span> <span class="s2">&quot;currency&quot;</span>
         <span class="k">elif</span> <span class="n">region</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">alpha3_to_alpha2</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
@@ -279,41 +297,66 @@
         <span class="k">elif</span> <span class="n">region</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">alpha3_to_alpha2</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">alpha3_to_alpha2</span><span class="p">[</span><span class="n">region</span><span class="p">],</span> <span class="s2">&quot;alpha3&quot;</span>
         <span class="k">elif</span> <span class="n">region</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">currency_to_alpha2</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
-            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">currency_to_alpha2</span><span class="p">[</span><span class="n">region</span><span class="p">],</span> <span class="s2">&quot;currency&quot;</span>
+            <span class="n">currency_region</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">currency_to_alpha2</span><span class="p">[</span><span class="n">region</span><span class="p">]</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">currency_region</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">currency_region</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="s2">&quot;currency&quot;</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;&#39;</span><span class="si">%s</span><span class="s2">&#39; is used in several countries thus cannot be mapped to a single nation.&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">region</span><span class="p">))</span>
         <span class="k">elif</span> <span class="n">region</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span><span class="o">.</span><span class="n">title</span><span class="p">()</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">region_to_alpha2</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">region_to_alpha2</span><span class="p">[</span><span class="n">region</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span><span class="o">.</span><span class="n">title</span><span class="p">()],</span> <span class="s2">&quot;natural&quot;</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Region Error. &#39;</span><span class="si">%s</span><span class="s2">&#39; is not recognized by EasyMoney. See options().&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">region</span><span class="p">))</span>
 
-    <span class="k">def</span> <span class="nf">_iso_mapping</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">region</span><span class="p">,</span> <span class="n">map_to</span> <span class="o">=</span> <span class="s1">&#39;alpha2&#39;</span><span class="p">):</span>
+<div class="viewcode-block" id="EasyPeasy.region_map"><a class="viewcode-back" href="../../source/easymoney.html#easymoney.money.EasyPeasy.region_map">[docs]</a>    <span class="k">def</span> <span class="nf">region_map</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">region</span><span class="p">,</span> <span class="n">map_to</span> <span class="o">=</span> <span class="s1">&#39;alpha2&#39;</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 
-<span class="sd">        *Private Method*</span>
-<span class="sd">        Map a region to ISO Alpha2 and Alpha3, as well as Currency Code and Natural Name.</span>
+<span class="sd">        Map a &#39;region&#39; to any one of: ISO Alpha2, ISO Alpha3 or Currency Code as well as its Natural Name.</span>
 
-<span class="sd">        :param region: a region in the format of a currency code, natural name or ISO Alpha2/3</span>
+<span class="sd">            Examples Converting From Currency:</span>
+<span class="sd">                - ``EasyPeasy().region_map(region = &#39;CAD&#39;, map_to = &#39;alpha2&#39;)``   :math:`=` &#39;CA&#39;</span>
+<span class="sd">                - ``EasyPeasy().region_map(region = &#39;CAD&#39;, map_to = &#39;alpha3&#39;)``   :math:`=` &#39;CAN&#39;</span>
+
+<span class="sd">            Examples Converting From Alpha2:</span>
+<span class="sd">                - ``EasyPeasy().region_map(region = &#39;FR&#39;, map_to = &#39;currency&#39;)`` :math:`=` &#39;EUR&#39;</span>
+<span class="sd">                - ``EasyPeasy().region_map(region = &#39;FR&#39;, map_to = &#39;natural&#39;)``  :math:`=` &#39;France&#39;</span>
+
+<span class="sd">        :param region: a &#39;region&#39; in the format of a ISO Alpha2, ISO Alpha3 or currency code, as well as natural name.</span>
 <span class="sd">        :type region: str</span>
-<span class="sd">        :param map_to: &#39;alpha2&#39;, &#39;alpha3&#39;, &#39;currency&#39; or &#39;natural&#39;. Defaults to &#39;alpha2&#39;.</span>
+<span class="sd">        :param map_to: &#39;alpha2&#39;, &#39;alpha3&#39; &#39;currency&#39; or &#39;natural&#39; for ISO Alpha2, ISO Alpha2, Currency Code and</span>
+<span class="sd">                        Natural Names, respectively. Defaults to &#39;alpha2&#39;.</span>
 <span class="sd">        :type map_to: str</span>
-<span class="sd">        :return: the desired mapping from region to ISO Alpha2</span>
+<span class="sd">        :return: the desired mapping from region to ISO Alpha2.</span>
 <span class="sd">        :rtype: str</span>
-<span class="sd">        :raises ValueError: if map_to is not one of &#39;alpha2&#39;, &#39;alpha3&#39;, &#39;currency&#39; or &#39;natural&#39;.</span>
+<span class="sd">        :raises ValueError: if *map_to* is not one of &#39;alpha2&#39;, &#39;alpha3&#39;, &#39;currency&#39; or &#39;natural&#39;.</span>
+
+<span class="sd">        .. warning::</span>
+<span class="sd">            Attempts to map common curriencies to a single nation will fail.</span>
+
+
+<span class="sd">            For instance: ``EasyPeasy().region_map(region = &#39;EUR&#39;, map_to = &#39;Alpha2&#39;)`` will fail because the Euro (EUR)</span>
+<span class="sd">            is used in several nations, and thus a request to map it to a single ISO Alpha2 country code creates insurmountable</span>
+<span class="sd">            ambiguity.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="c1"># Define legal map_to options</span>
+        <span class="c1"># Initialize</span>
+        <span class="n">error_list</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="n">map_to_options</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;alpha2&#39;</span><span class="p">,</span> <span class="s1">&#39;alpha3&#39;</span><span class="p">,</span> <span class="s1">&#39;currency&#39;</span><span class="p">,</span> <span class="s1">&#39;natural&#39;</span><span class="p">]</span>
 
+        <span class="c1"># Check that map_to is valid.</span>
         <span class="k">if</span> <span class="n">map_to</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">map_to_options</span><span class="p">:</span>
-            <span class="n">map_to_options</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;&#39;&quot;</span> <span class="o">+</span> <span class="n">m</span> <span class="o">+</span> <span class="s2">&quot;&#39;&quot;</span> <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="n">map_to_options</span><span class="p">]</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;map_to must be one of: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="s2">&quot;, &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">map_to_options</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span><span class="o">+</span><span class="s2">&quot; or &quot;</span><span class="o">+</span><span class="n">map_to_options</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">+</span><span class="s2">&quot;.&quot;</span><span class="p">))</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;map_to must be one of: </span><span class="si">%s</span><span class="s2">.&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">prettify_list_of_strings</span><span class="p">(</span><span class="n">map_to_options</span><span class="p">,</span> <span class="s1">&#39;or&#39;</span><span class="p">)))</span>
 
-        <span class="c1"># Block EUR and Europe handling by the below _iso_mapping() code</span>
-        <span class="k">if</span> <span class="n">region</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span> <span class="o">==</span> <span class="s1">&#39;EUR&#39;</span> <span class="ow">or</span> <span class="n">region</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span><span class="o">.</span><span class="n">title</span><span class="p">()</span> <span class="o">==</span> <span class="s1">&#39;Europe&#39;</span><span class="p">:</span>
-            <span class="k">if</span> <span class="n">map_to</span> <span class="ow">in</span> <span class="n">map_to_options</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]:</span>
-                <span class="k">return</span> <span class="s1">&#39;EUR&#39;</span>
-            <span class="k">else</span><span class="p">:</span>
-                <span class="k">return</span> <span class="s1">&#39;Europe&#39;</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="n">alpha2_mapping</span><span class="p">,</span> <span class="n">raw_region_type</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_region_type</span><span class="p">(</span><span class="n">region</span><span class="p">)</span>
+        <span class="c1"># Seperately handle requests for map_to == &#39;currency&#39;</span>
+        <span class="c1"># when region is a currency used by several nations.</span>
+        <span class="k">if</span> <span class="n">region</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">currency_to_alpha2</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">currency_to_alpha2</span><span class="p">[</span><span class="n">region</span><span class="p">])</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">map_to</span> <span class="o">==</span> <span class="s1">&#39;currency&#39;</span><span class="p">:</span>
+                    <span class="k">return</span> <span class="n">region</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;The &#39;</span><span class="si">%s</span><span class="s2">&#39; currency is used in multiple nations thus cannot be mapped to a single one.&quot;</span> \
+                     <span class="o">%</span> <span class="p">(</span><span class="n">region</span><span class="p">))</span>
+
+        <span class="c1"># Get the Alpha2 Mapping</span>
+        <span class="n">alpha2_mapping</span><span class="p">,</span> <span class="n">raw_region_type</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_region_type</span><span class="p">(</span><span class="n">region</span><span class="p">)</span>
 
         <span class="c1"># Return iso code (alpha2 or 3), currency code or natural name</span>
         <span class="k">if</span> <span class="n">map_to</span> <span class="o">==</span> <span class="s1">&#39;alpha2&#39;</span><span class="p">:</span>
@@ -321,9 +364,9 @@
         <span class="k">elif</span> <span class="n">map_to</span> <span class="o">==</span> <span class="s1">&#39;alpha3&#39;</span><span class="p">:</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">alpha2_to_alpha3</span><span class="p">[</span><span class="n">alpha2_mapping</span><span class="p">]</span>
         <span class="k">elif</span> <span class="n">map_to</span> <span class="o">==</span> <span class="s1">&#39;currency&#39;</span><span class="p">:</span>
-            <span class="k">return</span> <span class="s2">&quot;EUR&quot;</span> <span class="k">if</span> <span class="n">alpha2_mapping</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">eu_join_dict</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span> <span class="k">else</span> <span class="bp">self</span><span class="o">.</span><span class="n">alpha2_to_currency</span><span class="p">[</span><span class="n">alpha2_mapping</span><span class="p">]</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">alpha2_to_currency</span><span class="p">[</span><span class="n">alpha2_mapping</span><span class="p">]</span>
         <span class="k">elif</span> <span class="n">map_to</span> <span class="o">==</span> <span class="s1">&#39;natural&#39;</span><span class="p">:</span>
-            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">alpha2_to_region</span><span class="p">[</span><span class="n">alpha2_mapping</span><span class="p">]</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">alpha2_to_region</span><span class="p">[</span><span class="n">alpha2_mapping</span><span class="p">]</span></div>
 
     <span class="k">def</span> <span class="nf">_try_to_get_CPI</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">region</span><span class="p">,</span> <span class="n">year</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -331,21 +374,21 @@
 <span class="sd">        *Private Method*</span>
 <span class="sd">        Function to look up CPI information in the cached database information.</span>
 
-<span class="sd">        :param region:</span>
-<span class="sd">        :type region:</span>
-<span class="sd">        :param year:</span>
-<span class="sd">        :type year:</span>
+<span class="sd">        :param region: a region (currency codes may work, provided they are not common curriencies, e.g., Euro).</span>
+<span class="sd">        :type region: str</span>
+<span class="sd">        :param year: year for which CPI information is desired.</span>
+<span class="sd">        :type year: int</span>
 <span class="sd">        :return: CPI information in the requested region for the requested year.</span>
 <span class="sd">        :rtype: float</span>
 <span class="sd">        :raises LookupError: if cannot obtain CPI information from the database.</span>
-<span class="sd">        :raises AttributeError: if not fallback</span>
+<span class="sd">        :raises AttributeError: if not fall_back</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># Initalize</span>
         <span class="n">cpi</span> <span class="o">=</span> <span class="kc">None</span>
-        <span class="n">inflation_error_message</span> <span class="o">=</span> <span class="s2">&quot;EasyMoney could not obtain inflation (CPI) information for &#39;</span><span class="si">%s</span><span class="s2">&#39; in &#39;</span><span class="si">%s</span><span class="s2">&#39;&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">region</span><span class="p">),</span> <span class="nb">str</span><span class="p">(</span><span class="n">year</span><span class="p">))</span>
+        <span class="n">inflation_error_message</span> <span class="o">=</span> <span class="s2">&quot;EasyMoney could not obtain inflation (CPI) information for &#39;</span><span class="si">%s</span><span class="s2">&#39; in &#39;</span><span class="si">%s</span><span class="s2">&#39;.&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">region</span><span class="p">),</span> <span class="nb">str</span><span class="p">(</span><span class="n">year</span><span class="p">))</span>
 
         <span class="c1"># convert region to alpha2</span>
-        <span class="n">cpi_region</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_iso_mapping</span><span class="p">(</span><span class="n">region</span><span class="p">,</span> <span class="n">map_to</span> <span class="o">=</span> <span class="s1">&#39;alpha2&#39;</span><span class="p">)</span>
+        <span class="n">cpi_region</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">region_map</span><span class="p">(</span><span class="n">region</span><span class="p">,</span> <span class="n">map_to</span> <span class="o">=</span> <span class="s1">&#39;alpha2&#39;</span><span class="p">)</span>
 
         <span class="c1"># Get most recent CPI year avaliable</span>
         <span class="k">if</span> <span class="n">cpi_region</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">cpi_dict</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
@@ -354,39 +397,53 @@
         <span class="n">max_cpi_year</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="nb">max</span><span class="p">([</span><span class="nb">float</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">cpi_dict</span><span class="p">[</span><span class="n">cpi_region</span><span class="p">]</span><span class="o">.</span><span class="n">keys</span><span class="p">()])))</span>
 
         <span class="k">if</span> <span class="nb">float</span><span class="p">(</span><span class="n">year</span><span class="p">)</span> <span class="o">&gt;</span> <span class="nb">float</span><span class="p">(</span><span class="n">max_cpi_year</span><span class="p">):</span>
-            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">fallback</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">fall_back</span><span class="p">:</span>
                 <span class="k">try</span><span class="p">:</span>
                     <span class="n">cpi</span> <span class="o">=</span> <span class="n">floater</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cpi_dict</span><span class="p">[</span><span class="n">cpi_region</span><span class="p">][</span><span class="nb">str</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">max_cpi_year</span><span class="p">)))])</span> <span class="c1"># add Error handling?</span>
-                    <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s2">&quot;Could not obtain required inflation (CPI) information for &#39;</span><span class="si">%s</span><span class="s2">&#39; in </span><span class="si">%s</span><span class="s2">.&quot;</span>
+                    <span class="n">warn</span><span class="p">(</span><span class="s2">&quot;Could not obtain required inflation (CPI) information for &#39;</span><span class="si">%s</span><span class="s2">&#39; in </span><span class="si">%s</span><span class="s2">.&quot;</span>
                                   <span class="s2">&quot; Using </span><span class="si">%s</span><span class="s2"> instead.&quot;</span> <span class="o">%</span> \
-                                  <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_iso_mapping</span><span class="p">(</span><span class="n">region</span><span class="p">,</span> <span class="n">map_to</span> <span class="o">=</span> <span class="s1">&#39;natural&#39;</span><span class="p">),</span> <span class="nb">str</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">year</span><span class="p">))),</span> <span class="n">max_cpi_year</span><span class="p">))</span>
+                                  <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">region_map</span><span class="p">(</span><span class="n">region</span><span class="p">,</span> <span class="n">map_to</span> <span class="o">=</span> <span class="s1">&#39;natural&#39;</span><span class="p">),</span> <span class="nb">str</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">year</span><span class="p">))),</span> <span class="n">max_cpi_year</span><span class="p">))</span>
                 <span class="k">except</span><span class="p">:</span>
                     <span class="k">raise</span> <span class="ne">LookupError</span><span class="p">(</span><span class="n">inflation_error_message</span><span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="k">raise</span> <span class="ne">AttributeError</span><span class="p">(</span><span class="n">inflation_error_message</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="k">try</span><span class="p">:</span>
-                <span class="n">cpi</span> <span class="o">=</span> <span class="n">floater</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cpi_dict</span><span class="p">[</span><span class="n">cpi_region</span><span class="p">][</span><span class="nb">str</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">year</span><span class="p">)))])</span> <span class="c1"># Add linear interpolation</span>
+                <span class="n">cpi</span> <span class="o">=</span> <span class="n">floater</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cpi_dict</span><span class="p">[</span><span class="n">cpi_region</span><span class="p">][</span><span class="nb">str</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">year</span><span class="p">)))])</span>
             <span class="k">except</span><span class="p">:</span>
                 <span class="k">raise</span> <span class="ne">LookupError</span><span class="p">(</span><span class="n">inflation_error_message</span><span class="p">)</span>
 
         <span class="k">return</span> <span class="n">cpi</span>
 
-<div class="viewcode-block" id="Currency.inflation_rate"><a class="viewcode-back" href="../../source/easymoney.html#easymoney.money.Currency.inflation_rate">[docs]</a>    <span class="k">def</span> <span class="nf">inflation_rate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">region</span><span class="p">,</span> <span class="n">year_a</span><span class="p">,</span> <span class="n">year_b</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">return_raw_cpi_dict</span> <span class="o">=</span> <span class="kc">False</span><span class="p">):</span>
+<div class="viewcode-block" id="EasyPeasy.inflation_rate"><a class="viewcode-back" href="../../source/easymoney.html#easymoney.money.EasyPeasy.inflation_rate">[docs]</a>    <span class="k">def</span> <span class="nf">inflation_rate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">region</span><span class="p">,</span> <span class="n">year_a</span><span class="p">,</span> <span class="n">year_b</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">return_raw_cpi_dict</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="n">pretty_print</span> <span class="o">=</span> <span class="kc">False</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 
 <span class="sd">        Calculator to compute the inflation rate from Consumer Price Index (CPI) information.</span>
 
+<span class="sd">        Inflation Formula:</span>
+
+<span class="sd">        .. math:: Inflation_{region} = \dfrac{c_{1} - c_{2}}{c_{2}} \cdot 100</span>
+
+<span class="sd">        | :math:`where`:</span>
+<span class="sd">        |   :math:`c_{1}` = CPI of the region in year_b.</span>
+<span class="sd">        |   :math:`c_{2}` = CPI of the region in year_a.</span>
+
 <span class="sd">        :param region: a region (currency codes may work, provided they are not common curriencies, e.g., Euro).</span>
 <span class="sd">        :type region: str</span>
-<span class="sd">        :param year_a: start year</span>
+<span class="sd">        :param year_a: start year.</span>
 <span class="sd">        :type year_a: int</span>
 <span class="sd">        :param year_b: end year. Defaults to None -- can only be left to this default if return_raw_cpi_dict is True.</span>
 <span class="sd">        :type year_b: int</span>
-<span class="sd">        :param return_raw_cpi_dict:</span>
+<span class="sd">        :param return_raw_cpi_dict: If True, returns the CPI information in a dict. Defaults to False.</span>
 <span class="sd">        :type return_raw_cpi_dict: bool</span>
-<span class="sd">        :return: the rate of inflation between year_a and year_h. Defaults to False.</span>
-<span class="sd">        :rtype: float</span>
+<span class="sd">        :param pretty_print: if True, pretty prints the result otherwise returns the result as a float. Defaults to False.</span>
+<span class="sd">        :type pretty_print: bool</span>
+<span class="sd">        :return: (a) the rate of inflation between year_a and year_h.</span>
+
+<span class="sd">                        Note: returns *nan* if :math:`c_{1}` or :math:`c_{2}` are *nan* OR :math:`c_{2}` is zero.</span>
+
+<span class="sd">                 (b) a dictionary of CPI information with years as keys, CPI as values.</span>
+<span class="sd">        :rtype: float, dict or *nan*</span>
 <span class="sd">        :raises ValueError: if year_b is None and return_raw_cpi_dict is False.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># Get the CPI for year_b and year_a</span>
@@ -406,24 +463,33 @@
         <span class="k">if</span> <span class="p">(</span><span class="nb">any</span><span class="p">([</span><span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">c1</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">c2</span><span class="p">)]))</span> <span class="ow">or</span> <span class="p">(</span><span class="n">c2</span> <span class="o">==</span> <span class="mf">0.0</span><span class="p">):</span>
             <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">NaN</span>
 
-        <span class="k">return</span> <span class="p">((</span><span class="n">c1</span> <span class="o">-</span> <span class="n">c2</span><span class="p">)</span> <span class="o">/</span> <span class="n">c2</span><span class="p">)</span> <span class="o">*</span> <span class="mi">100</span></div>
+        <span class="c1"># Compute the rate of Inflation</span>
+        <span class="n">rate</span> <span class="o">=</span> <span class="p">((</span><span class="n">c1</span> <span class="o">-</span> <span class="n">c2</span><span class="p">)</span> <span class="o">/</span> <span class="n">c2</span><span class="p">)</span> <span class="o">*</span> <span class="mi">100</span>
 
-<div class="viewcode-block" id="Currency.inflation_calculator"><a class="viewcode-back" href="../../source/easymoney.html#easymoney.money.Currency.inflation_calculator">[docs]</a>    <span class="k">def</span> <span class="nf">inflation_calculator</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">amount</span><span class="p">,</span> <span class="n">region</span><span class="p">,</span> <span class="n">year_a</span><span class="p">,</span> <span class="n">year_b</span><span class="p">):</span>
+        <span class="c1"># Return or Pretty Print.</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">pretty_print</span><span class="p">:</span>
+            <span class="k">return</span> <span class="nb">round</span><span class="p">(</span><span class="n">rate</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">round_to</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="n">money_printer</span><span class="p">(</span><span class="n">rate</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">region_map</span><span class="p">(</span><span class="n">region</span><span class="p">,</span> <span class="s1">&#39;currency&#39;</span><span class="p">),</span> <span class="n">round_to</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">round_to</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="EasyPeasy.inflation_calculator"><a class="viewcode-back" href="../../source/easymoney.html#easymoney.money.EasyPeasy.inflation_calculator">[docs]</a>    <span class="k">def</span> <span class="nf">inflation_calculator</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">amount</span><span class="p">,</span> <span class="n">region</span><span class="p">,</span> <span class="n">year_a</span><span class="p">,</span> <span class="n">year_b</span><span class="p">,</span> <span class="n">pretty_print</span> <span class="o">=</span> <span class="kc">False</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 
 <span class="sd">        Adjusts a given amount of money for inflation.</span>
 
-<span class="sd">        :param amount: a montary amount, e.g., 5</span>
+<span class="sd">        :param amount: a montary amount, e.g., 5.23.</span>
 <span class="sd">        :type amount: float or int</span>
-<span class="sd">        :param region: a geographical region, e.g., US</span>
+<span class="sd">        :param region: a geographical region, e.g., US.</span>
 <span class="sd">        :type region: str</span>
-<span class="sd">        :param year_a: start year</span>
+<span class="sd">        :param year_a: start year.</span>
 <span class="sd">        :type year_a: int</span>
-<span class="sd">        :param year_b: end year</span>
+<span class="sd">        :param year_b: end year.</span>
 <span class="sd">        :type year_b: int</span>
-<span class="sd">        :return: amount * inflation rate.</span>
+<span class="sd">        :param pretty_print: if True, pretty prints the result otherwise returns the result as a float. Defaults to False.</span>
+<span class="sd">        :type pretty_print: bool</span>
+<span class="sd">        :return: :math:`amount \cdot inflation \space rate`.</span>
 <span class="sd">        :rtype: float</span>
-<span class="sd">        :raises ValueError: if  year_a occurs after year_b</span>
+<span class="sd">        :raises ValueError: if  year_a occurs after year_b.</span>
 <span class="sd">        :raises KeyError: if inflation (CPI) information cannot be found in the inflation database.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># Input checking</span>
@@ -433,19 +499,19 @@
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;year_a cannot be greater than year_b&quot;</span><span class="p">)</span>
 
         <span class="c1"># Get the CPI information</span>
-        <span class="n">inflation_dict</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">inflation_rate</span><span class="p">(</span>  <span class="bp">self</span><span class="o">.</span><span class="n">_iso_mapping</span><span class="p">(</span><span class="n">region</span><span class="p">,</span> <span class="n">map_to</span> <span class="o">=</span> <span class="s1">&#39;alpha2&#39;</span><span class="p">)</span>
+        <span class="n">inflation_dict</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">inflation_rate</span><span class="p">(</span>  <span class="bp">self</span><span class="o">.</span><span class="n">region_map</span><span class="p">(</span><span class="n">region</span><span class="p">,</span> <span class="n">map_to</span> <span class="o">=</span> <span class="s1">&#39;alpha2&#39;</span><span class="p">)</span>
                                              <span class="p">,</span> <span class="nb">int</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">year_a</span><span class="p">))</span>
                                              <span class="p">,</span> <span class="nb">int</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">year_b</span><span class="p">))</span>
                                              <span class="p">,</span> <span class="n">return_raw_cpi_dict</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span>
 
         <span class="c1"># Check all the values are floats</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">all</span><span class="p">([</span><span class="n">floater</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">just_check</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">inflation_dict</span><span class="o">.</span><span class="n">values</span><span class="p">()]):</span>
-            <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s2">&quot;Problem obtaining required inflation information.&quot;</span><span class="p">)</span>
+            <span class="n">warn</span><span class="p">(</span><span class="s2">&quot;Problem obtaining required inflation information.&quot;</span><span class="p">)</span>
             <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">NaN</span>
 
         <span class="c1"># Block division by zero</span>
         <span class="k">if</span> <span class="nb">any</span><span class="p">(</span><span class="n">x</span> <span class="o">==</span> <span class="mf">0.0</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">inflation_dict</span><span class="o">.</span><span class="n">values</span><span class="p">()):</span>
-            <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s2">&quot;Problem obtaining required inflation information.&quot;</span><span class="p">)</span>
+            <span class="n">warn</span><span class="p">(</span><span class="s2">&quot;Problem obtaining required inflation information.&quot;</span><span class="p">)</span>
             <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">NaN</span>
 
         <span class="c1"># Scale w.r.t. inflation.</span>
@@ -453,70 +519,144 @@
             <span class="n">adjusted_amount</span> <span class="o">=</span> <span class="n">inflation_dict</span><span class="p">[</span><span class="nb">str</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">year_b</span><span class="p">)))]</span><span class="o">/</span><span class="nb">float</span><span class="p">(</span><span class="n">inflation_dict</span><span class="p">[</span><span class="nb">str</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">year_a</span><span class="p">)))])</span> <span class="o">*</span> <span class="n">amount</span>
         <span class="k">except</span> <span class="ne">KeyError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="s2">&quot;Could not obtain inflation information for </span><span class="si">%s</span><span class="s2"> in </span><span class="si">%s</span><span class="s2">.&quot;</span> <span class="o">%</span> \
-                           <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_iso_mapping</span><span class="p">(</span><span class="n">region</span><span class="p">,</span> <span class="n">map_to</span> <span class="o">=</span> <span class="s1">&#39;natural&#39;</span><span class="p">),</span> <span class="n">e</span><span class="p">))</span>
+                           <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">region_map</span><span class="p">(</span><span class="n">region</span><span class="p">,</span> <span class="n">map_to</span> <span class="o">=</span> <span class="s1">&#39;natural&#39;</span><span class="p">),</span> <span class="n">e</span><span class="p">))</span>
 
-        <span class="c1"># Round and Return</span>
-        <span class="k">return</span> <span class="nb">round</span><span class="p">(</span><span class="n">adjusted_amount</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">round_to</span><span class="p">)</span></div>
+        <span class="c1"># Return or Pretty Print.</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">pretty_print</span><span class="p">:</span>
+            <span class="k">return</span> <span class="nb">round</span><span class="p">(</span><span class="n">adjusted_amount</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">round_to</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="n">money_printer</span><span class="p">(</span><span class="n">adjusted_amount</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">region_map</span><span class="p">(</span><span class="n">region</span><span class="p">,</span> <span class="s1">&#39;currency&#39;</span><span class="p">),</span> <span class="n">round_to</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">round_to</span><span class="p">))</span></div>
 
-    <span class="k">def</span> <span class="nf">_eur_to_lcu</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">currency</span><span class="p">,</span> <span class="n">date</span> <span class="o">=</span> <span class="s2">&quot;latest&quot;</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">_eur_to_lcu</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">currency</span><span class="p">,</span> <span class="n">date</span> <span class="o">=</span> <span class="s2">&quot;latest&quot;</span><span class="p">,</span> <span class="n">return_max_date</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="n">date_format</span> <span class="o">=</span> <span class="s2">&quot;%Y-%m-</span><span class="si">%d</span><span class="s2">&quot;</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 
 <span class="sd">        *Private Method*</span>
 <span class="sd">        Convert from Euros to a local currency unit, e.g., CAD.</span>
 
 <span class="sd">        :param currency: a currency code or region</span>
-<span class="sd">        :param date: MUST be of the form: YYYY-MM-DD; defaults to &quot;latest&quot;.</span>
+<span class="sd">        :type currency: str</span>
+<span class="sd">        :param date: MUST be of the form: ``YYYY-MM-DD`` OR ``YYYY``*; defaults to &quot;latest&quot;.</span>
+
+<span class="sd">                     .. warning::</span>
+<span class="sd">                        If a date of the form YYYY is passed, the average exchange rate will be returned for that year.</span>
+
+<span class="sd">        :type date: str</span>
+<span class="sd">        :param return_max_date: if True, returns the max date for EUR to LCU.</span>
+<span class="sd">        :type return_max_date: bool</span>
+<span class="sd">        :param date_format: a date format. Defaults to &quot;%Y-%m-%d&quot;.</span>
+<span class="sd">        :type date_format: str</span>
 <span class="sd">        :return: exchange_rate w.r.t. the EURO (as a base currency).</span>
+<span class="sd">        :raises ValueError: if date is not &#39;latest&#39; and return_max_date is True.</span>
 <span class="sd">        :raises AttributeError: if exchange rate information cannot be found in the exchange rate database.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># Initialize</span>
         <span class="n">date_key</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="n">date_key_list</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="n">str_time</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">strptime</span>
+        <span class="n">error_msg</span> <span class="o">=</span> <span class="s2">&quot;Could not obtain most recent exchange information from the European Central Bank.&quot;</span>
+
+        <span class="c1"># Check for invalid request</span>
+        <span class="k">if</span> <span class="n">date</span> <span class="o">!=</span> <span class="s1">&#39;latest&#39;</span> <span class="ow">and</span> <span class="n">return_max_date</span> <span class="o">==</span> <span class="kc">True</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;date must be equal to &#39;latest&#39; if return_max_date is True.&quot;</span><span class="p">)</span>
 
         <span class="c1"># Convert currency arg. to a currency code.</span>
-        <span class="n">currency_to_convert</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_iso_mapping</span><span class="p">(</span><span class="n">currency</span><span class="p">,</span> <span class="s1">&#39;currency&#39;</span><span class="p">)</span>
+        <span class="n">currency_to_convert</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">region_map</span><span class="p">(</span><span class="n">currency</span><span class="p">,</span> <span class="s1">&#39;currency&#39;</span><span class="p">)</span>
 
         <span class="c1"># Block self-conversion</span>
-        <span class="k">if</span> <span class="n">currency_to_convert</span> <span class="o">==</span> <span class="s2">&quot;EUR&quot;</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">currency_to_convert</span> <span class="o">==</span> <span class="s2">&quot;EUR&quot;</span> <span class="ow">and</span> <span class="n">return_max_date</span> <span class="o">==</span> <span class="kc">False</span><span class="p">:</span>
             <span class="k">return</span> <span class="mf">1.0</span>
+        <span class="k">elif</span> <span class="n">currency_to_convert</span> <span class="o">==</span> <span class="s2">&quot;EUR&quot;</span> <span class="ow">and</span> <span class="n">date</span> <span class="o">==</span> <span class="s1">&#39;latest&#39;</span> <span class="ow">and</span> <span class="n">return_max_date</span> <span class="o">==</span> <span class="kc">True</span><span class="p">:</span>
+            <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="nb">max</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ex_dict</span><span class="o">.</span><span class="n">keys</span><span class="p">()))</span>
 
         <span class="c1"># Get the current date</span>
         <span class="k">if</span> <span class="n">date</span> <span class="o">==</span> <span class="s2">&quot;latest&quot;</span><span class="p">:</span>
             <span class="k">try</span><span class="p">:</span>
-                <span class="n">date_key</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="nb">max</span><span class="p">([</span><span class="n">d</span><span class="o">.</span><span class="n">date</span><span class="p">()</span> <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">pd</span><span class="o">.</span><span class="n">to_datetime</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ex_dict</span><span class="o">.</span><span class="n">keys</span><span class="p">()))]))</span>
+                <span class="n">date_key_list</span> <span class="o">=</span> <span class="p">[</span><span class="n">k</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">ex_dict</span><span class="o">.</span><span class="n">items</span><span class="p">()</span> <span class="k">if</span> <span class="n">currency_to_convert</span> <span class="ow">in</span> <span class="n">v</span><span class="o">.</span><span class="n">keys</span><span class="p">()]</span>
             <span class="k">except</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="ne">AttributeError</span><span class="p">(</span><span class="s2">&quot;Could not obtain most recent exchange information from the European Central Bank.&quot;</span><span class="p">)</span>
+                <span class="k">raise</span> <span class="ne">AttributeError</span><span class="p">(</span><span class="n">error_msg</span><span class="p">)</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">date_key_list</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">date_key</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="nb">max</span><span class="p">(</span><span class="n">date_key_list</span><span class="p">))</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">error_msg</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">return_max_date</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">date_key</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="k">if</span> <span class="n">date</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">ex_dict</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+            <span class="k">if</span> <span class="n">floater</span><span class="p">(</span><span class="n">date</span><span class="p">,</span> <span class="n">just_check</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">date</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">())</span> <span class="o">==</span> <span class="mi">4</span><span class="p">:</span>
+                <span class="c1"># Compute the average conversion rate over the whole year</span>
+                <span class="k">return</span> <span class="n">mean</span><span class="p">([</span><span class="n">v</span><span class="p">[</span><span class="n">currency_to_convert</span><span class="p">]</span>
+                             <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">ex_dict</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
+                                <span class="k">if</span> <span class="n">currency_to_convert</span> <span class="ow">in</span> <span class="n">v</span> <span class="ow">and</span> <span class="nb">str</span><span class="p">(</span><span class="n">str_to_datetime</span><span class="p">(</span><span class="n">k</span><span class="p">)</span><span class="o">.</span><span class="n">year</span><span class="p">)</span> <span class="o">==</span> <span class="nb">str</span><span class="p">(</span><span class="n">date</span><span class="p">)])</span>
+            <span class="k">elif</span> <span class="n">date</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">ex_dict</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
                 <span class="n">date_key</span> <span class="o">=</span> <span class="n">date</span>
             <span class="k">elif</span> <span class="n">date</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">ex_dict</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
-                <span class="n">date_key</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_closest_date</span><span class="p">([</span>  <span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">strptime</span><span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="s2">&quot;%Y-%m-</span><span class="si">%d</span><span class="s2">&quot;</span><span class="p">)</span> <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">ex_dict</span><span class="o">.</span><span class="n">keys</span><span class="p">()]</span>
-                                               <span class="p">,</span> <span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">strptime</span><span class="p">(</span><span class="n">date</span><span class="p">,</span> <span class="s2">&quot;%Y-%m-</span><span class="si">%d</span><span class="s2">&quot;</span><span class="p">),</span> <span class="n">problem_domain</span> <span class="o">=</span> <span class="s1">&#39;currency&#39;</span><span class="p">)</span>
-                <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s2">&quot;Currency information could not be obtained for &#39;</span><span class="si">%s</span><span class="s2">&#39;, </span><span class="si">%s</span><span class="s2"> was used instead&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">date</span><span class="p">,</span> <span class="n">date_key</span><span class="p">))</span>
+                <span class="n">date_key</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_closest_date</span><span class="p">(</span>  <span class="n">list_of_dates</span> <span class="o">=</span> <span class="p">[</span><span class="n">str_time</span><span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="n">date_format</span><span class="p">)</span> <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">ex_dict</span><span class="o">.</span><span class="n">keys</span><span class="p">()]</span>
+                                              <span class="p">,</span> <span class="n">date</span> <span class="o">=</span> <span class="n">str_time</span><span class="p">(</span><span class="n">date</span><span class="p">,</span> <span class="n">date_format</span><span class="p">)</span>
+                                              <span class="p">,</span> <span class="n">problem_domain</span> <span class="o">=</span> <span class="s1">&#39;currency&#39;</span>
+                                              <span class="p">,</span> <span class="n">date_format</span> <span class="o">=</span> <span class="n">date_format</span><span class="p">)</span>
+                <span class="n">warn</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Currency information could not be obtained for &#39;</span><span class="si">%s</span><span class="s2">&#39;, </span><span class="si">%s</span><span class="s2"> was used instead.&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">date</span><span class="p">,</span> <span class="n">date_key</span><span class="p">))</span>
 
+        <span class="c1"># Return the exchange rate on a given date</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">ex_dict</span><span class="p">[</span><span class="n">date_key</span><span class="p">][</span><span class="n">currency_to_convert</span><span class="o">.</span><span class="n">upper</span><span class="p">()]</span>
 
-<div class="viewcode-block" id="Currency.currency_converter"><a class="viewcode-back" href="../../source/easymoney.html#easymoney.money.Currency.currency_converter">[docs]</a>    <span class="k">def</span> <span class="nf">currency_converter</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">amount</span><span class="p">,</span> <span class="n">from_currency</span><span class="p">,</span> <span class="n">to_currency</span><span class="p">,</span> <span class="n">date</span> <span class="o">=</span> <span class="s2">&quot;latest&quot;</span><span class="p">,</span> <span class="n">pretty_print</span> <span class="o">=</span> <span class="kc">False</span><span class="p">):</span>
+<div class="viewcode-block" id="EasyPeasy.currency_converter"><a class="viewcode-back" href="../../source/easymoney.html#easymoney.money.EasyPeasy.currency_converter">[docs]</a>    <span class="k">def</span> <span class="nf">currency_converter</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">amount</span><span class="p">,</span> <span class="n">from_currency</span><span class="p">,</span> <span class="n">to_currency</span><span class="p">,</span> <span class="n">date</span> <span class="o">=</span> <span class="s2">&quot;latest&quot;</span><span class="p">,</span> <span class="n">pretty_print</span> <span class="o">=</span> <span class="kc">False</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 
-<span class="sd">        Function to convert an amount of money from one currency to another.</span>
+<span class="sd">        Function to perform currency conversion based on, **not** directly reported from, data obtained</span>
+<span class="sd">        from the European Central Bank (ECB). This data contains the exchange rate from Euros (EUR) to</span>
+<span class="sd">        many local currency units (LCUs).</span>
 
-<span class="sd">        :param amount: an amount of money to be converted</span>
+<span class="sd">        **Formulae Used**.</span>
+
+<span class="sd">        Let :math:`LCU` be defined as:</span>
+
+<span class="sd">            .. math:: LCU(\phi_{EUR}, CUR) = ExchangeRate_{\phi_{EUR} → CUR}</span>
+
+<span class="sd">        | :math:`where`:</span>
+<span class="sd">        |   :math:`CUR` is some local currency unit.</span>
+<span class="sd">        |   :math:`\phi = 1`, as in the ECB data.</span>
+<span class="sd">        |</span>
+<span class="sd">        That is, less formally:</span>
+
+<span class="sd">            .. math:: LCU(1 \space EUR, CUR) = \dfrac{x \space \space CUR}{1 \space EUR}</span>
+
+<span class="sd">        :math:`Thus`:</span>
+
+<span class="sd">            From :math:`EUR` to :math:`CUR`:</span>
+
+<span class="sd">                .. math:: amount_{CUR} = LCU(\phi_{EUR}, CUR) \cdot amount_{EUR}</span>
+
+<span class="sd">            From :math:`CUR` to :math:`EUR`:</span>
+
+<span class="sd">                .. math:: amount_{EUR} = \dfrac{1}{LCU(\phi_{EUR}, CUR)} \cdot amount_{CUR}</span>
+
+<span class="sd">            From :math:`CUR_{1}` to :math:`CUR_{2}`:</span>
+
+<span class="sd">                .. math:: amount_{CUR_{2}} = \dfrac{1}{LCU(\phi_{EUR}, CUR_{1})} \cdot LCU(\phi_{EUR}, CUR_{2}) \cdot amount_{CUR_{1}}</span>
+
+<span class="sd">        :param amount: an amount of money to be converted.</span>
 <span class="sd">        :type amount: float or int</span>
-<span class="sd">        :param from_currency: the currency of the amount</span>
+<span class="sd">        :param from_currency: the currency of the amount.</span>
 <span class="sd">        :type from_currency: str</span>
-<span class="sd">        :param to_currency: the currency the amount is to be converted into</span>
+<span class="sd">        :param to_currency: the currency the amount is to be converted into.</span>
 <span class="sd">        :type to_currency: str</span>
-<span class="sd">        :param date: date of data to perform the conversion with. Dates must be of the form: YYYY-MM-DD.</span>
-<span class="sd">                     Defaults to &quot;latest&quot; (which will use to most recent data avaliable).</span>
+<span class="sd">        :param date: date of data to perform the conversion with. Dates must be of the form: ``YYYY-MM-DD`` or ``YYYY``.</span>
+<span class="sd">                     Defaults to &quot;latest&quot; (which will use the most recent data avaliable).</span>
+
+<span class="sd">                     .. warning::</span>
+<span class="sd">                         If a date of the form *YYYY*  is passed, the average exchange rate will be returned for that entire year.</span>
+
+<span class="sd">                         For this reason, using a value other than a date of the form *YYYY-MM-DD*</span>
+<span class="sd">                         or the default is not recommended.</span>
+
 <span class="sd">        :type date: str</span>
-<span class="sd">        :param pretty_print: if True, prints the table otherwise returns the table as a pandas DataFrame. Defaults to False.</span>
+<span class="sd">        :param pretty_print: if True, pretty prints the table otherwise returns the table as a pandas DataFrame. Defaults to False.</span>
 <span class="sd">        :type pretty_print: bool</span>
-<span class="sd">        :return: converted currency</span>
+<span class="sd">        :return: converted currency.</span>
 <span class="sd">        :rtype: float</span>
-<span class="sd">        :raises ValueError: if amount is not numeric (float or int).</span>
+<span class="sd">        :raises ValueError: if (a) pretty_print is not a boolean (b) amount is not numeric (float or int).</span>
 <span class="sd">        :raises AttributeError: Conversion would result in division by zero (rare).</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="c1"># Initialize variables</span>
+        <span class="c1"># Initialize</span>
         <span class="n">conversion_to_invert</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="n">converted_amount</span> <span class="o">=</span> <span class="kc">None</span>
 
@@ -524,32 +664,37 @@
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">amount</span><span class="p">,</span> <span class="p">(</span><span class="nb">float</span><span class="p">,</span> <span class="nb">int</span><span class="p">)):</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;amount must be numeric (intiger or float).&quot;</span><span class="p">)</span>
 
+        <span class="c1"># Check pretty_print is a bool</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">pretty_print</span><span class="p">,</span> <span class="nb">bool</span><span class="p">):</span> <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;pretty_print must be either True or False.&quot;</span><span class="p">)</span>
+
         <span class="c1"># Correct from_currency</span>
-        <span class="n">from_currency_fn</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_iso_mapping</span><span class="p">(</span><span class="n">from_currency</span><span class="p">,</span> <span class="n">map_to</span> <span class="o">=</span> <span class="s2">&quot;currency&quot;</span><span class="p">)</span>
+        <span class="n">from_currency_fn</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">region_map</span><span class="p">(</span><span class="n">from_currency</span><span class="p">,</span> <span class="n">map_to</span> <span class="o">=</span> <span class="s2">&quot;currency&quot;</span><span class="p">)</span>
 
-        <span class="c1"># Check for from_currency == to_currency</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_iso_mapping</span><span class="p">(</span><span class="n">from_currency_fn</span><span class="p">)</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">_iso_mapping</span><span class="p">(</span><span class="n">to_currency</span><span class="p">):</span>
-            <span class="k">return</span> <span class="nb">round</span><span class="p">(</span><span class="n">amount</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">round_to</span><span class="p">)</span> <span class="k">if</span> <span class="ow">not</span> <span class="n">pretty_print</span> <span class="k">else</span> <span class="nb">print</span><span class="p">(</span><span class="n">money_printer</span><span class="p">(</span><span class="n">amount</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">round_to</span><span class="p">),</span> <span class="n">to_currency</span><span class="p">)</span>
+        <span class="c1"># Correct to_currency</span>
+        <span class="n">to_currency_fn</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">region_map</span><span class="p">(</span><span class="n">to_currency</span><span class="p">,</span> <span class="n">map_to</span> <span class="o">=</span> <span class="s2">&quot;currency&quot;</span><span class="p">)</span>
 
-        <span class="c1"># To some currency from Euro</span>
+        <span class="c1"># Return amount unaltered if self-conversion was requested.</span>
+        <span class="k">if</span> <span class="n">from_currency_fn</span> <span class="o">==</span> <span class="n">to_currency_fn</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">amount</span>
+
+        <span class="c1"># From Euro to some currency</span>
         <span class="k">if</span> <span class="n">from_currency_fn</span> <span class="o">==</span> <span class="s2">&quot;EUR&quot;</span><span class="p">:</span>
-            <span class="n">converted_amount</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_eur_to_lcu</span><span class="p">(</span><span class="n">to_currency</span><span class="p">,</span> <span class="n">date</span><span class="p">)</span> <span class="o">*</span> <span class="nb">float</span><span class="p">(</span><span class="n">amount</span><span class="p">)</span>
+            <span class="n">converted_amount</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_eur_to_lcu</span><span class="p">(</span><span class="n">to_currency_fn</span><span class="p">,</span> <span class="n">date</span><span class="p">)</span> <span class="o">*</span> <span class="nb">float</span><span class="p">(</span><span class="n">amount</span><span class="p">)</span>
 
         <span class="c1"># From some currency to Euro</span>
-        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">_eur_to_lcu</span><span class="p">(</span><span class="n">to_currency</span><span class="p">)</span> <span class="o">==</span> <span class="s2">&quot;EUR&quot;</span><span class="p">:</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">_eur_to_lcu</span><span class="p">(</span><span class="n">to_currency_fn</span><span class="p">)</span> <span class="o">==</span> <span class="s2">&quot;EUR&quot;</span><span class="p">:</span>
             <span class="n">conversion_to_invert</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_eur_to_lcu</span><span class="p">(</span><span class="n">from_currency</span><span class="p">,</span> <span class="n">date</span><span class="p">)</span>
 
             <span class="k">if</span> <span class="n">conversion_to_invert</span> <span class="o">==</span> <span class="mf">0.0</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="ne">AttributeError</span><span class="p">(</span><span class="s2">&quot;Cannot converted to &#39;</span><span class="si">%s</span><span class="s2">&#39;.&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">to_currency</span><span class="p">))</span>
+                <span class="k">raise</span> <span class="ne">AttributeError</span><span class="p">(</span><span class="s2">&quot;Cannot converted to &#39;</span><span class="si">%s</span><span class="s2">&#39;.&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">to_currency_fn</span><span class="p">))</span>
             <span class="n">converted_amount</span> <span class="o">=</span> <span class="n">conversion_to_invert</span><span class="o">**-</span><span class="mi">1</span> <span class="o">*</span> <span class="nb">float</span><span class="p">(</span><span class="n">amount</span><span class="p">)</span>
 
         <span class="c1"># from_currency --&gt; Euro --&gt; to_currency</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="n">conversion_to_invert</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_eur_to_lcu</span><span class="p">(</span><span class="n">from_currency_fn</span> <span class="p">,</span> <span class="n">date</span><span class="p">)</span>
+            <span class="n">conversion_to_invert</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_eur_to_lcu</span><span class="p">(</span><span class="n">from_currency_fn</span><span class="p">,</span> <span class="n">date</span><span class="p">)</span>
             <span class="k">if</span> <span class="n">conversion_to_invert</span> <span class="o">==</span> <span class="mf">0.0</span><span class="p">:</span>
                 <span class="k">raise</span> <span class="ne">AttributeError</span><span class="p">(</span><span class="s2">&quot;Cannot converted from &#39;</span><span class="si">%s</span><span class="s2">&#39;.&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">from_currency</span><span class="p">))</span>
-
-            <span class="n">converted_amount</span> <span class="o">=</span> <span class="n">conversion_to_invert</span><span class="o">**-</span><span class="mi">1</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">_eur_to_lcu</span><span class="p">(</span><span class="n">to_currency</span><span class="p">,</span> <span class="n">date</span><span class="p">)</span> <span class="o">*</span> <span class="nb">float</span><span class="p">(</span><span class="n">amount</span><span class="p">)</span>
+            <span class="n">converted_amount</span> <span class="o">=</span> <span class="n">conversion_to_invert</span><span class="o">**-</span><span class="mi">1</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">_eur_to_lcu</span><span class="p">(</span><span class="n">to_currency_fn</span><span class="p">,</span> <span class="n">date</span><span class="p">)</span> <span class="o">*</span> <span class="nb">float</span><span class="p">(</span><span class="n">amount</span><span class="p">)</span>
 
         <span class="c1"># Round</span>
         <span class="n">rounded_amount</span> <span class="o">=</span> <span class="nb">round</span><span class="p">(</span><span class="n">converted_amount</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">round_to</span><span class="p">)</span>
@@ -558,63 +703,107 @@
         <span class="k">if</span> <span class="ow">not</span> <span class="n">pretty_print</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">rounded_amount</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="nb">print</span><span class="p">(</span><span class="n">money_printer</span><span class="p">(</span><span class="n">rounded_amount</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">round_to</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">_iso_mapping</span><span class="p">(</span><span class="n">to_currency</span><span class="p">,</span> <span class="s2">&quot;currency&quot;</span><span class="p">))</span></div>
+            <span class="nb">print</span><span class="p">(</span><span class="n">money_printer</span><span class="p">(</span><span class="n">rounded_amount</span><span class="p">,</span> <span class="n">to_currency</span><span class="p">,</span> <span class="n">round_to</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">round_to</span><span class="p">))</span></div>
 
-<div class="viewcode-block" id="Currency.normalize"><a class="viewcode-back" href="../../source/easymoney.html#easymoney.money.Currency.normalize">[docs]</a>    <span class="k">def</span> <span class="nf">normalize</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">amount</span><span class="p">,</span> <span class="n">currency</span><span class="p">,</span> <span class="n">from_year</span><span class="p">,</span> <span class="n">to_year</span> <span class="o">=</span> <span class="s2">&quot;latest&quot;</span><span class="p">,</span> <span class="n">base_currency</span> <span class="o">=</span> <span class="s2">&quot;EUR&quot;</span><span class="p">,</span> <span class="n">pretty_print</span> <span class="o">=</span> <span class="kc">False</span><span class="p">):</span>
+<div class="viewcode-block" id="EasyPeasy.normalize"><a class="viewcode-back" href="../../source/easymoney.html#easymoney.money.EasyPeasy.normalize">[docs]</a>    <span class="k">def</span> <span class="nf">normalize</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">amount</span><span class="p">,</span> <span class="n">currency</span><span class="p">,</span> <span class="n">from_year</span><span class="p">,</span> <span class="n">to_year</span> <span class="o">=</span> <span class="s2">&quot;latest&quot;</span><span class="p">,</span> <span class="n">base_currency</span> <span class="o">=</span> <span class="s2">&quot;EUR&quot;</span><span class="p">,</span> <span class="n">exchange_date</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">pretty_print</span> <span class="o">=</span> <span class="kc">False</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 
-<span class="sd">        Convert a Nominal Amount to a Real Amount in the same, or another, currency.</span>
+<span class="sd">        | Convert a Nominal Amount to a Real Amount in the same, or another, currency.</span>
+<span class="sd">        |</span>
+<span class="sd">        | This requires both inflation (for *currency*) and exchange rate information (*currency* to *base_currency*).</span>
+<span class="sd">          See ``options(info = &#39;all&#39;, overlap_only = True)`` for an exhaustive listing of valid values to pass to this method.</span>
+<span class="sd">        |</span>
+<span class="sd">        | Currency Normalization occurs in two steps:</span>
+<span class="sd">        |       1. Adjust the currency for inflation, e.g., 100 (2010 :math:`CUR_{1}`) :math:`\longrightarrow` x (2015 :math:`CUR_{1}`).</span>
+<span class="sd">        |       2. Convert the adjusted amount into the *base_currency*.</span>
 
-<span class="sd">        :param amount: a numeric amount of money</span>
+<span class="sd">        :param amount: a numeric amount of money.</span>
 <span class="sd">        :type amount: float or int</span>
-<span class="sd">        :param currency: a region or currency. Legal: Region Name, ISO Alpha2, Alpha3 or Currency Code (see `options()`).</span>
+<span class="sd">        :param currency: a region or currency. Legal: Region Name, ISO Alpha2, Alpha3 or Currency Code (see ``options()``).</span>
 <span class="sd">        :type currency: str</span>
-<span class="sd">        :param from_year: a year. For legal values see `options()`.</span>
+<span class="sd">        :param from_year: a year. For legal values see ``options()``.</span>
 <span class="sd">        :type from_year: int</span>
-<span class="sd">        :param to_year: a year. For legal values see `options()`.</span>
-<span class="sd">        :type to_year: int</span>
-<span class="sd">        :param base_currency:  a region or currency. Legal: Region Name, ISO Alpha2, Alpha3 or Currency Code (see `options()`). Defaults to &#39;EUR&#39;.</span>
+<span class="sd">        :param to_year: a year. For legal values see ``options()``. Defaults to &#39;latest&#39; (which will use the most recent data avaliable).</span>
+
+<span class="sd">                        .. warning::</span>
+<span class="sd">                            If *to_year* is set to a specific year rather than to its default (&#39;latest&#39;) and</span>
+<span class="sd">                            *exchange_date* is left to its default (*None*), the *average* exchange rate for *to_year*</span>
+<span class="sd">                            will be used :sup:`1`.</span>
+
+<span class="sd">                            For this reason, it is suggested that if you wish to pass a specific year via *to_year*,</span>
+<span class="sd">                            you also supply a specific date to *exchange_date* for this method to perform the currency</span>
+<span class="sd">                            conversion. Recall that the exchange rate is only computed after *amount* has been</span>
+<span class="sd">                            converted into real local currency units (LCUs; e.g., Real US Dollars or Real Euros.).</span>
+
+<span class="sd">                            :sup:`1` The only exception to this generalization is if *currency* and *base_currency*</span>
+<span class="sd">                            are the same (as currency conversion is not needed in such an instance).</span>
+
+<span class="sd">        :type to_year: str or int</span>
+<span class="sd">        :param base_currency:  a region or currency. Legal: Region Name, ISO Alpha2, Alpha3 or Currency Code</span>
+<span class="sd">                               (see ``options()``). Defaults to &#39;EUR&#39;.</span>
 <span class="sd">        :type base_currency: str</span>
-<span class="sd">        :param pretty_print: Pretty Print the result if True; return amount if False. Defaults to False.</span>
+<span class="sd">        :param pretty_print: Pretty print the result if True; return amount if False. Defaults to False.</span>
 <span class="sd">        :type pretty_print: bool</span>
-<span class="sd">        :return: adjusted_amount</span>
+<span class="sd">        :param exchange_date: date to perform the currency conversion on. Dates must be of the form: ``YYYY-MM-DD``.</span>
+<span class="sd">                              Defaults to None.</span>
+<span class="sd">        :type exchange_date: str</span>
+<span class="sd">        :return: amount adjusted for inflation and converted into the base currency.</span>
 <span class="sd">        :type: float</span>
-<span class="sd">        :raises ValueError: if from_currency does not map onto a specific region.</span>
-<span class="sd">                            If you&#39;d like to convert from EUR, please specify a specific nation (may be fixed in a future update).</span>
+<span class="sd">        :raises ValueError: if:</span>
+
+<span class="sd">                               (a) *from_currency* does not map onto a specific region,</span>
+
+<span class="sd">                               (b) *to_year* is not numeric (``float`` or ``int``) OR</span>
+
+<span class="sd">                               (c) *to_year* is greater than the year for which most recent inflation information is avaliable.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Initialize</span>
+        <span class="n">most_recent_cpi_record</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="n">inflation_year_b</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="n">adjusted_amount</span> <span class="o">=</span> <span class="kc">None</span>
+
         <span class="c1"># Standardize currency input</span>
-        <span class="n">from_currency</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_iso_mapping</span><span class="p">(</span><span class="n">currency</span><span class="p">,</span> <span class="n">map_to</span> <span class="o">=</span> <span class="s2">&quot;currency&quot;</span><span class="p">)</span>
-
-        <span class="k">if</span> <span class="n">from_currency</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">currency_to_alpha2</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;&#39;</span><span class="si">%s</span><span class="s2">&#39; cannot be mapped to a specific region, and thus inflation cannot be determined.&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">currency</span><span class="p">))</span>
-
-        <span class="c1"># Ensure base_currrency is a valid currency code</span>
-        <span class="n">to_currency</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_iso_mapping</span><span class="p">(</span><span class="n">base_currency</span><span class="p">,</span> <span class="n">map_to</span> <span class="o">=</span> <span class="s1">&#39;currency&#39;</span><span class="p">)</span>
+        <span class="n">from_currency</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">region_map</span><span class="p">(</span><span class="n">currency</span><span class="p">,</span> <span class="n">map_to</span> <span class="o">=</span> <span class="s1">&#39;currency&#39;</span><span class="p">)</span>
 
         <span class="c1"># Determine Alpha2 country code</span>
-        <span class="n">from_region</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_iso_mapping</span><span class="p">(</span><span class="n">currency</span><span class="p">,</span> <span class="n">map_to</span> <span class="o">=</span> <span class="s1">&#39;alpha2&#39;</span><span class="p">)</span>
+        <span class="n">from_region</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">region_map</span><span class="p">(</span><span class="n">currency</span><span class="p">,</span> <span class="n">map_to</span> <span class="o">=</span> <span class="s1">&#39;alpha2&#39;</span><span class="p">)</span>
+
+        <span class="c1"># Ensure base_currrency is a valid currency code</span>
+        <span class="n">to_currency</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">region_map</span><span class="p">(</span><span class="n">base_currency</span><span class="p">,</span> <span class="n">map_to</span> <span class="o">=</span> <span class="s1">&#39;currency&#39;</span><span class="p">)</span>
 
         <span class="c1"># Determine to CPI Data</span>
-        <span class="n">most_recent_cpi_record</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cpi_df</span><span class="p">[(</span><span class="bp">self</span><span class="o">.</span><span class="n">cpi_df</span><span class="o">.</span><span class="n">alpha2</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">currency_to_alpha2</span><span class="p">[</span><span class="n">from_currency</span><span class="p">])</span> <span class="o">&amp;</span> \
-                                             <span class="p">(</span><span class="o">~</span><span class="n">pd</span><span class="o">.</span><span class="n">isnull</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cpi_df</span><span class="o">.</span><span class="n">cpi</span><span class="p">))]</span><span class="o">.</span><span class="n">year</span><span class="o">.</span><span class="n">max</span><span class="p">()</span>
+        <span class="n">cpi_record</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cpi_df</span><span class="p">[(</span><span class="bp">self</span><span class="o">.</span><span class="n">cpi_df</span><span class="o">.</span><span class="n">alpha2</span> <span class="o">==</span> <span class="n">from_region</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="o">~</span><span class="n">pd</span><span class="o">.</span><span class="n">isnull</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cpi_df</span><span class="o">.</span><span class="n">cpi</span><span class="p">))]</span>
+        <span class="k">if</span> <span class="n">cpi_record</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">most_recent_cpi_record</span> <span class="o">=</span> <span class="n">cpi_record</span><span class="o">.</span><span class="n">year</span><span class="o">.</span><span class="n">max</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;&#39;</span><span class="si">%s</span><span class="s2">&#39; cannot be mapped to a specific region, and thus inflation cannot be determined.&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">currency</span><span class="p">))</span>
 
         <span class="k">if</span> <span class="n">to_year</span> <span class="o">!=</span> <span class="s2">&quot;latest&quot;</span> <span class="ow">and</span> <span class="nb">float</span><span class="p">(</span><span class="n">to_year</span><span class="p">)</span> <span class="o">&lt;</span> <span class="nb">float</span><span class="p">(</span><span class="n">most_recent_cpi_record</span><span class="p">):</span>
-            <span class="k">if</span> <span class="n">floater</span><span class="p">(</span><span class="n">to_year</span><span class="p">):</span>
-                <span class="n">inflation_year_b</span> <span class="o">=</span> <span class="n">to_year</span>
+            <span class="k">if</span> <span class="n">floater</span><span class="p">(</span><span class="n">to_year</span><span class="p">,</span> <span class="n">just_check</span> <span class="o">=</span> <span class="kc">True</span><span class="p">):</span>
+                <span class="n">inflation_year_b</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">to_year</span><span class="p">))</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;to_year invalid; &#39;</span><span class="si">%s</span><span class="s2">&#39; is not numeric (intiger or float).&quot;</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">to_year</span> <span class="o">!=</span> <span class="s2">&quot;latest&quot;</span> <span class="ow">and</span> <span class="nb">float</span><span class="p">(</span><span class="n">to_year</span><span class="p">)</span> <span class="o">&gt;</span> <span class="nb">float</span><span class="p">(</span><span class="n">most_recent_cpi_record</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;No data avaliable for &#39;</span><span class="si">%s</span><span class="s2">&#39; in </span><span class="si">%s</span><span class="s2">. Try </span><span class="si">%s</span><span class="s2"> or earlier.&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">currency</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">to_year</span><span class="p">),</span> <span class="nb">str</span><span class="p">(</span><span class="n">most_recent_cpi_record</span><span class="p">)))</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">inflation_year_b</span> <span class="o">=</span> <span class="n">most_recent_cpi_record</span>
             <span class="k">if</span> <span class="nb">float</span><span class="p">(</span><span class="n">inflation_year_b</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="p">(</span><span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span><span class="o">.</span><span class="n">year</span> <span class="o">-</span> <span class="mi">2</span><span class="p">):</span>
-                <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s2">&quot;Inflation information not avaliable for &#39;</span><span class="si">%s</span><span class="s2">&#39;, using </span><span class="si">%s</span><span class="s2">.&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">to_year</span><span class="p">,</span> <span class="n">inflation_year_b</span><span class="p">))</span>
+                <span class="n">warn</span><span class="p">(</span><span class="s2">&quot;Inflation information not avaliable for &#39;</span><span class="si">%s</span><span class="s2">&#39;, using </span><span class="si">%s</span><span class="s2">.&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">to_year</span><span class="p">,</span> <span class="n">inflation_year_b</span><span class="p">))</span>
 
         <span class="c1"># Adjust input for inflation</span>
         <span class="n">currency_adj_inflation</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">inflation_calculator</span><span class="p">(</span><span class="n">amount</span><span class="p">,</span> <span class="n">from_region</span><span class="p">,</span> <span class="n">from_year</span><span class="p">,</span> <span class="n">inflation_year_b</span><span class="p">)</span>
 
         <span class="c1"># Convert into the base currency</span>
-        <span class="n">adjusted_amount</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">currency_converter</span><span class="p">(</span><span class="n">currency_adj_inflation</span><span class="p">,</span> <span class="n">from_currency</span><span class="p">,</span> <span class="n">to_currency</span><span class="p">)</span>
+        <span class="n">adjusted_amount</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">currency_converter</span><span class="p">(</span>  <span class="n">amount</span> <span class="o">=</span> <span class="n">currency_adj_inflation</span>
+                                                  <span class="p">,</span> <span class="n">from_currency</span> <span class="o">=</span> <span class="n">from_currency</span>
+                                                  <span class="p">,</span> <span class="n">to_currency</span> <span class="o">=</span> <span class="n">to_currency</span>
+                                                  <span class="p">,</span> <span class="n">date</span> <span class="o">=</span> <span class="p">(</span><span class="n">to_year</span> <span class="k">if</span> <span class="n">exchange_date</span> <span class="o">==</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">exchange_date</span><span class="p">))</span>
 
-        <span class="k">return</span> <span class="n">adjusted_amount</span> <span class="k">if</span> <span class="ow">not</span> <span class="n">pretty_print</span> <span class="k">else</span> <span class="nb">print</span><span class="p">(</span><span class="n">money_printer</span><span class="p">(</span><span class="n">adjusted_amount</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">round_to</span><span class="p">),</span> <span class="n">to_currency</span><span class="p">)</span></div>
+        <span class="c1"># Return or Pretty Print</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">pretty_print</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">adjusted_amount</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="n">money_printer</span><span class="p">(</span><span class="n">adjusted_amount</span><span class="p">,</span> <span class="n">to_currency</span><span class="p">,</span> <span class="n">round_to</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">round_to</span><span class="p">))</span></div>
 
     <span class="k">def</span> <span class="nf">_date_options</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">nested_date_dict</span><span class="p">,</span> <span class="n">keys_as_dates</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="n">date_format</span> <span class="o">=</span> <span class="s2">&quot;%Y-%m-</span><span class="si">%d</span><span class="s2">&quot;</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -623,16 +812,16 @@
 <span class="sd">        Function that figures out how to return dates for which data is avaliable.</span>
 
 <span class="sd">        Expected structures:</span>
-<span class="sd">            1. keys_as_dates = True:  {DATE: {KEY: VALUE}, DATE: {KEY: VALUE}...}; DATE = YYYY-MM-DD</span>
-<span class="sd">            2. keys_as_dates = False: {KEY: {DATE: VALUE}, KEY: {DATE: VALUE}...}; DATE = YYYY</span>
+<span class="sd">            1. ``keys_as_dates = True:  {DATE: {KEY: VALUE}, DATE: {KEY: VALUE}...}; DATE = YYYY-MM-DD``</span>
+<span class="sd">            2. ``keys_as_dates = False: {KEY: {DATE: VALUE}, KEY: {DATE: VALUE}...}; DATE = YYYY``</span>
 
-<span class="sd">        :param nested_date_dict: nested dictionary</span>
+<span class="sd">        :param nested_date_dict: nested dictionary.</span>
 <span class="sd">        :type nested_date_dict: dict</span>
 <span class="sd">        :param keys_as_dates: whether or not the date information exists as the key or the key of the nested dict. Defaults to False.</span>
 <span class="sd">        :type keys_as_dates: bool</span>
 <span class="sd">        :param date_format: a date format. Defaults to &quot;%Y-%m-%d&quot;.</span>
 <span class="sd">        :type date_format: str</span>
-<span class="sd">        :return: a date options dict</span>
+<span class="sd">        :return: a date options dict.</span>
 <span class="sd">        :rtype: dict</span>
 <span class="sd">        :raises ValueError: keys_as_dates is not boolean (True or False).</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -670,11 +859,11 @@
                 <span class="n">date_ranges_dict</span><span class="p">[</span><span class="n">k</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">v</span><span class="p">)</span>
 
             <span class="c1"># Convert Keys to Alpha2 and return</span>
-            <span class="k">return</span> <span class="nb">dict</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">_iso_mapping</span><span class="p">(</span><span class="n">k</span><span class="p">),</span> <span class="n">v</span><span class="p">)</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">date_ranges_dict</span><span class="o">.</span><span class="n">items</span><span class="p">())</span>
+            <span class="k">return</span> <span class="nb">dict</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">region_map</span><span class="p">(</span><span class="n">k</span><span class="p">),</span> <span class="n">v</span><span class="p">)</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">date_ranges_dict</span><span class="o">.</span><span class="n">items</span><span class="p">())</span>
 
         <span class="c1"># i.e., cpi_dict</span>
         <span class="k">elif</span> <span class="ow">not</span> <span class="n">keys_as_dates</span><span class="p">:</span>
-            <span class="n">date_ranges_dict</span> <span class="o">=</span> <span class="nb">dict</span><span class="o">.</span><span class="n">fromkeys</span><span class="p">(</span><span class="n">nested_date_dict</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span> <span class="c1"># should be using _iso_mapping() here.</span>
+            <span class="n">date_ranges_dict</span> <span class="o">=</span> <span class="nb">dict</span><span class="o">.</span><span class="n">fromkeys</span><span class="p">(</span><span class="n">nested_date_dict</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span> <span class="c1"># should be using region_map() here.</span>
             <span class="c1"># Get the date range for each key in the nested dict</span>
             <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">date_ranges_dict</span><span class="p">:</span>
                 <span class="n">date_values</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">str_to_datetime</span><span class="p">(</span><span class="n">nested_date_dict</span><span class="p">[</span><span class="n">k</span><span class="p">]</span><span class="o">.</span><span class="n">keys</span><span class="p">(),</span> <span class="n">date_format</span> <span class="o">=</span> <span class="n">date_format</span><span class="p">))</span>
@@ -823,7 +1012,7 @@
         <span class="sd">&quot;&quot;&quot;</span>
 
 <span class="sd">        *Private Method*</span>
-<span class="sd">        Wrapper for _currency_options()</span>
+<span class="sd">        Wrapper for ``_currency_options()``</span>
 
 <span class="sd">        :param info: &#39;exchange&#39; for exchange rate; &#39;inflation&#39; for inflation information; &#39;all&#39; for both.</span>
 <span class="sd">        :type info: str</span>
@@ -844,13 +1033,13 @@
 
         <span class="k">return</span> <span class="n">info_table</span>
 
-<div class="viewcode-block" id="Currency.options"><a class="viewcode-back" href="../../source/easymoney.html#easymoney.money.Currency.options">[docs]</a>    <span class="k">def</span> <span class="nf">options</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">info</span><span class="p">,</span> <span class="n">rformat</span> <span class="o">=</span> <span class="s1">&#39;table&#39;</span><span class="p">,</span> <span class="n">pretty_table</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">pretty_print</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">overlap_only</span> <span class="o">=</span> <span class="kc">False</span><span class="p">):</span>
+<div class="viewcode-block" id="EasyPeasy.options"><a class="viewcode-back" href="../../source/easymoney.html#easymoney.money.EasyPeasy.options">[docs]</a>    <span class="k">def</span> <span class="nf">options</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">info</span><span class="p">,</span> <span class="n">rformat</span> <span class="o">=</span> <span class="s1">&#39;table&#39;</span><span class="p">,</span> <span class="n">pretty_table</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">pretty_print</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">overlap_only</span> <span class="o">=</span> <span class="kc">False</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 
 <span class="sd">        An easy inferface to explore all of the terminology EasyMoney understands</span>
 <span class="sd">        as well the dates for which data is available.</span>
 
-<span class="sd">        :param info: &#39;exchange&#39;, &#39;inflation&#39; or &#39;all&#39; (&#39;all&#39; requires rformat is set to &#39;table&#39;)</span>
+<span class="sd">        :param info: &#39;exchange&#39;, &#39;inflation&#39; or &#39;all&#39; (&#39;all&#39; requires rformat is set to &#39;table&#39;).</span>
 <span class="sd">        :type info: str</span>
 <span class="sd">        :param rformat: &#39;table&#39; for a table or &#39;list&#39; for just the currecy codes, alone. Defaults to &#39;table&#39;.</span>
 <span class="sd">        :type rformat: str</span>
@@ -859,12 +1048,12 @@
 <span class="sd">        :param pretty_print: if True, prints the list or table. If False, returns the list or table (as a Pandas DataFrame).</span>
 <span class="sd">                             Defaults to True.</span>
 <span class="sd">        :type pretty_print: bool</span>
-<span class="sd">        :param overlap_only: when info is set to &#39;all&#39;, only keep those rows for which exchange rate and inflation data</span>
+<span class="sd">        :param overlap_only: when info is set to &#39;all&#39;, keep only those rows for which exchange rate and inflation data</span>
 <span class="sd">                             overlap.</span>
 <span class="sd">        :type overlap_only: bool</span>
 <span class="sd">        :return: DataFrame of Currency Information EasyMoney Understands.</span>
 <span class="sd">        :rtype: Pandas DataFrame</span>
-<span class="sd">        :raises ValueError: if (a) rformat is not either &#39;list&#39; or &#39;table&#39; or (b) `overlap_only` is True</span>
+<span class="sd">        :raises ValueError: if (a) rformat is not either &#39;list&#39; or &#39;table&#39; or (b) *overlap_only* is True</span>
 <span class="sd">                            while info is not &#39;all&#39; and rformat is not &#39;table&#39;.</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -873,8 +1062,8 @@
         <span class="c1"># despite it&#39;s size, it now it represent is a single (long) thought.</span>
 
         <span class="c1"># Initalize</span>
-        <span class="n">list_to_return</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="n">info_table</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="n">list_options</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="n">date_columns_in_table</span> <span class="o">=</span> <span class="kc">None</span>
 
         <span class="c1"># Create a lambda to convert the InflationRange lists to lists of ints (from lists of strings).</span>
@@ -894,8 +1083,8 @@
 
         <span class="c1"># Generate a (sorted) list</span>
         <span class="k">if</span> <span class="n">rformat</span> <span class="o">==</span> <span class="s1">&#39;list&#39;</span><span class="p">:</span>
-            <span class="n">list_to_return</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_list_option</span><span class="p">(</span><span class="n">info</span><span class="p">)</span>
-            <span class="k">return</span> <span class="n">list_to_return</span> <span class="k">if</span> <span class="ow">not</span> <span class="n">pretty_print</span> <span class="k">else</span> <span class="nb">print</span><span class="p">(</span><span class="n">list_to_return</span><span class="p">)</span>
+            <span class="n">list_options</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_list_option</span><span class="p">(</span><span class="n">info</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">list_options</span> <span class="k">if</span> <span class="ow">not</span> <span class="n">pretty_print</span> <span class="k">else</span> <span class="nb">print</span><span class="p">(</span><span class="n">list_options</span><span class="p">)</span>
 
         <span class="c1"># Generate a table</span>
         <span class="k">elif</span> <span class="n">rformat</span> <span class="o">==</span> <span class="s1">&#39;table&#39;</span><span class="p">:</span>
@@ -929,20 +1118,6 @@
                         <span class="n">info_table</span><span class="p">[</span><span class="n">col</span><span class="p">]</span> <span class="o">=</span> <span class="n">info_table</span><span class="p">[</span><span class="n">col</span><span class="p">]</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="n">full_date_to_datetime</span><span class="p">)</span>
 
                 <span class="k">return</span> <span class="n">info_table</span></div></div>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 

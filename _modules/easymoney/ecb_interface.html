@@ -130,7 +130,6 @@
   <h1>Source code for easymoney.ecb_interface</h1><div class="highlight"><pre>
 <span></span><span class="ch">#!/usr/bin/env python3</span>
 
-
 <span class="sd">&quot;&quot;&quot;</span>
 
 <span class="sd">    Tools for Obtaining Data from the European Central Bank</span>
@@ -141,43 +140,18 @@
 
 <span class="c1"># Modules #</span>
 <span class="kn">import</span> <span class="nn">re</span>
-<span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">import</span> <span class="nn">requests</span>
 <span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
-<span class="kn">from</span> <span class="nn">bs4</span> <span class="k">import</span> <span class="n">BeautifulSoup</span>
 <span class="kn">from</span> <span class="nn">easymoney.support_money</span> <span class="k">import</span> <span class="n">floater</span>
 
-<span class="k">if</span> <span class="n">sys</span><span class="o">.</span><span class="n">version_info</span><span class="o">.</span><span class="n">major</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span>
-    <span class="kn">import</span> <span class="nn">urllib.request</span>
-<span class="k">elif</span> <span class="n">sys</span><span class="o">.</span><span class="n">version_info</span><span class="o">.</span><span class="n">major</span> <span class="o">==</span> <span class="mi">2</span> <span class="ow">and</span> <span class="n">sys</span><span class="o">.</span><span class="n">version_info</span><span class="o">.</span><span class="n">minor</span> <span class="o">&gt;=</span> <span class="mi">7</span><span class="p">:</span>
-    <span class="kn">import</span> <span class="nn">urllib2</span>
-<span class="k">else</span><span class="p">:</span>
-    <span class="k">raise</span> <span class="ne">ImportError</span><span class="p">(</span><span class="s2">&quot;Your Version of Python is too old. Please Consider upgrading to --at least-- Python 2.7.</span><span class="se">\n</span><span class="s2">&quot;</span>
-                      <span class="s2">&quot;Python 3.5 is preferable.&quot;</span><span class="p">)</span>
 
-<span class="k">def</span> <span class="nf">_soup_from_url</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">parser</span> <span class="o">=</span> <span class="s1">&#39;lxml&#39;</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
-
-<span class="sd">    *Private Method*</span>
-<span class="sd">    Parses a URL with bs4&#39;s BeautifulSoup() method.</span>
-
-<span class="sd">    :param url: URL to parse with BeautifulSoup().</span>
-<span class="sd">    :type url: str</span>
-<span class="sd">    :param parser: the parser to be used by BeautifulSoup(). Defaults to &#39;lxml&#39;.</span>
-<span class="sd">    :type parser: str</span>
-<span class="sd">    :return: BeautifulSoup</span>
-<span class="sd">    :rtype: bs4 obj</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">if</span> <span class="n">sys</span><span class="o">.</span><span class="n">version_info</span><span class="o">.</span><span class="n">major</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span>
-        <span class="k">return</span> <span class="n">BeautifulSoup</span><span class="p">(</span><span class="n">urllib</span><span class="o">.</span><span class="n">request</span><span class="o">.</span><span class="n">urlopen</span><span class="p">(</span><span class="n">url</span><span class="p">),</span> <span class="n">parser</span><span class="p">)</span>
-    <span class="k">else</span><span class="p">:</span>
-        <span class="k">return</span> <span class="n">BeautifulSoup</span><span class="p">(</span><span class="n">urllib2</span><span class="o">.</span><span class="n">Request</span><span class="p">(</span><span class="n">url</span><span class="p">),</span> <span class="n">parser</span><span class="p">)</span>
-
-<div class="viewcode-block" id="ecb_exchange_data"><a class="viewcode-back" href="../../source/easymoney.html#easymoney.ecb_interface.ecb_exchange_data">[docs]</a><span class="k">def</span> <span class="nf">ecb_exchange_data</span><span class="p">(</span><span class="n">return_as</span> <span class="o">=</span> <span class="s1">&#39;dict&#39;</span><span class="p">,</span> <span class="n">ecb_extension</span> <span class="o">=</span> <span class="s2">&quot;/stats/eurofxref/eurofxref-hist.xml&quot;</span><span class="p">):</span>
+<div class="viewcode-block" id="ecb_xml_exchange_data"><a class="viewcode-back" href="../../source/easymoney.html#easymoney.ecb_interface.ecb_xml_exchange_data">[docs]</a><span class="k">def</span> <span class="nf">ecb_xml_exchange_data</span><span class="p">(</span><span class="n">return_as</span> <span class="o">=</span> <span class="s1">&#39;dict&#39;</span><span class="p">,</span> <span class="n">ecb_extension</span> <span class="o">=</span> <span class="s2">&quot;/stats/eurofxref/eurofxref-hist.xml&quot;</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 
 <span class="sd">    | This tool goes out to the European Central Bank via their generously provided API</span>
-<span class="sd">    | and coerces XML data into a dictionary. Expects &#39;time&#39;, &#39;currency&#39;, &#39;rate&#39; in the XML data.</span>
-<span class="sd">    | Returns a nested dictionary of the form: {time: {currency: rate}}.</span>
+<span class="sd">    | and coerces XML data into a dictionary.</span>
+<span class="sd">    | Expects &#39;time&#39;, &#39;currency&#39;, &#39;rate&#39; in the XML data.</span>
+<span class="sd">    | Returns a nested dictionary of the form: ``{time: {currency: rate}}``.</span>
 <span class="sd">    | DO NOT WRITE PROCEDURES THAT SLAM THEIR SERVERS.</span>
 
 <span class="sd">    :param return_as: &#39;dict&#39; for dictionary (nested); &#39;df&#39; for pandas dataframe.</span>
@@ -194,20 +168,20 @@
     <span class="c1"># Constuct the URL to the XML data on the ECB&#39;s website.</span>
     <span class="n">xmlpath</span> <span class="o">=</span> <span class="s2">&quot;http://www.ecb.europa.eu&quot;</span> <span class="o">+</span> <span class="n">ecb_extension</span>
 
-    <span class="c1"># Parse with BeautifulSoup</span>
-    <span class="n">soup</span> <span class="o">=</span> <span class="n">_soup_from_url</span><span class="p">(</span><span class="n">xmlpath</span><span class="p">)</span>
+    <span class="c1"># Request the data from the sever.</span>
+    <span class="n">url_request</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">xmlpath</span><span class="p">)</span>
 
-    <span class="c1"># Convert to string</span>
-    <span class="n">ecb_hist_xml</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">soup</span><span class="o">.</span><span class="n">find_all</span><span class="p">(</span><span class="s2">&quot;cube&quot;</span><span class="p">,</span> <span class="n">attrs</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;time&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">}))</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;,&quot;</span><span class="p">)</span>
+    <span class="c1"># Convert the XML to str, split on &#39;Cube&gt;&lt;Cube&#39; and remove the first element.</span>
+    <span class="n">parsed_xml</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">url_request</span><span class="o">.</span><span class="n">content</span><span class="p">)</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;Cube&gt;&lt;Cube&quot;</span><span class="p">)[</span><span class="mi">1</span><span class="p">:]</span>
 
-    <span class="c1"># Get all Dates</span>
-    <span class="n">exchange_rate_db</span> <span class="o">=</span> <span class="nb">dict</span><span class="o">.</span><span class="n">fromkeys</span><span class="p">([</span><span class="n">re</span><span class="o">.</span><span class="n">findall</span><span class="p">(</span><span class="s1">r&#39;time=&quot;(.*?)&quot;&gt;&#39;</span><span class="p">,</span> <span class="n">i</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">ecb_hist_xml</span><span class="p">])</span>
+    <span class="c1"># Initialize the exchange rate dict</span>
+    <span class="n">exchange_rate_db</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
 
-    <span class="c1"># Extract time, currency and rate information</span>
-    <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="n">ecb_hist_xml</span><span class="p">:</span>
-        <span class="n">date</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">findall</span><span class="p">(</span><span class="s1">r&#39;time=&quot;(.*?)&quot;&gt;&#39;</span><span class="p">,</span> <span class="n">j</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="c1"># Iterate though the parsed XML</span>
+    <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="n">parsed_xml</span><span class="p">:</span>
+        <span class="n">date</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">findall</span><span class="p">(</span><span class="s1">r&#39;time=&quot;(.*?)&quot;&#39;</span><span class="p">,</span> <span class="n">j</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
         <span class="n">ccodes</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">findall</span><span class="p">(</span><span class="s1">r&#39;currency=&quot;(.*?)&quot; rate=&#39;</span><span class="p">,</span> <span class="n">j</span><span class="p">)</span>
-        <span class="n">rates</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">findall</span><span class="p">(</span><span class="s1">r&#39;rate=&quot;(.*?)&quot;&gt;&#39;</span><span class="p">,</span> <span class="n">j</span><span class="p">)</span>
+        <span class="n">rates</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">findall</span><span class="p">(</span><span class="s1">r&#39;rate=&quot;(.*?)&quot;&#39;</span><span class="p">,</span> <span class="n">j</span><span class="p">)</span>
         <span class="n">exchange_rate_db</span><span class="p">[</span><span class="n">date</span><span class="p">]</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">ccodes</span><span class="p">,</span> <span class="p">[</span><span class="n">floater</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">rates</span><span class="p">]))</span>
         <span class="n">all_currency_codes</span> <span class="o">+=</span> <span class="p">[</span><span class="n">c</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">ccodes</span> <span class="k">if</span> <span class="n">c</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">all_currency_codes</span><span class="p">]</span>
 
@@ -224,10 +198,16 @@
 
         <span class="c1"># Melt the dataframe</span>
         <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">melt</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">id_vars</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;date&#39;</span><span class="p">],</span> <span class="n">value_vars</span> <span class="o">=</span> <span class="p">[</span><span class="n">d</span> <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">df</span><span class="o">.</span><span class="n">columns</span> <span class="k">if</span> <span class="n">d</span> <span class="o">!=</span> <span class="s1">&#39;date&#39;</span><span class="p">])</span>
-        <span class="n">df</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="n">columns</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;variable&quot;</span> <span class="p">:</span> <span class="s2">&quot;ccode&quot;</span><span class="p">,</span> <span class="s2">&quot;value&quot;</span> <span class="p">:</span> <span class="s2">&quot;rate&quot;</span><span class="p">},</span> <span class="n">inplace</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span>
+        <span class="n">df</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="n">columns</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;variable&quot;</span> <span class="p">:</span> <span class="s2">&quot;currency&quot;</span><span class="p">,</span> <span class="s2">&quot;value&quot;</span> <span class="p">:</span> <span class="s2">&quot;rate&quot;</span><span class="p">},</span> <span class="n">inplace</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span>
 
         <span class="c1"># Convert date column --&gt; datetime</span>
         <span class="n">df</span><span class="o">.</span><span class="n">date</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">to_datetime</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">date</span><span class="p">,</span> <span class="n">infer_datetime_format</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span>
+
+        <span class="c1"># Sort by currency code</span>
+        <span class="n">df</span><span class="o">.</span><span class="n">sort_values</span><span class="p">([</span><span class="s1">&#39;date&#39;</span><span class="p">,</span> <span class="s1">&#39;currency&#39;</span><span class="p">],</span> <span class="n">ascending</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="n">inplace</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span>
+
+        <span class="c1"># Refresh index</span>
+        <span class="n">df</span><span class="o">.</span><span class="n">index</span> <span class="o">=</span> <span class="nb">range</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
 
         <span class="k">return</span> <span class="n">df</span><span class="p">,</span> <span class="n">all_currency_codes</span></div>
 
@@ -241,6 +221,7 @@
                                 <span class="p">,</span> <span class="s2">&quot;SKK&quot;</span><span class="p">:</span> <span class="s2">&quot;SK&quot;</span>
                                 <span class="p">,</span> <span class="s2">&quot;TRL&quot;</span><span class="p">:</span> <span class="s2">&quot;TR&quot;</span>
 <span class="p">}</span>
+
 </pre></div>
 
            </div>

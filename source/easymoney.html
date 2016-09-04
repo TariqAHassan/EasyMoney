@@ -141,12 +141,13 @@
 <div class="section" id="tools-for-obtaining-data-from-the-european-central-bank">
 <h3>Tools for Obtaining Data from the European Central Bank<a class="headerlink" href="#tools-for-obtaining-data-from-the-european-central-bank" title="Permalink to this headline">¶</a></h3>
 <dl class="function">
-<dt id="easymoney.ecb_interface.ecb_exchange_data">
-<code class="descclassname">easymoney.ecb_interface.</code><code class="descname">ecb_exchange_data</code><span class="sig-paren">(</span><em>return_as='dict'</em>, <em>ecb_extension='/stats/eurofxref/eurofxref-hist.xml'</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/easymoney/ecb_interface.html#ecb_exchange_data"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#easymoney.ecb_interface.ecb_exchange_data" title="Permalink to this definition">¶</a></dt>
+<dt id="easymoney.ecb_interface.ecb_xml_exchange_data">
+<code class="descclassname">easymoney.ecb_interface.</code><code class="descname">ecb_xml_exchange_data</code><span class="sig-paren">(</span><em>return_as='dict'</em>, <em>ecb_extension='/stats/eurofxref/eurofxref-hist.xml'</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/easymoney/ecb_interface.html#ecb_xml_exchange_data"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#easymoney.ecb_interface.ecb_xml_exchange_data" title="Permalink to this definition">¶</a></dt>
 <dd><div class="line-block">
 <div class="line">This tool goes out to the European Central Bank via their generously provided API</div>
-<div class="line">and coerces XML data into a dictionary. Expects &#8216;time&#8217;, &#8216;currency&#8217;, &#8216;rate&#8217; in the XML data.</div>
-<div class="line">Returns a nested dictionary of the form: {time: {currency: rate}}.</div>
+<div class="line">and coerces XML data into a dictionary.</div>
+<div class="line">Expects &#8216;time&#8217;, &#8216;currency&#8217;, &#8216;rate&#8217; in the XML data.</div>
+<div class="line">Returns a nested dictionary of the form: <code class="docutils literal"><span class="pre">{time:</span> <span class="pre">{currency:</span> <span class="pre">rate}}</span></code>.</div>
 <div class="line">DO NOT WRITE PROCEDURES THAT SLAM THEIR SERVERS.</div>
 </div>
 <table class="docutils field-list" frame="void" rules="none">
@@ -177,8 +178,8 @@ Defaults to &#8216;/stats/eurofxref/eurofxref-hist.xml&#8217;.</li>
 <div class="section" id="main-api-functionality">
 <h3>Main API Functionality<a class="headerlink" href="#main-api-functionality" title="Permalink to this headline">¶</a></h3>
 <dl class="class">
-<dt id="easymoney.money.Currency">
-<em class="property">class </em><code class="descclassname">easymoney.money.</code><code class="descname">Currency</code><span class="sig-paren">(</span><em>precision=2</em>, <em>fallback=True</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/easymoney/money.html#Currency"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#easymoney.money.Currency" title="Permalink to this definition">¶</a></dt>
+<dt id="easymoney.money.EasyPeasy">
+<em class="property">class </em><code class="descclassname">easymoney.money.</code><code class="descname">EasyPeasy</code><span class="sig-paren">(</span><em>precision=2</em>, <em>fall_back=True</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/easymoney/money.html#EasyPeasy"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#easymoney.money.EasyPeasy" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
 <p>Tools for converting one currency to another, looking up inflation information, adjusting for inflation, and more!</p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -187,38 +188,84 @@ Defaults to &#8216;/stats/eurofxref/eurofxref-hist.xml&#8217;.</li>
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
 <li><strong>precision</strong> (<em>int</em>) &#8211; number of places to round to. Defaults to 2.</li>
-<li><strong>fallback</strong> (<em>bool</em>) &#8211; if True, fallback to closest possible date. Defaults to True.</li>
+<li><strong>fall_back</strong> (<em>bool</em>) &#8211; if True, fall back to closest possible date. Defaults to True.</li>
 </ul>
 </td>
 </tr>
 </tbody>
 </table>
 <dl class="method">
-<dt id="easymoney.money.Currency.currency_converter">
-<code class="descname">currency_converter</code><span class="sig-paren">(</span><em>amount</em>, <em>from_currency</em>, <em>to_currency</em>, <em>date='latest'</em>, <em>pretty_print=False</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/easymoney/money.html#Currency.currency_converter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#easymoney.money.Currency.currency_converter" title="Permalink to this definition">¶</a></dt>
-<dd><p>Function to convert an amount of money from one currency to another.</p>
+<dt id="easymoney.money.EasyPeasy.currency_converter">
+<code class="descname">currency_converter</code><span class="sig-paren">(</span><em>amount</em>, <em>from_currency</em>, <em>to_currency</em>, <em>date='latest'</em>, <em>pretty_print=False</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/easymoney/money.html#EasyPeasy.currency_converter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#easymoney.money.EasyPeasy.currency_converter" title="Permalink to this definition">¶</a></dt>
+<dd><p>Function to perform currency conversion based on, <strong>not</strong> directly reported from, data obtained
+from the European Central Bank (ECB). This data contains the exchange rate from Euros (EUR) to
+many local currency units (LCUs).</p>
+<p><strong>Formulae Used</strong>.</p>
+<p>Let <span class="math">\(LCU\)</span> be defined as:</p>
+<blockquote>
+<div><div class="math">
+\[LCU(\phi_{EUR}, CUR) = ExchangeRate_{\phi_{EUR} → CUR}\]</div>
+</div></blockquote>
+<div class="line-block">
+<div class="line"><span class="math">\(where\)</span>:</div>
+<div class="line-block">
+<div class="line"><span class="math">\(CUR\)</span> is some local currency unit.</div>
+<div class="line"><span class="math">\(\phi = 1\)</span>, as in the ECB data.</div>
+<div class="line"><br /></div>
+</div>
+</div>
+<p>That is, less formally:</p>
+<blockquote>
+<div><div class="math">
+\[LCU(1 \space EUR, CUR) = \dfrac{x \space \space CUR}{1 \space EUR}\]</div>
+</div></blockquote>
+<p><span class="math">\(Thus\)</span>:</p>
+<blockquote>
+<div><p>From <span class="math">\(EUR\)</span> to <span class="math">\(CUR\)</span>:</p>
+<blockquote>
+<div><div class="math">
+\[amount_{CUR} = LCU(\phi_{EUR}, CUR) \cdot amount_{EUR}\]</div>
+</div></blockquote>
+<p>From <span class="math">\(CUR\)</span> to <span class="math">\(EUR\)</span>:</p>
+<blockquote>
+<div><div class="math">
+\[amount_{EUR} = \dfrac{1}{LCU(\phi_{EUR}, CUR)} \cdot amount_{CUR}\]</div>
+</div></blockquote>
+<p>From <span class="math">\(CUR_{1}\)</span> to <span class="math">\(CUR_{2}\)</span>:</p>
+<blockquote>
+<div><div class="math">
+\[amount_{CUR_{2}} = \dfrac{1}{LCU(\phi_{EUR}, CUR_{1})} \cdot LCU(\phi_{EUR}, CUR_{2}) \cdot amount_{CUR_{1}}\]</div>
+</div></blockquote>
+</div></blockquote>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>amount</strong> (<em>float or int</em>) &#8211; an amount of money to be converted</li>
-<li><strong>from_currency</strong> (<em>str</em>) &#8211; the currency of the amount</li>
-<li><strong>to_currency</strong> (<em>str</em>) &#8211; the currency the amount is to be converted into</li>
-<li><strong>date</strong> (<em>str</em>) &#8211; date of data to perform the conversion with. Dates must be of the form: YYYY-MM-DD.
-Defaults to &#8220;latest&#8221; (which will use to most recent data avaliable).</li>
-<li><strong>pretty_print</strong> (<em>bool</em>) &#8211; if True, prints the table otherwise returns the table as a pandas DataFrame. Defaults to False.</li>
+<li><strong>amount</strong> (<em>float or int</em>) &#8211; an amount of money to be converted.</li>
+<li><strong>from_currency</strong> (<em>str</em>) &#8211; the currency of the amount.</li>
+<li><strong>to_currency</strong> (<em>str</em>) &#8211; the currency the amount is to be converted into.</li>
+<li><strong>date</strong> (<em>str</em>) &#8211; <p>date of data to perform the conversion with. Dates must be of the form: <code class="docutils literal"><span class="pre">YYYY-MM-DD</span></code> or <code class="docutils literal"><span class="pre">YYYY</span></code>.
+Defaults to &#8220;latest&#8221; (which will use the most recent data avaliable).</p>
+<div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p>If a date of the form <em>YYYY</em>  is passed, the average exchange rate will be returned for that entire year.</p>
+<p class="last">For this reason, using a value other than a date of the form <em>YYYY-MM-DD</em>
+or the default is not recommended.</p>
+</div>
+</li>
+<li><strong>pretty_print</strong> (<em>bool</em>) &#8211; if True, pretty prints the table otherwise returns the table as a pandas DataFrame. Defaults to False.</li>
 </ul>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">converted currency</p>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">converted currency.</p>
 </td>
 </tr>
 <tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first">float</p>
 </td>
 </tr>
 <tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><ul class="first last simple">
-<li><strong>ValueError</strong> &#8211; if amount is not numeric (float or int).</li>
+<li><strong>ValueError</strong> &#8211; if (a) pretty_print is not a boolean (b) amount is not numeric (float or int).</li>
 <li><strong>AttributeError</strong> &#8211; Conversion would result in division by zero (rare).</li>
 </ul>
 </td>
@@ -228,29 +275,30 @@ Defaults to &#8220;latest&#8221; (which will use to most recent data avaliable).
 </dd></dl>
 
 <dl class="method">
-<dt id="easymoney.money.Currency.inflation_calculator">
-<code class="descname">inflation_calculator</code><span class="sig-paren">(</span><em>amount</em>, <em>region</em>, <em>year_a</em>, <em>year_b</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/easymoney/money.html#Currency.inflation_calculator"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#easymoney.money.Currency.inflation_calculator" title="Permalink to this definition">¶</a></dt>
+<dt id="easymoney.money.EasyPeasy.inflation_calculator">
+<code class="descname">inflation_calculator</code><span class="sig-paren">(</span><em>amount</em>, <em>region</em>, <em>year_a</em>, <em>year_b</em>, <em>pretty_print=False</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/easymoney/money.html#EasyPeasy.inflation_calculator"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#easymoney.money.EasyPeasy.inflation_calculator" title="Permalink to this definition">¶</a></dt>
 <dd><p>Adjusts a given amount of money for inflation.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>amount</strong> (<em>float or int</em>) &#8211; a montary amount, e.g., 5</li>
-<li><strong>region</strong> (<em>str</em>) &#8211; a geographical region, e.g., US</li>
-<li><strong>year_a</strong> (<em>int</em>) &#8211; start year</li>
-<li><strong>year_b</strong> (<em>int</em>) &#8211; end year</li>
+<li><strong>amount</strong> (<em>float or int</em>) &#8211; a montary amount, e.g., 5.23.</li>
+<li><strong>region</strong> (<em>str</em>) &#8211; a geographical region, e.g., US.</li>
+<li><strong>year_a</strong> (<em>int</em>) &#8211; start year.</li>
+<li><strong>year_b</strong> (<em>int</em>) &#8211; end year.</li>
+<li><strong>pretty_print</strong> (<em>bool</em>) &#8211; if True, pretty prints the result otherwise returns the result as a float. Defaults to False.</li>
 </ul>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">amount * inflation rate.</p>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><span class="math">\(amount \cdot inflation \space rate\)</span>.</p>
 </td>
 </tr>
 <tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first">float</p>
 </td>
 </tr>
 <tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><ul class="first last simple">
-<li><strong>ValueError</strong> &#8211; if  year_a occurs after year_b</li>
+<li><strong>ValueError</strong> &#8211; if  year_a occurs after year_b.</li>
 <li><strong>KeyError</strong> &#8211; if inflation (CPI) information cannot be found in the inflation database.</li>
 </ul>
 </td>
@@ -260,25 +308,45 @@ Defaults to &#8220;latest&#8221; (which will use to most recent data avaliable).
 </dd></dl>
 
 <dl class="method">
-<dt id="easymoney.money.Currency.inflation_rate">
-<code class="descname">inflation_rate</code><span class="sig-paren">(</span><em>region</em>, <em>year_a</em>, <em>year_b=None</em>, <em>return_raw_cpi_dict=False</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/easymoney/money.html#Currency.inflation_rate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#easymoney.money.Currency.inflation_rate" title="Permalink to this definition">¶</a></dt>
+<dt id="easymoney.money.EasyPeasy.inflation_rate">
+<code class="descname">inflation_rate</code><span class="sig-paren">(</span><em>region</em>, <em>year_a</em>, <em>year_b=None</em>, <em>return_raw_cpi_dict=False</em>, <em>pretty_print=False</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/easymoney/money.html#EasyPeasy.inflation_rate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#easymoney.money.EasyPeasy.inflation_rate" title="Permalink to this definition">¶</a></dt>
 <dd><p>Calculator to compute the inflation rate from Consumer Price Index (CPI) information.</p>
+<p>Inflation Formula:</p>
+<div class="math">
+\[Inflation_{region} = \dfrac{c_{1} - c_{2}}{c_{2}} \cdot 100\]</div>
+<div class="line-block">
+<div class="line"><span class="math">\(where\)</span>:</div>
+<div class="line-block">
+<div class="line"><span class="math">\(c_{1}\)</span> = CPI of the region in year_b.</div>
+<div class="line"><span class="math">\(c_{2}\)</span> = CPI of the region in year_a.</div>
+</div>
+</div>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
 <li><strong>region</strong> (<em>str</em>) &#8211; a region (currency codes may work, provided they are not common curriencies, e.g., Euro).</li>
-<li><strong>year_a</strong> (<em>int</em>) &#8211; start year</li>
+<li><strong>year_a</strong> (<em>int</em>) &#8211; start year.</li>
 <li><strong>year_b</strong> (<em>int</em>) &#8211; end year. Defaults to None &#8211; can only be left to this default if return_raw_cpi_dict is True.</li>
-<li><strong>return_raw_cpi_dict</strong> (<em>bool</em>) &#8211; </li>
+<li><strong>return_raw_cpi_dict</strong> (<em>bool</em>) &#8211; If True, returns the CPI information in a dict. Defaults to False.</li>
+<li><strong>pretty_print</strong> (<em>bool</em>) &#8211; if True, pretty prints the result otherwise returns the result as a float. Defaults to False.</li>
 </ul>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">the rate of inflation between year_a and year_h. Defaults to False.</p>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><ol class="loweralpha">
+<li><p class="first">the rate of inflation between year_a and year_h.</p>
+<blockquote>
+<div><p>Note: returns <em>nan</em> if <span class="math">\(c_{1}\)</span> or <span class="math">\(c_{2}\)</span> are <em>nan</em> OR <span class="math">\(c_{2}\)</span> is zero.</p>
+</div></blockquote>
+</li>
+<li><p class="first">a dictionary of CPI information with years as keys, CPI as values.</p>
+</li>
+</ol>
+</p>
 </td>
 </tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first">float</p>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first">float, dict or <em>nan</em></p>
 </td>
 </tr>
 <tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><p class="first last"><strong>ValueError</strong> &#8211; if year_b is None and return_raw_cpi_dict is False.</p>
@@ -289,31 +357,63 @@ Defaults to &#8220;latest&#8221; (which will use to most recent data avaliable).
 </dd></dl>
 
 <dl class="method">
-<dt id="easymoney.money.Currency.normalize">
-<code class="descname">normalize</code><span class="sig-paren">(</span><em>amount</em>, <em>currency</em>, <em>from_year</em>, <em>to_year='latest'</em>, <em>base_currency='EUR'</em>, <em>pretty_print=False</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/easymoney/money.html#Currency.normalize"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#easymoney.money.Currency.normalize" title="Permalink to this definition">¶</a></dt>
-<dd><p>Convert a Nominal Amount to a Real Amount in the same, or another, currency.</p>
+<dt id="easymoney.money.EasyPeasy.normalize">
+<code class="descname">normalize</code><span class="sig-paren">(</span><em>amount</em>, <em>currency</em>, <em>from_year</em>, <em>to_year='latest'</em>, <em>base_currency='EUR'</em>, <em>exchange_date=None</em>, <em>pretty_print=False</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/easymoney/money.html#EasyPeasy.normalize"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#easymoney.money.EasyPeasy.normalize" title="Permalink to this definition">¶</a></dt>
+<dd><div class="line-block">
+<div class="line">Convert a Nominal Amount to a Real Amount in the same, or another, currency.</div>
+<div class="line"><br /></div>
+<div class="line">This requires both inflation (for <em>currency</em>) and exchange rate information (<em>currency</em> to <em>base_currency</em>).
+See <code class="docutils literal"><span class="pre">options(info</span> <span class="pre">=</span> <span class="pre">'all',</span> <span class="pre">overlap_only</span> <span class="pre">=</span> <span class="pre">True)</span></code> for an exhaustive listing of valid values to pass to this method.</div>
+<div class="line"><br /></div>
+<div class="line">Currency Normalization occurs in two steps:</div>
+<div class="line-block">
+<div class="line">1. Adjust the currency for inflation, e.g., 100 (2010 <span class="math">\(CUR_{1}\)</span>) <span class="math">\(\longrightarrow\)</span> x (2015 <span class="math">\(CUR_{1}\)</span>).</div>
+<div class="line">2. Convert the adjusted amount into the <em>base_currency</em>.</div>
+</div>
+</div>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>amount</strong> (<em>float or int</em>) &#8211; a numeric amount of money</li>
-<li><strong>currency</strong> (<em>str</em>) &#8211; a region or currency. Legal: Region Name, ISO Alpha2, Alpha3 or Currency Code (see <cite>options()</cite>).</li>
-<li><strong>from_year</strong> (<em>int</em>) &#8211; a year. For legal values see <cite>options()</cite>.</li>
-<li><strong>to_year</strong> (<em>int</em>) &#8211; a year. For legal values see <cite>options()</cite>.</li>
-<li><strong>base_currency</strong> (<em>str</em>) &#8211; a region or currency. Legal: Region Name, ISO Alpha2, Alpha3 or Currency Code (see <cite>options()</cite>). Defaults to &#8216;EUR&#8217;.</li>
-<li><strong>pretty_print</strong> (<em>bool</em>) &#8211; Pretty Print the result if True; return amount if False. Defaults to False.</li>
+<li><strong>amount</strong> (<em>float or int</em>) &#8211; a numeric amount of money.</li>
+<li><strong>currency</strong> (<em>str</em>) &#8211; a region or currency. Legal: Region Name, ISO Alpha2, Alpha3 or Currency Code (see <code class="docutils literal"><span class="pre">options()</span></code>).</li>
+<li><strong>from_year</strong> (<em>int</em>) &#8211; a year. For legal values see <code class="docutils literal"><span class="pre">options()</span></code>.</li>
+<li><strong>to_year</strong> (<em>str or int</em>) &#8211; <p>a year. For legal values see <code class="docutils literal"><span class="pre">options()</span></code>. Defaults to &#8216;latest&#8217; (which will use the most recent data avaliable).</p>
+<div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p>If <em>to_year</em> is set to a specific year rather than to its default (&#8216;latest&#8217;) and
+<em>exchange_date</em> is left to its default (<em>None</em>), the <em>average</em> exchange rate for <em>to_year</em>
+will be used <sup>1</sup>.</p>
+<p>For this reason, it is suggested that if you wish to pass a specific year via <em>to_year</em>,
+you also supply a specific date to <em>exchange_date</em> for this method to perform the currency
+conversion. Recall that the exchange rate is only computed after <em>amount</em> has been
+converted into real local currency units (LCUs; e.g., Real US Dollars or Real Euros.).</p>
+<p class="last"><sup>1</sup> The only exception to this generalization is if <em>currency</em> and <em>base_currency</em>
+are the same (as currency conversion is not needed in such an instance).</p>
+</div>
+</li>
+<li><strong>base_currency</strong> (<em>str</em>) &#8211; a region or currency. Legal: Region Name, ISO Alpha2, Alpha3 or Currency Code
+(see <code class="docutils literal"><span class="pre">options()</span></code>). Defaults to &#8216;EUR&#8217;.</li>
+<li><strong>pretty_print</strong> (<em>bool</em>) &#8211; Pretty print the result if True; return amount if False. Defaults to False.</li>
+<li><strong>exchange_date</strong> (<em>str</em>) &#8211; date to perform the currency conversion on. Dates must be of the form: <code class="docutils literal"><span class="pre">YYYY-MM-DD</span></code>.
+Defaults to None.</li>
 </ul>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">adjusted_amount</p>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">amount adjusted for inflation and converted into the base currency.</p>
 </td>
 </tr>
 <tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body"><p class="first">float</p>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><p class="first last"><strong>ValueError</strong> &#8211; if from_currency does not map onto a specific region.
-If you&#8217;d like to convert from EUR, please specify a specific nation (may be fixed in a future update).</p>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><p class="first last"><strong>ValueError</strong> &#8211; <p>if:</p>
+<ol class="loweralpha simple">
+<li><em>from_currency</em> does not map onto a specific region,</li>
+<li><em>to_year</em> is not numeric (<code class="docutils literal"><span class="pre">float</span></code> or <code class="docutils literal"><span class="pre">int</span></code>) OR</li>
+<li><em>to_year</em> is greater than the year for which most recent inflation information is avaliable.</li>
+</ol>
+</p>
 </td>
 </tr>
 </tbody>
@@ -321,8 +421,8 @@ If you&#8217;d like to convert from EUR, please specify a specific nation (may b
 </dd></dl>
 
 <dl class="method">
-<dt id="easymoney.money.Currency.options">
-<code class="descname">options</code><span class="sig-paren">(</span><em>info</em>, <em>rformat='table'</em>, <em>pretty_table=True</em>, <em>pretty_print=True</em>, <em>overlap_only=False</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/easymoney/money.html#Currency.options"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#easymoney.money.Currency.options" title="Permalink to this definition">¶</a></dt>
+<dt id="easymoney.money.EasyPeasy.options">
+<code class="descname">options</code><span class="sig-paren">(</span><em>info</em>, <em>rformat='table'</em>, <em>pretty_table=True</em>, <em>pretty_print=True</em>, <em>overlap_only=False</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/easymoney/money.html#EasyPeasy.options"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#easymoney.money.EasyPeasy.options" title="Permalink to this definition">¶</a></dt>
 <dd><p>An easy inferface to explore all of the terminology EasyMoney understands
 as well the dates for which data is available.</p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -330,12 +430,12 @@ as well the dates for which data is available.</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>info</strong> (<em>str</em>) &#8211; &#8216;exchange&#8217;, &#8216;inflation&#8217; or &#8216;all&#8217; (&#8216;all&#8217; requires rformat is set to &#8216;table&#8217;)</li>
+<li><strong>info</strong> (<em>str</em>) &#8211; &#8216;exchange&#8217;, &#8216;inflation&#8217; or &#8216;all&#8217; (&#8216;all&#8217; requires rformat is set to &#8216;table&#8217;).</li>
 <li><strong>rformat</strong> (<em>str</em>) &#8211; &#8216;table&#8217; for a table or &#8216;list&#8217; for just the currecy codes, alone. Defaults to &#8216;table&#8217;.</li>
 <li><strong>pretty_table</strong> (<em>bool</em>) &#8211; prettifies the options table. Defaults to True.</li>
 <li><strong>pretty_print</strong> (<em>bool</em>) &#8211; if True, prints the list or table. If False, returns the list or table (as a Pandas DataFrame).
 Defaults to True.</li>
-<li><strong>overlap_only</strong> (<em>bool</em>) &#8211; when info is set to &#8216;all&#8217;, only keep those rows for which exchange rate and inflation data
+<li><strong>overlap_only</strong> (<em>bool</em>) &#8211; when info is set to &#8216;all&#8217;, keep only those rows for which exchange rate and inflation data
 overlap.</li>
 </ul>
 </td>
@@ -346,12 +446,63 @@ overlap.</li>
 <tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first">Pandas DataFrame</p>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><p class="first last"><strong>ValueError</strong> &#8211; if (a) rformat is not either &#8216;list&#8217; or &#8216;table&#8217; or (b) <cite>overlap_only</cite> is True
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><p class="first last"><strong>ValueError</strong> &#8211; if (a) rformat is not either &#8216;list&#8217; or &#8216;table&#8217; or (b) <em>overlap_only</em> is True
 while info is not &#8216;all&#8217; and rformat is not &#8216;table&#8217;.</p>
 </td>
 </tr>
 </tbody>
 </table>
+</dd></dl>
+
+<dl class="method">
+<dt id="easymoney.money.EasyPeasy.region_map">
+<code class="descname">region_map</code><span class="sig-paren">(</span><em>region</em>, <em>map_to='alpha2'</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/easymoney/money.html#EasyPeasy.region_map"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#easymoney.money.EasyPeasy.region_map" title="Permalink to this definition">¶</a></dt>
+<dd><p>Map a &#8216;region&#8217; to any one of: ISO Alpha2, ISO Alpha3 or Currency Code as well as its Natural Name.</p>
+<blockquote>
+<div><dl class="docutils">
+<dt>Examples Converting From Currency:</dt>
+<dd><ul class="first last simple">
+<li><code class="docutils literal"><span class="pre">EasyPeasy().region_map(region</span> <span class="pre">=</span> <span class="pre">'CAD',</span> <span class="pre">map_to</span> <span class="pre">=</span> <span class="pre">'alpha2')</span></code>   <span class="math">\(=\)</span> &#8216;CA&#8217;</li>
+<li><code class="docutils literal"><span class="pre">EasyPeasy().region_map(region</span> <span class="pre">=</span> <span class="pre">'CAD',</span> <span class="pre">map_to</span> <span class="pre">=</span> <span class="pre">'alpha3')</span></code>   <span class="math">\(=\)</span> &#8216;CAN&#8217;</li>
+</ul>
+</dd>
+<dt>Examples Converting From Alpha2:</dt>
+<dd><ul class="first last simple">
+<li><code class="docutils literal"><span class="pre">EasyPeasy().region_map(region</span> <span class="pre">=</span> <span class="pre">'FR',</span> <span class="pre">map_to</span> <span class="pre">=</span> <span class="pre">'currency')</span></code> <span class="math">\(=\)</span> &#8216;EUR&#8217;</li>
+<li><code class="docutils literal"><span class="pre">EasyPeasy().region_map(region</span> <span class="pre">=</span> <span class="pre">'FR',</span> <span class="pre">map_to</span> <span class="pre">=</span> <span class="pre">'natural')</span></code>  <span class="math">\(=\)</span> &#8216;France&#8217;</li>
+</ul>
+</dd>
+</dl>
+</div></blockquote>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>region</strong> (<em>str</em>) &#8211; a &#8216;region&#8217; in the format of a ISO Alpha2, ISO Alpha3 or currency code, as well as natural name.</li>
+<li><strong>map_to</strong> (<em>str</em>) &#8211; &#8216;alpha2&#8217;, &#8216;alpha3&#8217; &#8216;currency&#8217; or &#8216;natural&#8217; for ISO Alpha2, ISO Alpha2, Currency Code and
+Natural Names, respectively. Defaults to &#8216;alpha2&#8217;.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">the desired mapping from region to ISO Alpha2.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first">str</p>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><p class="first last"><strong>ValueError</strong> &#8211; if <em>map_to</em> is not one of &#8216;alpha2&#8217;, &#8216;alpha3&#8217;, &#8216;currency&#8217; or &#8216;natural&#8217;.</p>
+</td>
+</tr>
+</tbody>
+</table>
+<div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p>Attempts to map common curriencies to a single nation will fail.</p>
+<p class="last">For instance: <code class="docutils literal"><span class="pre">EasyPeasy().region_map(region</span> <span class="pre">=</span> <span class="pre">'EUR',</span> <span class="pre">map_to</span> <span class="pre">=</span> <span class="pre">'Alpha2')</span></code> will fail because the Euro (EUR)
+is used in several nations, and thus a request to map it to a single ISO Alpha2 country code creates insurmountable
+ambiguity.</p>
+</div>
 </dd></dl>
 
 </dd></dl>
@@ -405,7 +556,7 @@ while info is not &#8216;all&#8217; and rformat is not &#8216;table&#8217;.</p>
 <dl class="function">
 <dt id="easymoney.world_bank_interface.world_bank_pull_wrapper">
 <code class="descclassname">easymoney.world_bank_interface.</code><code class="descname">world_bank_pull_wrapper</code><span class="sig-paren">(</span><em>value_true_name</em>, <em>indicator</em>, <em>na_drop_col=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/easymoney/world_bank_interface.html#world_bank_pull_wrapper"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#easymoney.world_bank_interface.world_bank_pull_wrapper" title="Permalink to this definition">¶</a></dt>
-<dd><p>Wrapper for the WorldBankParse().world_bank_pull() method.
+<dd><p>Wrapper for the <code class="docutils literal"><span class="pre">WorldBankParse().world_bank_pull()</span></code> method.
 Extracts world bank information based on a specific indicator and returns a Pandas DataFrame.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
