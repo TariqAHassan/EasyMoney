@@ -22,7 +22,7 @@ setup(
     packages = find_packages(),
     package_data = {'': ['*.csv', '*.p'],},
     data_files = [('', ["LICENSE.txt"])],
-    install_requires = ['numpy', 'pandas', 'wbdata'],
+    install_requires = ['numpy', 'pandas', 'wbdata', 'requests'],
     classifiers = [  "Development Status :: 4 - Beta"
                    , "Natural Language :: English"
                    , "Intended Audience :: Financial and Insurance Industry"

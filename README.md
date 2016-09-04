@@ -17,7 +17,7 @@ EasyMoney is a set of tools for:
 
 ###Dependencies
 
-EasyMoney requires: [numpy], [pandas] and [wbdata]<sup>†</sup>.
+EasyMoney requires: [numpy], [pandas], [requests] and [wbdata]<sup>†</sup>.
 
 Internet access is required to create an instance of the main `EasyPeasy()` class.
 However, once EasyMoney has cached the latest data from online databases (see below), internet
@@ -183,5 +183,6 @@ Indicators used:
   [Euro foreign exchange reference rates - European Central Bank]: https://www.ecb.europa.eu/stats/exchange/eurofxref/html/index.en.html
   [numpy]: http://www.numpy.org
   [pandas]: http://pandas.pydata.org
+  [requests]: http://docs.python-requests.org/en/master/
   [wbdata]: https://github.com/OliverSherouse/wbdata
   [here]: https://tariqahassan.github.io/EasyMoney/index.html
