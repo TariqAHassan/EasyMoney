@@ -12,6 +12,7 @@ import os
 import sys
 import unittest
 import pandas as pd
+import pkg_resources
 
 # Allow access to modules
 sys.path.insert(0, os.path.abspath("."))
@@ -28,7 +29,7 @@ from easymoney.money import EasyPeasy
 # initialized inside FunctionalityTests()...not clear why.
 
 # Import Using the default method.
-ep_default = EasyPeasy()
+ep_default = EasyPeasy(pkg_resources.resource_filename('sources', 'data'))
 
 # Import from a cache of EasyMoney Databases
 # ep_test_data = EasyPeasy(os.path.abspath("./test_data"))
