@@ -77,7 +77,7 @@ class EasyPeasy(object):
         ]
 
         # Obtain required databases
-        required_databases = DatabaseManagment(DEFAULT_DATA_PATH, alt_database_dir, required_data_bases)._database_wizard()
+        required_databases = DatabaseManagment(DEFAULT_DATA_PATH, alt_database_dir)._database_wizard()
 
         # Define Databases
         self.ISOAlphaCodesDB      = required_databases[0]
@@ -1012,7 +1012,6 @@ class EasyPeasy(object):
 
 
 
-# ep = EasyPeasy()
 
 
 

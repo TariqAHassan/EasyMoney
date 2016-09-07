@@ -55,12 +55,10 @@ class DatabaseManagment(object):
     :type default_data_path: str
     :param alt_database_dir: an alternate default path to EasyMoney's included DataBases
     :type alt_database_dir: str
-    :param required_data_bases: a list of the databases required by EasyMoney
-    :type required_data_bases: list
     """
 
 
-    def __init__(self, default_data_path, alt_database_dir, required_data_bases):
+    def __init__(self, default_data_path, alt_database_dir):
         """
 
         Initialize ``DatabaseManagment()`` Class.
@@ -68,7 +66,12 @@ class DatabaseManagment(object):
         """
         self.default_data_path = default_data_path
         self.alt_database_dir = alt_database_dir
-        self.required_data_bases = required_data_bases
+        self.required_databases =  [  'ISOAlphaCodesDB.csv'          # Included with EasyMoney.
+                                    , 'CurrencyTransitionDB.csv'     # Included with EasyMoney.
+                                    , 'CurrencyRelationshipsDB.csv'  # Included with EasyMoney.
+                                    , 'ExchangeRatesDB.csv'          # Obtained from Online API(s).
+                                    , 'ConsumerPriceIndexDB.csv'     # Obtained from Online API(s).
+        ]
 
     def _data_path_assessment(self):
         """
@@ -92,17 +95,17 @@ class DatabaseManagment(object):
         elif os.path.isdir(self.alt_database_dir):
 
             # List of required files, if any, in the alt_database_dir.
-            files_in_alterative_path = [x in os.listdir(self.alt_database_dir) for x in self.required_data_bases]
+            files_in_alterative_path = [x in os.listdir(self.alt_database_dir) for x in self.required_databases]
 
             # All Databases Present in the self.alt_database_dir.
             if all(files_in_alterative_path):
                 return False, self.alt_database_dir
             # Some Databases present in the alt_database_dir.
             elif any(files_in_alterative_path):
-                return True, [x for x in self.required_data_bases if x not in os.listdir(self.alt_database_dir)]
+                return True, [x for x in self.required_databases if x not in os.listdir(self.alt_database_dir)]
             # No Databases present in the alt_database_dir.
             elif list(set(files_in_alterative_path)) == [False]:
-                return True, self.required_data_bases
+                return True, self.required_databases
         else:
             if isinstance(self.alt_database_dir, str):
                 raise FileNotFoundError("No such directory: '%s'." % (self.alt_database_dir))
@@ -136,7 +139,7 @@ class DatabaseManagment(object):
         ExchangeRatesDB_alt = None
 
         # Determine the databases that ship with EasyMoney that missing from alt_database_dir.
-        missing_shipped_files = [x for x in self.required_data_bases[0:3] if x in missing_files]
+        missing_shipped_files = [x for x in self.required_databases[0:3] if x in missing_files]
 
         # Read in ISOAlphaCodesDB.
         if 'ISOAlphaCodesDB.csv' in missing_files:
@@ -211,7 +214,6 @@ class DatabaseManagment(object):
         # Need to Add Files is False
         elif not database_assessment[0]:
             return self._database_manager(data_path = database_assessment[1], missing_files = [])
-
 
 
 
