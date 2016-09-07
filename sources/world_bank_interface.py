@@ -21,7 +21,7 @@ from pathlib import Path
 from easymoney.support_money import pandas_str_column_to_list
 
 
-DEFAULT_DATA_PATH = str(Path("../sources/data").resolve())
+DEFAULT_DATA_PATH = str(os.getcwd()).split('EasyMoney', 1)[0] + "EasyMoney/sources/data"
 
 
 class WorldBankParse(object):

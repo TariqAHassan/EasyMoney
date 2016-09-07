@@ -67,7 +67,7 @@ class DatabaseManagment(object):
         Initialize ``DatabaseManagment()`` Class.
 
         """
-        self.default_data_path = str(Path("../sources/data").resolve())
+        self.default_data_path = str(os.getcwd()).split('EasyMoney', 1)[0] + "EasyMoney/sources/data"
         self.alt_database_dir = alt_database_dir
         self.required_databases =  [  'ISOAlphaCodesDB.csv'          # Included with EasyMoney.
                                     , 'CurrencyTransitionDB.csv'     # Included with EasyMoney.
