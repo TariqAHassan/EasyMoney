@@ -16,6 +16,9 @@ import pandas as pd
 # Allow access to modules
 sys.path.insert(0, os.path.abspath("."))
 sys.path.insert(0, os.path.abspath("../"))
+sys.path.insert(0, os.path.abspath("../sources"))
+sys.path.insert(0, os.path.abspath("../sources/data"))
+
 
 # Import the tool
 from easymoney.money import EasyPeasy
@@ -28,7 +31,7 @@ from easymoney.money import EasyPeasy
 ep_default = EasyPeasy()
 
 # Import from a cache of EasyMoney Databases
-ep_test_data = EasyPeasy(os.path.abspath("./test_data"))
+# ep_test_data = EasyPeasy(os.path.abspath("./test_data"))
 
 
 class OptionTests(unittest.TestCase):
