@@ -15,13 +15,25 @@ import numpy as np
 import pandas as pd
 
 
-from easymoney.support_money import strlist_to_list
+def strlist_to_list(to_parse, convert_to_str_first = False):
+    """
 
+    Eval() work around for str(list) --> list.
+    For example: "[1992, '221-21', 2102, 'apples']" --> ['1992', '221-21', '2102', 'apples'].
+
+    :param to_parse: a string of a list.
+    :type to_parse: str
+    :param convert_to_str_first: convert to a string first (as a precaution). Defaults to False.
+    :type convert_to_str_first: bool
+    :return: string of a list to an actual list.
+    :return: list
+    """
+    str_list = str(to_parse) if convert_to_str_first else to_parse
+    return [i.strip().replace("'", "") for i in [j.split(",") for j in [str_list.replace("[", "").replace("]", "")]][0]]
 
 def pandas_print_full(pd_df, full_rows = True, full_cols = True):
     """
 
-    *Private Method*
     Print *all* of a Pandas DataFrame.
 
     :param pd_df: DataFrame to printed in its entirety.
@@ -40,19 +52,23 @@ def pandas_print_full(pd_df, full_rows = True, full_cols = True):
     if full_rows: pd.reset_option('display.max_rows')
     if full_cols: pd.set_option('expand_frame_repr', True)
 
-def pandas_dictkey_to_key_unpack(pandas_series, unpack_dict):
+def pandas_dictkey_to_key_unpack(pandas_series, unpack_dict, convert_values_to_str = False):
     """
 
-    *Private Method*
     Used to unpack ISO Alpha2 --> Alpha2 ISO code Pandas Series.
 
     :param pandas_series: a Series to replace the alpha2 codes with another set.
     :type pandas_series: Pandas Series
+    :param convert_values_to_str: convert the values to string (precaution).
+    :type convert_values_to_str: bool
     :param unpack_dict: a dict with the values coerced into strings.
     :type unpack_dict: dict
     :return: a pandas series with the alpha2 values replaced with unpack_dict.values(). NaNs are used if a match cannot be found.
     :rtype: Pandas Series
     """
+    if convert_values_to_str:
+        unpack_dict = {k: str(v) for k, v in unpack_dict.items()}
+
     # Hacking the living daylights out of the pandas API
     return pandas_series.replace(unpack_dict).map(lambda x: np.NaN if 'nan' in str(x) else strlist_to_list(str(x)))
 
@@ -149,7 +165,6 @@ def twoD_nested_dict(data_frame
                      , engine = 'standard'):
     """
 
-    *Private Method*
     Generate a nested dictionary from the columns of a pandas dataframe.
     Defaults to using the first 3 columns.
 
@@ -234,6 +249,11 @@ def pandas_str_column_to_list(data_frame, columns):
         data_frame[col] = data_frame[col].astype(str).map(lambda x: [i.strip() for i in x.split(",")])
 
     return data_frame
+
+
+
+
+
 
 
 

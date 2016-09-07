@@ -26,6 +26,7 @@ from easymoney.support_money import min_max
 from easymoney.support_money import money_printer
 from easymoney.support_money import prettify_list_of_strings
 from easymoney.support_money import remove_from_dict
+from easymoney.support_money import transition_dict_generator
 from easymoney.support_money import str_to_datetime
 
 from easymoney.easy_pandas import pandas_dictkey_to_key_unpack
@@ -81,7 +82,7 @@ class EasyPeasy(object):
         self.exchange_dict = _exchange_rates_from_datafile(self.ExchangeRatesDB)[0]
 
         # Create currency transitions dictionary
-        self.currency_transitions_dict = dict(zip(self.CurrencyTransitionDB['Alpha2'], self.CurrencyTransitionDB['TransitionYears']))
+        self.transitions_dict = transition_dict_generator(self.CurrencyTransitionDB, 'Alpha2', 'Date', 'NewCurrency')
 
         # Create CPI dict
         self.cpi_dict = twoD_nested_dict(self.ConsumerPriceIndexDB, 'Alpha2', 'Year', 'CPI', to_float = ['CPI'], to_int = ['Year'])
@@ -204,7 +205,7 @@ class EasyPeasy(object):
             Attempts to map common curriencies to a single nation will fail.
 
 
-            For instance: ``EasyPeasy().region_map(region = 'EUR', map_to = 'Alpha2')`` will fail because the Euro (EUR)
+            For instance: ``EasyPeasy().region_map(region = 'EUR', map_to = 'alpha2')`` will fail because the Euro (EUR)
             is used in several nations, and thus a request to map it to a single ISO Alpha2 country code creates insurmountable
             ambiguity.
         """
@@ -221,7 +222,7 @@ class EasyPeasy(object):
             if map_to == 'currency':
                 return region
             else:
-                raise ValueError("The '%s' currency is used in multiple nations thus cannot be mapped to a single one." \
+                raise ValueError("The '%s' currency is used in multiple nations and thus cannot be mapped to a single one." \
                  % (region))
 
         # Get the Alpha2 Mapping
@@ -527,7 +528,7 @@ class EasyPeasy(object):
 
                             (b) amount is not numeric (``float`` or ``int``).
 
-        :raises AttributeError: Conversion would result in division by zero (rare).
+        :raises AttributeError: conversion would result in division by zero (rare).
         """
         # Initialize
         conversion_to_invert = None
@@ -944,14 +945,23 @@ class EasyPeasy(object):
             info_table = self._currency_inflation_options(  self._currency_options(min_max_dates)
                                                           , self._inflation_options(min_max_dates))
 
-        # Add date when Countries Changed curriency (only to Euro for now).
-        # Note: Sadly, Pandas Series of dtype 'int' cannot contain NaNs. Using the 'object' dtype instead.
-        info_table['CurrencyTransition'] = info_table['Alpha2'].replace(self.currency_transitions_dict).map(
-            lambda x: int(x) if floater(x, True) and str(x) != 'nan' else '')
+        # Get years Countries changed curriency.
+        # Note: sadly, Pandas Series of dtype 'int' cannot contain NaNs. Using the 'object' dtype instead.
+        transitions = pandas_dictkey_to_key_unpack(info_table['Alpha2'], self.transitions_dict, True).map(
+            lambda x: x if len(x[0]) > 2 else '')
+
+        # add to info_table
+        info_table['Transitions'] = transitions
 
         return info_table
 
-    def options(self, info, rformat = 'table', pretty_table = True, pretty_print = True, overlap_only = False, min_max_dates = True):
+    def options(self
+                , info
+                , rformat = 'table'
+                , pretty_table = True
+                , pretty_print = True
+                , overlap_only = False
+                , min_max_dates = True):
         """
 
         An easy inferface to explore all of the terminology EasyMoney understands
@@ -1036,9 +1046,9 @@ class EasyPeasy(object):
                 if 'InflationRange' in info_table.columns:
                     info_table['InflationRange'] = info_table['InflationRange'].map(year_to_int)
 
-                # Replace the '' in the CurrencyTransition column with NaNs
-                info_table['CurrencyTransition'] = \
-                    info_table['CurrencyTransition'].map(lambda x: np.NaN if str(x).strip() == '' else [x])
+                # Replace the '' in the Transitions column with NaNs
+                info_table['Transitions'] = \
+                    info_table['Transitions'].map(lambda x: np.NaN if str(x).strip() == '' else [x])
 
                 # CurrencyRange and Overlap columns --> list of datetimes
                 date_columns_in_table = [i for i in info_table.columns if i in ['CurrencyRange', 'Overlap']]

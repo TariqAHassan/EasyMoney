@@ -1,4 +1,4 @@
-CountryName,OldCurrencies,Alpha2,Alpha3,NewCurrencies,TransitionYears
+CountryName,OldCurrency,Alpha2,Alpha3,NewCurrency,Date
 Vatican City,VAL,VA,VAT,EUR,1999
 France,FRF,FR,FRA,EUR,1999
 Latvia,LVL,LV,LVA,EUR,2014
