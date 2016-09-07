@@ -880,7 +880,7 @@
 
 <span class="sd">        :param min_max_dates: if True, only report the minimum and maximum date for which data is avaliable;</span>
 <span class="sd">                              if False, all dates for which which data is avaliable will be reported.</span>
-<span class="sd">        :type pretty_table: bool</span>
+<span class="sd">        :type min_max_dates: bool</span>
 <span class="sd">        :return: DataFrame with all the currencies for which EasyMoney has data.</span>
 <span class="sd">        :rtype: Pandas DataFrame</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -942,7 +942,7 @@
 <span class="sd">        Determines the inflation (CPI) information cached.</span>
 <span class="sd">        :param min_max_dates: if True, only report the minimum and maximum date for which data is avaliable;</span>
 <span class="sd">                              if False, all dates for which which data is avaliable will be reported.</span>
-<span class="sd">        :type pretty_table: bool</span>
+<span class="sd">        :type min_max_dates: bool</span>
 <span class="sd">        :return: a dataframe with all CPI information EasyMoney has, as well as date ranges the date exists for.</span>
 <span class="sd">        :rtype: Pandas DataFrame</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -1060,7 +1060,7 @@
 <span class="sd">        :type info: str</span>
 <span class="sd">        :param min_max_dates: if True, only report the minimum and maximum date for which data is avaliable;</span>
 <span class="sd">                              if False, all dates for which which data is avaliable will be reported.</span>
-<span class="sd">        :type pretty_table: bool</span>
+<span class="sd">        :type min_max_dates: bool</span>
 <span class="sd">        :return: DataFrame with the requested information</span>
 <span class="sd">        :rtype: Pandas DataFrame</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -1102,7 +1102,7 @@
 <span class="sd">        :type overlap_only: bool</span>
 <span class="sd">        :param min_max_dates: if True, only report the minimum and maximum date for which data is avaliable;</span>
 <span class="sd">                              if False, all dates for which which data is avaliable will be reported. Defaults to True.</span>
-<span class="sd">        :type pretty_table: bool</span>
+<span class="sd">        :type min_max_dates: bool</span>
 <span class="sd">        :return: DataFrame of Currency Information EasyMoney Understands.</span>
 <span class="sd">        :rtype: Pandas DataFrame</span>
 <span class="sd">        :raises ValueError: if</span>
@@ -1178,6 +1178,8 @@
                         <span class="n">info_table</span><span class="p">[</span><span class="n">col</span><span class="p">]</span> <span class="o">=</span> <span class="n">info_table</span><span class="p">[</span><span class="n">col</span><span class="p">]</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="n">full_date_to_datetime</span><span class="p">)</span>
 
                 <span class="k">return</span> <span class="n">info_table</span></div></div>
+
+
 
 
 
