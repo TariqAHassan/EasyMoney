@@ -93,7 +93,7 @@ class DatabaseManagment(object):
         # If alt_database_dir is None, use the default databases that are included with EasyMoney.
         if self.alt_database_dir == None:
             return False, self.default_data_path
-        elif os.path.isdir(os.path.join(self.alt_database_dir)):
+        elif isinstance(self.alt_database_dir, str):
 
             # List of required files, if any, in the alt_database_dir.
             files_in_alterative_path = [x in os.listdir(self.alt_database_dir) for x in self.required_databases]
@@ -108,10 +108,7 @@ class DatabaseManagment(object):
             elif list(set(files_in_alterative_path)) == [False]:
                 return True, self.required_databases
         else:
-            if isinstance(self.alt_database_dir, str):
-                raise FileNotFoundError("No such directory: '%s'." % (self.alt_database_dir))
-            else:
-                raise ValueError("the alterative path to the databases must be either None or a valid path (string).")
+            raise ValueError("the alterative path to the databases must be either None or a valid path (string).")
 
     def _database_manager(self, data_path, missing_files):
         """
