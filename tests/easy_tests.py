@@ -18,7 +18,7 @@ import pkg_resources
 sys.path.insert(0, os.path.abspath("."))
 sys.path.insert(0, os.path.abspath("../"))
 sys.path.insert(0, os.path.abspath("../sources"))
-sys.path.insert(0, os.path.abspath("../sources/data"))
+sys.path.insert(0, os.path.abspath("../EasyMoney/sources/data"))
 
 
 # Import the tool
@@ -29,7 +29,9 @@ from easymoney.money import EasyPeasy
 # initialized inside FunctionalityTests()...not clear why.
 
 # Import Using the default method.
-ep_default = EasyPeasy(os.path.abspath("../EasyMoney/sources/data"))
+ep_default = EasyPeasy()
+
+# ep_default = EasyPeasy(os.path.abspath("../EasyMoney/sources/data"))
 
 # Import from a cache of EasyMoney Databases
 # ep_test_data = EasyPeasy(os.path.abspath("./test_data"))
