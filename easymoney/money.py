@@ -1,15 +1,14 @@
 #!/usr/bin/env python3
 
-'''
+"""
 
     Main API Functionality
     ~~~~~~~~~~~~~~~~~~~~~~
 
 
-'''
+"""
 
 # Modules #
-import os
 import datetime
 import numpy as np
 import pandas as pd
@@ -17,7 +16,6 @@ import pandas as pd
 from warnings import warn
 from collections import defaultdict
 
-from easymoney.support_money import pandas_dictkey_to_key_unpack
 from easymoney.support_money import date_bounds_floor
 from easymoney.support_money import datetime_to_str
 from easymoney.support_money import dict_list_unpack
@@ -26,18 +24,19 @@ from easymoney.support_money import floater
 from easymoney.support_money import key_value_flip
 from easymoney.support_money import min_max
 from easymoney.support_money import money_printer
+from easymoney.support_money import pandas_dictkey_to_key_unpack
 from easymoney.support_money import pandas_print_full
 from easymoney.support_money import prettify_list_of_strings
 from easymoney.support_money import remove_from_dict
 from easymoney.support_money import str_to_datetime
 from easymoney.support_money import twoD_nested_dict
 
-from easymoney.ecb_interface import ecb_xml_exchange_data
-from easymoney.ecb_interface import ecb_currency_to_alpha2_dict
-from easymoney.world_bank_interface import world_bank_pull_wrapper
+from sources.databases import DatabaseManagment
+from sources.databases import _exchange_rates_from_datafile
+from sources.ecb_interface import ecb_currency_to_alpha2_dict
 
 
-from easymoney.support_money import DATA_PATH
+from easymoney.support_money import DEFAULT_DATA_PATH
 
 
 class EasyPeasy(object):
@@ -45,17 +44,22 @@ class EasyPeasy(object):
 
     Tools for converting one currency to another, looking up inflation information, adjusting for inflation, and more!
 
+    :param alt_database_dir: an alterative path to the database files. If this directory does not
+                              contain the required databases, those missing will be pulled from the web
+                              and placed there. Otherwise, the databases therein there will
+                              supplant those used by automatically EasyMoney. Defaults to None.
+    :type alt_database_dir: str
     :param precision: number of places to round to. Defaults to 2.
     :type precision: int
-    :param fall_back: if True, fall back to closest possible date. Defaults to True.
+    :param fall_back: if True, fall back to closest possible date for which data is available. Defaults to True.
     :type fall_back: bool
     """
 
 
-    def __init__(self, precision = 2, fall_back = True):
+    def __init__(self, alt_database_dir = None, precision = 2, fall_back = True):
         """
 
-        Initialize the EasyPeasy() class.
+        Initialize the ``EasyPeasy()`` class.
 
         """
         # Places of precision
@@ -64,33 +68,43 @@ class EasyPeasy(object):
         # Fall back boolean
         self.fall_back = fall_back
 
-        # Get CPI Data
-        self.cpi_df = world_bank_pull_wrapper(value_true_name = "cpi", indicator = "FP.CPI.TOTL") # add an NA col drop?
+        # List of required Databases.
+        required_data_bases = [  'ISOAlphaCodesDB.csv'           #  Included with EasyMoney.
+                               , 'CurrencyTransitionDB.csv'      #  Included with EasyMoney.
+                               , 'CurrencyRelationshipsDB.csv'   #  Included with EasyMoney.
+                               , 'ExchangeRatesDB.csv'           #  Obtained from Online API(s).
+                               , 'ConsumerPriceIndexDB.csv'      #  Obtained from Online API(s).
+        ]
+
+        # Obtain required databases
+        required_databases = DatabaseManagment(DEFAULT_DATA_PATH, alt_database_dir, required_data_bases)._database_wizard()
+
+        # Define Databases
+        self.ISOAlphaCodesDB      = required_databases[0]
+        self.CurrencyTransitionDB = required_databases[1]
+        self.ExchangeRatesDB      = required_databases[2]
+        self.currency_codes       = required_databases[3]
+        self.ConsumerPriceIndexDB = required_databases[4]
+
+        # Convert the ExchangeRatesDB to a dict for faster look up speed.
+        self.exchange_dict = _exchange_rates_from_datafile(self.ExchangeRatesDB)[0]
+
+        # Create currency transitions dictionary
+        self.currency_transitions_dict = dict(zip(self.CurrencyTransitionDB['Alpha2'], self.CurrencyTransitionDB['TransitionYears']))
 
         # Create CPI dict
-        self.cpi_dict = twoD_nested_dict(self.cpi_df, 'alpha2', 'year', 'cpi', to_float = ['cpi'], to_int = ['year'])
-
-        # Get Exchange Rate Data
-        # TO DO: get currency codes by extracting them from every date key
-        self.ex_dict, self.currency_codes = ecb_xml_exchange_data(return_as = 'dict')
-        self.ex_dict_keys_series = pd.Series(sorted(list(self.ex_dict.keys())))
-
-        # Import EU join Data
-        eu_join = pd.read_csv(DATA_PATH + "/JoinEuro.csv")
-        self.eu_join_dict = dict(zip(eu_join.alpha2, eu_join.join_year))
-
-        alpha2_alpha3_df = pd.read_csv(DATA_PATH + "/CountryAlpha2_and_3.csv", keep_default_na = False)
+        self.cpi_dict = twoD_nested_dict(self.ConsumerPriceIndexDB, 'Alpha2', 'Year', 'CPI', to_float = ['CPI'], to_int = ['Year'])
 
         # Create Alpha3 --> Alpha2 Dict
-        self.alpha3_to_alpha2 = remove_from_dict(dict(zip(alpha2_alpha3_df.Alpha3, alpha2_alpha3_df.Alpha2)))
+        self.alpha3_to_alpha2 = remove_from_dict(dict(zip(self.ISOAlphaCodesDB.Alpha3, self.ISOAlphaCodesDB.Alpha2)))
 
         # Create Alpha2 --> Alpha3 Dict
         self.alpha2_to_alpha3 = key_value_flip(self.alpha3_to_alpha2)
 
-        # Create the dict and populate using uniques in the cpi_df.
+        # Create the dict and populate using uniques in the ConsumerPriceIndexDB.
         currency_to_alpha2 = dict()
-        for k in self.cpi_df.currency_code.unique().tolist():
-            currency_to_alpha2[k] = self.cpi_df.alpha2[self.cpi_df.currency_code.astype(str) == k].unique().tolist()
+        for k in self.ConsumerPriceIndexDB['Currency'].unique().tolist():
+            currency_to_alpha2[k] = self.ConsumerPriceIndexDB['Alpha2'][self.ConsumerPriceIndexDB['Currency'].astype(str) == k].unique().tolist()
 
         # Drop NaNs
         self.currency_to_alpha2 = remove_from_dict(currency_to_alpha2)
@@ -99,7 +113,7 @@ class EasyPeasy(object):
         self.alpha2_to_currency = dict_list_unpack(currency_to_alpha2)
 
         # Create Region Name --> Alpha2 Dict
-        self.region_to_alpha2 = remove_from_dict(dict(zip(self.cpi_df.region, self.cpi_df.alpha2)))
+        self.region_to_alpha2 = remove_from_dict(dict(zip(self.ConsumerPriceIndexDB['Country'], self.ConsumerPriceIndexDB['Alpha2'])))
 
         # Create Alpha2 --> Region Name Dict
         self.alpha2_to_region = key_value_flip(self.region_to_alpha2)
@@ -430,12 +444,12 @@ class EasyPeasy(object):
         if currency_to_convert == "EUR" and return_max_date == False:
             return 1.0
         elif currency_to_convert == "EUR" and date == 'latest' and return_max_date == True:
-            return str(max(self.ex_dict.keys()))
+            return str(max(self.exchange_dict.keys()))
 
         # Get the current date
         if date == "latest":
             try:
-                date_key_list = [k for k, v in self.ex_dict.items() if currency_to_convert in v.keys()]
+                date_key_list = [k for k, v in self.exchange_dict.items() if currency_to_convert in v.keys()]
             except:
                 raise AttributeError(error_msg)
             if len(date_key_list) > 0:
@@ -447,19 +461,19 @@ class EasyPeasy(object):
         else:
             if floater(date, just_check = True) and len(str(date).strip()) == 4:
                 # Compute the average conversion rate over the whole year
-                return np.mean([v[currency_to_convert] for k, v in self.ex_dict.items()
+                return np.mean([v[currency_to_convert] for k, v in self.exchange_dict.items()
                                 if currency_to_convert in v and str(str_to_datetime(k).year) == str(date)])
-            elif date in self.ex_dict.keys():
+            elif date in self.exchange_dict.keys():
                 date_key = date
-            elif date not in self.ex_dict.keys():
-                date_key = self._closest_date(  list_of_dates = [str_time(d, date_format) for d in self.ex_dict.keys()]
+            elif date not in self.exchange_dict.keys():
+                date_key = self._closest_date(  list_of_dates = [str_time(d, date_format) for d in self.exchange_dict.keys()]
                                               , date = str_time(date, date_format)
                                               , problem_domain = 'currency'
                                               , date_format = date_format)
                 warn("\nCurrency information could not be obtained for '%s', %s was used instead." % (date, date_key))
 
         # Return the exchange rate on a given date
-        return self.ex_dict[date_key][currency_to_convert.upper()]
+        return self.exchange_dict[date_key][currency_to_convert.upper()]
 
     def currency_converter(self, amount, from_currency, to_currency, date = "latest", pretty_print = False):
         """
@@ -516,7 +530,12 @@ class EasyPeasy(object):
         :type pretty_print: bool
         :return: converted currency.
         :rtype: float
-        :raises ValueError: if (a) pretty_print is not a boolean (b) amount is not numeric (``float`` or ``int``).
+        :raises ValueError: if
+
+                            (a) pretty_print is not a boolean
+
+                            (b) amount is not numeric (``float`` or ``int``).
+
         :raises AttributeError: Conversion would result in division by zero (rare).
         """
         # Initialize
@@ -634,9 +653,9 @@ class EasyPeasy(object):
         to_currency = self.region_map(base_currency, map_to = 'currency')
 
         # Determine to CPI Data
-        cpi_record = self.cpi_df[(self.cpi_df.alpha2 == from_region) & (~pd.isnull(self.cpi_df.cpi))]
+        cpi_record = self.ConsumerPriceIndexDB[(self.ConsumerPriceIndexDB['Alpha2'] == from_region) & (~pd.isnull(self.ConsumerPriceIndexDB['CPI']))]
         if cpi_record.shape[0] != 0:
-            most_recent_cpi_record = cpi_record.year.max()
+            most_recent_cpi_record = cpi_record['Year'].max()
         else:
             raise ValueError("'%s' cannot be mapped to a specific region, and thus inflation cannot be determined." % (currency))
 
@@ -674,8 +693,8 @@ class EasyPeasy(object):
         Function that figures out how to return dates for which data is avaliable.
 
         Expected structures:
-            1. ``keys_as_dates = True:  {DATE: {KEY: VALUE}, DATE: {KEY: VALUE}...}; DATE = YYYY-MM-DD``
-            2. ``keys_as_dates = False: {KEY: {DATE: VALUE}, KEY: {DATE: VALUE}...}; DATE = YYYY``
+            1. ``keys_as_dates = True``:  ``{DATE: {KEY: VALUE}, DATE: {KEY: VALUE}...}``; DATE: ``YYYY-MM-DD``
+            2. ``keys_as_dates = False``: ``{KEY: {DATE: VALUE}, KEY: {DATE: VALUE}...}``; DATE: ``YYYY``
 
         :param nested_date_dict: nested dictionary.
         :type nested_date_dict: dict
@@ -698,7 +717,7 @@ class EasyPeasy(object):
         if not isinstance(keys_as_dates, bool):
             raise ValueError('keys_as_dates must be a boolean.')
 
-        # i.e., ex_dict
+        # i.e., exchange_dict
         if keys_as_dates:
 
             # Replace the string keys with datetimes; populate with nested keys provided they have float values
@@ -755,7 +774,7 @@ class EasyPeasy(object):
         currency_ops = currency_ops[['Region', 'Currency', 'Alpha2', 'Alpha3']]
 
         # Add date information
-        dates_dict = self._date_options(nested_date_dict = self.ex_dict, keys_as_dates = True)
+        dates_dict = self._date_options(nested_date_dict = self.exchange_dict, keys_as_dates = True)
 
         ex_dict_dates = dict((k, str(datetime_to_str(min_max(v)))) for k, v in dates_dict.items())
 
@@ -789,7 +808,7 @@ class EasyPeasy(object):
         :return: a dataframe with all CPI information EasyMoney has, as well as date ranges the date exists for.
         :rtype: Pandas DataFrame
         """
-        cpi_ops = self.cpi_df[['region', 'currency_code', 'alpha2', 'alpha3']].drop_duplicates()
+        cpi_ops = self.ConsumerPriceIndexDB[['Country', 'Currency', 'Alpha2', 'Alpha3']].drop_duplicates()
         cpi_ops.columns = ['Region', 'Currency', 'Alpha2', 'Alpha3']
         cpi_ops.index = range(cpi_ops.shape[0])
 
@@ -865,7 +884,7 @@ class EasyPeasy(object):
         if info == 'exchange':
             return sorted(self.currency_codes + ['EUR'])
         elif info == 'inflation':
-            return sorted([i for i in self.cpi_df.alpha2.unique().tolist() if isinstance(i, str)])
+            return sorted([i for i in self.ConsumerPriceIndexDB['Alpha2'].unique().tolist() if isinstance(i, str)])
         elif info == 'all':
             raise ValueError("Error in info: 'all' is only valid for when rformat is set to 'table'.")
 
@@ -892,7 +911,7 @@ class EasyPeasy(object):
 
         # Add date when Countries Changed curriency (only to Euro for now).
         # Note: Sadly, Pandas Series of dtype 'int' cannot contain NaNs. Using the 'object' dtype instead.
-        info_table['CurrencyTransition'] = info_table['Alpha2'].replace(self.eu_join_dict).map(
+        info_table['CurrencyTransition'] = info_table['Alpha2'].replace(self.currency_transitions_dict).map(
             lambda x: int(x) if floater(x, True) and str(x) != 'nan' else '')
 
         return info_table
@@ -917,8 +936,11 @@ class EasyPeasy(object):
         :type overlap_only: bool
         :return: DataFrame of Currency Information EasyMoney Understands.
         :rtype: Pandas DataFrame
-        :raises ValueError: if (a) rformat is not either 'list' or 'table' or (b) *overlap_only* is True
-                            while info is not 'all' and rformat is not 'table'.
+        :raises ValueError: if
+
+                            (a) rformat is not either 'list' or 'table' OR
+
+                            (b) *overlap_only* is True while info is not 'all' and rformat is not 'table'.
 
         """
         # This is a jumbo function.
@@ -987,6 +1009,24 @@ class EasyPeasy(object):
                         info_table[col] = info_table[col].map(full_date_to_datetime)
 
                 return info_table
+
+
+
+# ep = EasyPeasy()
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

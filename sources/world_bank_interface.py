@@ -11,13 +11,15 @@
 # Modules #
 import os
 import re
+import copy
 import wbdata
 import numpy as np
 import pandas as pd
 import pkg_resources
 
 
-from easymoney.support_money import DATA_PATH
+from easymoney.support_money import DEFAULT_DATA_PATH
+from easymoney.support_money import pandas_str_column_to_list
 
 
 class WorldBankParse(object):
@@ -30,34 +32,43 @@ class WorldBankParse(object):
     :type value_true_name: str
     :param indicator: a indicator used by the World Bank's API, e.g., "FP.CPI.TOTL" for CPI.
     :type indicator: str
+    :param data_path: alternative path to database. Defaults to None.
+    :type data_path: str
     """
 
 
-    def __init__(self, value_true_name, indicator):
+    def __init__(self
+                 , value_true_name
+                 , indicator
+                 , data_path = None):
         """
 
-        Int the WorldBankParse() class.
+        Initialize the ``WorldBankParse()`` class.
 
         """
         self.indicator = indicator
         self.raw_data = wbdata.get_data(indicator)
-        self.dict_keys = ['region', 'alpha2', 'indicator', value_true_name, 'year']
-        self.final_col_order = ['region', 'alpha2', 'alpha3', 'currency_code', 'indicator', value_true_name, 'year']
+        self.dict_keys = ['Country', 'Alpha2', 'Indicator', value_true_name, 'Year']
+        self.final_col_order = ['Country', 'Alpha2', 'Alpha3', 'Currency', 'Indicator', value_true_name, 'Year']
+
+        # Select the path to the data
+        DATA_PATH = DEFAULT_DATA_PATH if data_path == None else data_path
 
         # Import Currency Code Database.
-        currency_df = pd.read_pickle(DATA_PATH + "/CurrencyCodes_DB.p")
+        CurrencyRelationshipsDB = pandas_str_column_to_list(pd.read_csv(DATA_PATH + "/CurrencyRelationshipsDB.csv"
+                                                            , encoding = "ISO-8859-1"
+                                                            , keep_default_na = False)
+                                                            , columns = ['Alpha2', 'Alpha3'])
 
-        # Import Country Codes Database
-        country_codes = pd.read_csv(DATA_PATH + "/CountryAlpha2_and_3.csv"
-                                    , encoding = "ISO-8859-1"
-                                    , keep_default_na = False)
+        # Import Country Codes Database.
+        country_codes = pd.read_csv(DATA_PATH + "/ISOAlphaCodesDB.csv", encoding = "ISO-8859-1", keep_default_na = False)
 
         # Alpha2 --> Alpha 3
-        self.alpha2_to_alpha3 = dict(zip(country_codes.Alpha2.tolist(), country_codes.Alpha3.tolist()))
+        self.alpha2_to_alpha3 = dict(zip(country_codes['Alpha2'].tolist(), country_codes['Alpha3'].tolist()))
 
         # Alpha2 --> Currency Code
-        self.alpha2_to_currency_code = dict.fromkeys(set([i for sublist in currency_df.Alpha2.tolist() for i in sublist]))
-        for i in zip(currency_df.Alpha2.tolist(), currency_df.CurrencyCode.tolist()):
+        self.alpha2_to_currency_code = dict.fromkeys(set([i for sublist in CurrencyRelationshipsDB.Alpha2.tolist() for i in sublist]))
+        for i in zip(CurrencyRelationshipsDB.Alpha2.tolist(), CurrencyRelationshipsDB.CurrencyCode.tolist()):
             for j in i[0]:
                 if self.alpha2_to_currency_code[j] == None:
                     self.alpha2_to_currency_code[j] = i[1]
@@ -70,7 +81,7 @@ class WorldBankParse(object):
 
         :param wb_row: a row of the raw World Bank Data (as a dataframe).
         :type wb_row: dict
-        :return: dict with keys: region, region_id, indicator, cpi, year
+        :return: dict with keys: Country, country id, Indicator, CPI, Year
         :rtype: dict
         """
         # dict with empty keys
@@ -103,8 +114,7 @@ class WorldBankParse(object):
 
         for t in to_title:
             if t not in df_cols:
-                raise ValueError("%s is not a column in the %s indicator data set.\n"
-                                 "Perhaps you meant one of these: %s." % (t, indicator, ", ".join(df_cols)))
+                raise ValueError("%s is not a column in the data set" % (t))
             if any(x in str(data_frame[t].dtype) for x in ['float', 'int']):
                 raise ValueError("Cannot Title this column; %s is a numeric." % (t))
 
@@ -140,38 +150,51 @@ class WorldBankParse(object):
         if to_title != None: data_frame = self._titler(data_frame, to_title)
 
         # Get Alpha3 from Alpha2
-        data_frame['alpha3'] = data_frame['alpha2'].replace(self.alpha2_to_alpha3, inplace = False)
+        data_frame['Alpha3'] = data_frame['Alpha2'].replace(self.alpha2_to_alpha3, inplace = False)
 
         # Replace failures to Match for Alpha3s with NaNs
-        data_frame['alpha3'][data_frame['alpha2'] == data_frame['alpha3']] = np.NaN
+        data_frame['Alpha3'][data_frame['Alpha2'] == data_frame['Alpha3']] = np.NaN
 
         # Get Currency Code from Alpha2
-        data_frame['currency_code'] = data_frame['alpha2'].replace(self.alpha2_to_currency_code, inplace = False)
+        data_frame['Currency'] = data_frame['Alpha2'].replace(self.alpha2_to_currency_code, inplace = False)
 
         # Replace failures to Match for Currency Codes with NaNs
-        data_frame['currency_code'][data_frame['alpha2'] == data_frame['currency_code']] = np.NaN
+        data_frame['Currency'][data_frame['Alpha2'] == data_frame['Currency']] = np.NaN
+
+        # Sort by region and year
+        data_frame.sort_values(['Country', 'Year'], ascending = [1, 0], inplace = True)
+
+        # Refresh the index
+        data_frame.index = range(data_frame.shape[0])
 
         # Reorder and Return
         return data_frame[self.final_col_order]
 
 
-def world_bank_pull_wrapper(value_true_name, indicator, na_drop_col = None):
+def world_bank_pull_wrapper(value_true_name, indicator, data_path = None, na_drop_col = None):
     """
 
     Wrapper for the ``WorldBankParse().world_bank_pull()`` method.
     Extracts world bank information based on a specific indicator and returns a Pandas DataFrame.
 
-    :param value_true_name: replacement name for the generic 'value' column, e.g., 'value' to 'cpi'.
+    :param value_true_name: see ``WorldBankParse()``.
     :type value_true_name: str
-    :param indicator: a indicator used by the World Bank's API, e.g., "FP.CPI.TOTL" for CPI.
+    :param indicator: see ``WorldBankParse()``.
     :type indicator: str
-    :param na_drop_col: list of columns (str) to drop from the final dataframe.
+    :param data_path: see ``WorldBankParse()``.
+    :type data_path: str
+    :param na_drop_col: list of columns (str) to drop from the final dataframe. Defaults to None
     :type na_drop_col: list
     :return: DataFrame with the requested indicator information.
     :rtype: Pandas DateFrame
     """
-    data_frame = WorldBankParse(value_true_name, indicator).world_bank_pull()
+    # Get the data
+    data_frame = WorldBankParse(value_true_name, indicator, data_path).world_bank_pull()
+
+    # Remove Nones from the value_true_name (e.g., CPI) column
     data_frame = data_frame[data_frame[value_true_name].astype(str) != 'None']
+
+    # Refresh the index
     data_frame.index = range(data_frame.shape[0])
 
     # Drop NaNs in Columns
@@ -180,4 +203,9 @@ def world_bank_pull_wrapper(value_true_name, indicator, na_drop_col = None):
             data_frame.drop(col, axis = 1, inplace = True)
 
     return data_frame
+
+
+
+
+
 

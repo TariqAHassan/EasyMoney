@@ -24,7 +24,7 @@ def ecb_xml_exchange_data(return_as = 'dict', ecb_extension = "/stats/eurofxref/
     | Returns a nested dictionary of the form: ``{time: {currency: rate}}``.
     | DO NOT WRITE PROCEDURES THAT SLAM THEIR SERVERS.
 
-    :param return_as: 'dict' for dictionary (nested); 'df' for pandas dataframe.
+    :param return_as: 'dict' for dictionary (nested); 'df' for Pandas DataFrame OR 'both' for both a dict and DataFrame.
     :type return_as: str
     :param ecb_extension: URL to the exchange rate XML data on "http://www.ecb.europa.eu".
                           Defaults to '/stats/eurofxref/eurofxref-hist.xml'.
@@ -60,26 +60,34 @@ def ecb_xml_exchange_data(return_as = 'dict', ecb_extension = "/stats/eurofxref/
         return exchange_rate_db, all_currency_codes
 
     # return as pandas df
-    elif return_as == 'df':
-        # Convert to pandas dataframe, convert date --> column and reindex
+    elif return_as == 'df' or return_as == 'both':
+        # Convert to pandas dataframe
         df = pd.DataFrame.from_dict(exchange_rate_db, orient = 'index')
-        df['date'] = df.index
+
+        # convert date index --> column
+        df['Date'] = df.index
         df.index = range(df.shape[0])
 
         # Melt the dataframe
-        df = pd.melt(df, id_vars = ['date'], value_vars = [d for d in df.columns if d != 'date'])
-        df.rename(columns = {"variable" : "currency", "value" : "rate"}, inplace = True)
+        df = pd.melt(df, id_vars = ['Date'], value_vars = [d for d in df.columns if d != 'Date'])
+        df.rename(columns = {"variable" : "Currency", "value" : "Rate"}, inplace = True)
+
+        # Drop NaNs
+        df = df[pd.notnull(df['Rate'])]
 
         # Convert date column --> datetime
-        df.date = pd.to_datetime(df.date, infer_datetime_format = True)
+        df['Date'] = pd.to_datetime(df['Date'], infer_datetime_format = True)
 
         # Sort by currency code
-        df.sort_values(['date', 'currency'], ascending = [1, 1], inplace = True)
+        df.sort_values(['Date', 'Currency'], ascending = [1, 1], inplace = True)
 
         # Refresh index
         df.index = range(df.shape[0])
 
-        return df, all_currency_codes
+        if return_as == 'df':
+            return df, all_currency_codes
+        elif return_as == 'both':
+            return exchange_rate_db, df, all_currency_codes
 
 ecb_currency_to_alpha2_dict = {   "CYP": "CY"
                                 , "EEK": "EE"
