@@ -251,8 +251,10 @@ If the directory already contains some of the required databases,
 ``EasyPeasy()`` will automagically read in the existing databases and
 generate only those databases that are missing.
 
+--------------
+
 Resources
-'''''''''
+~~~~~~~~~
 
 Indicators used:
 
