@@ -7,13 +7,13 @@ Overview
 EasyMoney is a set of tools for:
 
 -  computing inflation
+-  currency conversions
 -  adjusting a given currency for inflation
--  converting from one currency to another
 -  'normalizing' a currency, i.e., adjust for inflation and then convert
    to a base currency.
 -  doing all of the above without having to memorize currency codes!
 
-**WARNING: Results may Contain Inaccuracies. See Below.**
+**NOTICE: THIS TOOL IS FOR INFORMATION PURPOSES ONLY.**
 
 --------------
 
@@ -21,7 +21,8 @@ Dependencies
 ~~~~~~~~~~~~
 
 EasyMoney requires: `numpy <http://www.numpy.org>`__,
-`pandas <http://pandas.pydata.org>`__ and
+`pandas <http://pandas.pydata.org>`__,
+`requests <http://docs.python-requests.org/en/master/>`__ and
 `wbdata <https://github.com/OliverSherouse/wbdata>`__\ †.
 
 Internet access is required to create an instance of the main
@@ -36,7 +37,7 @@ Installation
 
 ``$ pip3 install git+git://github.com/TariqAHassan/EasyMoney@master``
 
-*Note*: EasyMoney requires Python 3.
+*Note*: EasyMoney requires Python 3.4 or later.
 
 --------------
 
@@ -61,7 +62,7 @@ Note: this may take a moment, depending on the speed of your internet
 connection.
 
 Prototypical Conversion Problems
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+''''''''''''''''''''''''''''''''
 
 Currency Converter
 ''''''''''''''''''
@@ -91,10 +92,10 @@ Convert Currency in a more Natural Way
     # 68.58 EUR
 
 Handling Common Currencies
-^^^^^^^^^^^^^^^^^^^^^^^^^^
+''''''''''''''''''''''''''
 
-1. Currency Conversion:
-'''''''''''''''''''''''
+Currency Conversion:
+''''''''''''''''''''
 
 .. code:: python
 
@@ -104,8 +105,8 @@ Handling Common Currencies
 
 EasyMoney understands that these two nations share a common currency.
 
-2. Normalization
-''''''''''''''''
+Normalization
+'''''''''''''
 
 .. code:: python
 
@@ -123,7 +124,7 @@ EasyMoney also understands that, while these two nations may share a
 common currency, inflation may differ.
 
 Options
-^^^^^^^
+'''''''
 
 It's easy to explore the terminology EasyMoney understands.
 
@@ -197,25 +198,61 @@ This can also be done for exchange rate information.
 *Note*: Errors may emerge when converting across currency transitions,
 e.g., CY (2005) → CY (2010).
 
---------------
+Databases
+'''''''''
 
-Documentation
--------------
+It's also straightforward to gain access to the databases used by
+``EasyPeasy()``.
 
-For complete documentation, please click
-`here <https://tariqahassan.github.io/EasyMoney/index.html>`__.
+To see all of the International Organization for Standardization (ISO)
+Alpha2 codes currently cached:
 
---------------
+.. code:: python
 
-License
--------
+    ep.ISOAlphaCodesDB
 
-This software is provided under a BSD License.
+To see all of the known transitions from one currency to another:
 
---------------
+.. code:: python
 
-References
-----------
+    ep.CurrencyTransitionDB
+
+To see the raw Exchange Rate information currently cached:
+
+.. code:: python
+
+    ep.ExchangeRatesDB
+
+To see the raw Consumer Price Index (CPI) information currently cached:
+
+.. code:: python
+
+    ep.ConsumerPriceIndexDB
+
+Finally, to see the relationships between Country Names, ISO Alpha2/3
+Codes and Currency Codes currently understood by ``EasyPeasy()``:
+
+.. code:: python
+
+    ep.ConsumerPriceIndexDB
+
+It's also easy to save these databases to disk so they can be used
+offline or modified. One can simply pass a directory when creating an
+instance of the class.
+
+.. code:: python
+
+    ep = EasyPeasy('/path/of/your/choosing')
+
+If this directory does not contain all of the required DataBases, it
+will be populated with them.
+
+If the directory already contains some of the required databases,
+``EasyPeasy()`` will automagically read in the existing databases and
+generate only those databases that are missing.
+
+Resources
+'''''''''
 
 Indicators used:
 
@@ -237,8 +274,8 @@ Indicators used:
          2. Rates are updated by the ECB around 16:00 CET.
          3. The ECB states, clearly, that usage for transaction purposes
             is strongly discouraged. This sentiment is echoed here;
-            ***this tool is intended to be for information-purposes
-            only***.
+            ***as stated above, this tool is intended to be for
+            information purposes only***.
          4. ALL EXCHANGE RESULTS OBTAINED FROM EASYMONEY ARE THE RESULT
             OF CALCULATIONS BASED ON ECB DATA. THAT IS, THESE RESULTS
             ARE NOT A DIRECT REPORTING OF ECB-PROVIDED DATA.

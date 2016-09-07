@@ -138,15 +138,19 @@
 <h2>Main API Functionality<a class="headerlink" href="#main-api-functionality" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
 <dt id="easymoney.money.EasyPeasy">
-<em class="property">class </em><code class="descclassname">easymoney.money.</code><code class="descname">EasyPeasy</code><span class="sig-paren">(</span><em>precision=2</em>, <em>fall_back=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/easymoney/money.html#EasyPeasy"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#easymoney.money.EasyPeasy" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">easymoney.money.</code><code class="descname">EasyPeasy</code><span class="sig-paren">(</span><em>alt_database_dir=None</em>, <em>precision=2</em>, <em>fall_back=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/easymoney/money.html#EasyPeasy"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#easymoney.money.EasyPeasy" title="Permalink to this definition">¶</a></dt>
 <dd><p>Tools for converting one currency to another, looking up inflation information, adjusting for inflation, and more!</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>alt_database_dir</strong> (<em>str</em>) &#8211; an alterative path to the database files. If this directory does not
+contain the required databases, those missing will be pulled from the web
+and placed there. Otherwise, the databases therein there will
+supplant those used by automatically EasyMoney. Defaults to None.</li>
 <li><strong>precision</strong> (<em>int</em>) &#8211; number of places to round to. Defaults to 2.</li>
-<li><strong>fall_back</strong> (<em>bool</em>) &#8211; if True, fall back to closest possible date. Defaults to True.</li>
+<li><strong>fall_back</strong> (<em>bool</em>) &#8211; if True, fall back to closest possible date for which data is available. Defaults to True.</li>
 </ul>
 </td>
 </tr>
@@ -223,7 +227,12 @@ or the default is not recommended.</p>
 </td>
 </tr>
 <tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><ul class="first last simple">
-<li><strong>ValueError</strong> &#8211; if (a) pretty_print is not a boolean (b) amount is not numeric (<code class="docutils literal"><span class="pre">float</span></code> or <code class="docutils literal"><span class="pre">int</span></code>).</li>
+<li><strong>ValueError</strong> &#8211; <p>if</p>
+<ol class="loweralpha">
+<li>pretty_print is not a boolean</li>
+<li>amount is not numeric (<code class="docutils literal"><span class="pre">float</span></code> or <code class="docutils literal"><span class="pre">int</span></code>).</li>
+</ol>
+</li>
 <li><strong>AttributeError</strong> &#8211; Conversion would result in division by zero (rare).</li>
 </ul>
 </td>
@@ -404,8 +413,12 @@ overlap.</li>
 <tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first">Pandas DataFrame</p>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><p class="first last"><strong>ValueError</strong> &#8211; if (a) rformat is not either &#8216;list&#8217; or &#8216;table&#8217; or (b) <em>overlap_only</em> is True
-while info is not &#8216;all&#8217; and rformat is not &#8216;table&#8217;.</p>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><p class="first last"><strong>ValueError</strong> &#8211; <p>if</p>
+<ol class="loweralpha simple">
+<li>rformat is not either &#8216;list&#8217; or &#8216;table&#8217; OR</li>
+<li><em>overlap_only</em> is True while info is not &#8216;all&#8217; and rformat is not &#8216;table&#8217;.</li>
+</ol>
+</p>
 </td>
 </tr>
 </tbody>
@@ -466,11 +479,11 @@ ambiguity.</p>
 </dd></dl>
 
 </div>
-<span class="target" id="module-easymoney.ecb_interface"></span><div class="section" id="tools-for-obtaining-data-from-the-european-central-bank">
+<span class="target" id="module-sources.ecb_interface"></span><div class="section" id="tools-for-obtaining-data-from-the-european-central-bank">
 <h2>Tools for Obtaining Data from the European Central Bank<a class="headerlink" href="#tools-for-obtaining-data-from-the-european-central-bank" title="Permalink to this headline">¶</a></h2>
 <dl class="function">
-<dt id="easymoney.ecb_interface.ecb_xml_exchange_data">
-<code class="descclassname">easymoney.ecb_interface.</code><code class="descname">ecb_xml_exchange_data</code><span class="sig-paren">(</span><em>return_as='dict'</em>, <em>ecb_extension='/stats/eurofxref/eurofxref-hist.xml'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/easymoney/ecb_interface.html#ecb_xml_exchange_data"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#easymoney.ecb_interface.ecb_xml_exchange_data" title="Permalink to this definition">¶</a></dt>
+<dt id="sources.ecb_interface.ecb_xml_exchange_data">
+<code class="descclassname">sources.ecb_interface.</code><code class="descname">ecb_xml_exchange_data</code><span class="sig-paren">(</span><em>return_as='dict'</em>, <em>ecb_extension='/stats/eurofxref/eurofxref-hist.xml'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sources/ecb_interface.html#ecb_xml_exchange_data"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sources.ecb_interface.ecb_xml_exchange_data" title="Permalink to this definition">¶</a></dt>
 <dd><div class="line-block">
 <div class="line">This tool goes out to the European Central Bank via their generously provided API</div>
 <div class="line">and coerces XML data into a dictionary.</div>
@@ -483,7 +496,7 @@ ambiguity.</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>return_as</strong> (<em>str</em>) &#8211; &#8216;dict&#8217; for dictionary (nested); &#8216;df&#8217; for pandas dataframe.</li>
+<li><strong>return_as</strong> (<em>str</em>) &#8211; &#8216;dict&#8217; for dictionary (nested); &#8216;df&#8217; for Pandas DataFrame OR &#8216;both&#8217; for both a dict and DataFrame.</li>
 <li><strong>ecb_extension</strong> (<em>str</em>) &#8211; URL to the exchange rate XML data on &#8220;<a class="reference external" href="http://www.ecb.europa.eu">http://www.ecb.europa.eu</a>&#8221;.
 Defaults to &#8216;/stats/eurofxref/eurofxref-hist.xml&#8217;.</li>
 </ul>
@@ -500,11 +513,11 @@ Defaults to &#8216;/stats/eurofxref/eurofxref-hist.xml&#8217;.</li>
 </dd></dl>
 
 </div>
-<span class="target" id="module-easymoney.world_bank_interface"></span><div class="section" id="tools-for-obtaining-data-from-the-world-bank-group">
+<span class="target" id="module-sources.world_bank_interface"></span><div class="section" id="tools-for-obtaining-data-from-the-world-bank-group">
 <h2>Tools for Obtaining Data from the World Bank Group<a class="headerlink" href="#tools-for-obtaining-data-from-the-world-bank-group" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
-<dt id="easymoney.world_bank_interface.WorldBankParse">
-<em class="property">class </em><code class="descclassname">easymoney.world_bank_interface.</code><code class="descname">WorldBankParse</code><span class="sig-paren">(</span><em>value_true_name</em>, <em>indicator</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/easymoney/world_bank_interface.html#WorldBankParse"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#easymoney.world_bank_interface.WorldBankParse" title="Permalink to this definition">¶</a></dt>
+<dt id="sources.world_bank_interface.WorldBankParse">
+<em class="property">class </em><code class="descclassname">sources.world_bank_interface.</code><code class="descname">WorldBankParse</code><span class="sig-paren">(</span><em>value_true_name</em>, <em>indicator</em>, <em>data_path=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sources/world_bank_interface.html#WorldBankParse"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sources.world_bank_interface.WorldBankParse" title="Permalink to this definition">¶</a></dt>
 <dd><div class="line-block">
 <div class="line">Tools to obtain indicator data from the World Bank&#8217;s API.</div>
 <div class="line">DO NOT WRITE PROCEDURES THAT SLAM THEIR SERVERS.</div>
@@ -516,14 +529,15 @@ Defaults to &#8216;/stats/eurofxref/eurofxref-hist.xml&#8217;.</li>
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
 <li><strong>value_true_name</strong> (<em>str</em>) &#8211; replacement name for the generic &#8216;value&#8217; column, e.g., &#8216;value&#8217; to &#8216;cpi&#8217;.</li>
 <li><strong>indicator</strong> (<em>str</em>) &#8211; a indicator used by the World Bank&#8217;s API, e.g., &#8220;FP.CPI.TOTL&#8221; for CPI.</li>
+<li><strong>data_path</strong> (<em>str</em>) &#8211; alternative path to database. Defaults to None.</li>
 </ul>
 </td>
 </tr>
 </tbody>
 </table>
 <dl class="method">
-<dt id="easymoney.world_bank_interface.WorldBankParse.world_bank_pull">
-<code class="descname">world_bank_pull</code><span class="sig-paren">(</span><em>to_title=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/easymoney/world_bank_interface.html#WorldBankParse.world_bank_pull"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#easymoney.world_bank_interface.WorldBankParse.world_bank_pull" title="Permalink to this definition">¶</a></dt>
+<dt id="sources.world_bank_interface.WorldBankParse.world_bank_pull">
+<code class="descname">world_bank_pull</code><span class="sig-paren">(</span><em>to_title=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sources/world_bank_interface.html#WorldBankParse.world_bank_pull"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sources.world_bank_interface.WorldBankParse.world_bank_pull" title="Permalink to this definition">¶</a></dt>
 <dd><p>Parse the information pulled from the world bank&#8217;s API.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -542,8 +556,8 @@ Defaults to &#8216;/stats/eurofxref/eurofxref-hist.xml&#8217;.</li>
 </dd></dl>
 
 <dl class="function">
-<dt id="easymoney.world_bank_interface.world_bank_pull_wrapper">
-<code class="descclassname">easymoney.world_bank_interface.</code><code class="descname">world_bank_pull_wrapper</code><span class="sig-paren">(</span><em>value_true_name</em>, <em>indicator</em>, <em>na_drop_col=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/easymoney/world_bank_interface.html#world_bank_pull_wrapper"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#easymoney.world_bank_interface.world_bank_pull_wrapper" title="Permalink to this definition">¶</a></dt>
+<dt id="sources.world_bank_interface.world_bank_pull_wrapper">
+<code class="descclassname">sources.world_bank_interface.</code><code class="descname">world_bank_pull_wrapper</code><span class="sig-paren">(</span><em>value_true_name</em>, <em>indicator</em>, <em>data_path=None</em>, <em>na_drop_col=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sources/world_bank_interface.html#world_bank_pull_wrapper"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sources.world_bank_interface.world_bank_pull_wrapper" title="Permalink to this definition">¶</a></dt>
 <dd><p>Wrapper for the <code class="docutils literal"><span class="pre">WorldBankParse().world_bank_pull()</span></code> method.
 Extracts world bank information based on a specific indicator and returns a Pandas DataFrame.</p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -551,9 +565,10 @@ Extracts world bank information based on a specific indicator and returns a Pand
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>value_true_name</strong> (<em>str</em>) &#8211; replacement name for the generic &#8216;value&#8217; column, e.g., &#8216;value&#8217; to &#8216;cpi&#8217;.</li>
-<li><strong>indicator</strong> (<em>str</em>) &#8211; a indicator used by the World Bank&#8217;s API, e.g., &#8220;FP.CPI.TOTL&#8221; for CPI.</li>
-<li><strong>na_drop_col</strong> (<em>list</em>) &#8211; list of columns (str) to drop from the final dataframe.</li>
+<li><strong>value_true_name</strong> (<em>str</em>) &#8211; see <code class="docutils literal"><span class="pre">WorldBankParse()</span></code>.</li>
+<li><strong>indicator</strong> (<em>str</em>) &#8211; see <code class="docutils literal"><span class="pre">WorldBankParse()</span></code>.</li>
+<li><strong>data_path</strong> (<em>str</em>) &#8211; see <code class="docutils literal"><span class="pre">WorldBankParse()</span></code>.</li>
+<li><strong>na_drop_col</strong> (<em>list</em>) &#8211; list of columns (str) to drop from the final dataframe. Defaults to None</li>
 </ul>
 </td>
 </tr>

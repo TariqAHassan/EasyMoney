@@ -1,0 +1,403 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>sources.world_bank_interface &mdash; EasyMoney 1.0.0 documentation</title>
+  
+
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+    <link rel="top" title="EasyMoney 1.0.0 documentation" href="../../index.html"/>
+        <link rel="up" title="Module code" href="../index.html"/> 
+
+  
+  <script src="../../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../../index.html" class="icon icon-home"> EasyMoney
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                1.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+                <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../README.html">EasyMoney</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../code.html">Code Documentation</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="../../index.html">EasyMoney</a>
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../../index.html">Docs</a> &raquo;</li>
+      
+          <li><a href="../index.html">Module code</a> &raquo;</li>
+      
+    <li>sources.world_bank_interface</li>
+      <li class="wy-breadcrumbs-aside">
+        
+          
+        
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for sources.world_bank_interface</h1><div class="highlight"><pre>
+<span></span><span class="ch">#!/usr/bin/env python3</span>
+
+<span class="sd">&#39;&#39;&#39;</span>
+
+<span class="sd">    Tools for Obtaining Data from the World Bank Group</span>
+<span class="sd">    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~</span>
+
+
+<span class="sd">&#39;&#39;&#39;</span>
+
+<span class="c1"># Modules #</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">re</span>
+<span class="kn">import</span> <span class="nn">copy</span>
+<span class="kn">import</span> <span class="nn">wbdata</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">import</span> <span class="nn">pkg_resources</span>
+
+<span class="kn">from</span> <span class="nn">easymoney.support_money</span> <span class="k">import</span> <span class="n">pandas_str_column_to_list</span>
+
+
+<span class="n">DEFAULT_DATA_PATH</span> <span class="o">=</span> <span class="n">pkg_resources</span><span class="o">.</span><span class="n">resource_filename</span><span class="p">(</span><span class="s1">&#39;sources&#39;</span><span class="p">,</span> <span class="s1">&#39;data&#39;</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="WorldBankParse"><a class="viewcode-back" href="../../code.html#sources.world_bank_interface.WorldBankParse">[docs]</a><span class="k">class</span> <span class="nc">WorldBankParse</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+
+<span class="sd">    | Tools to obtain indicator data from the World Bank&#39;s API.</span>
+<span class="sd">    | DO NOT WRITE PROCEDURES THAT SLAM THEIR SERVERS.</span>
+
+<span class="sd">    :param value_true_name: replacement name for the generic &#39;value&#39; column, e.g., &#39;value&#39; to &#39;cpi&#39;.</span>
+<span class="sd">    :type value_true_name: str</span>
+<span class="sd">    :param indicator: a indicator used by the World Bank&#39;s API, e.g., &quot;FP.CPI.TOTL&quot; for CPI.</span>
+<span class="sd">    :type indicator: str</span>
+<span class="sd">    :param data_path: alternative path to database. Defaults to None.</span>
+<span class="sd">    :type data_path: str</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span>
+                 <span class="p">,</span> <span class="n">value_true_name</span>
+                 <span class="p">,</span> <span class="n">indicator</span>
+                 <span class="p">,</span> <span class="n">data_path</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+
+<span class="sd">        Initialize the ``WorldBankParse()`` class.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">indicator</span> <span class="o">=</span> <span class="n">indicator</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">raw_data</span> <span class="o">=</span> <span class="n">wbdata</span><span class="o">.</span><span class="n">get_data</span><span class="p">(</span><span class="n">indicator</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dict_keys</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;Country&#39;</span><span class="p">,</span> <span class="s1">&#39;Alpha2&#39;</span><span class="p">,</span> <span class="s1">&#39;Indicator&#39;</span><span class="p">,</span> <span class="n">value_true_name</span><span class="p">,</span> <span class="s1">&#39;Year&#39;</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">final_col_order</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;Country&#39;</span><span class="p">,</span> <span class="s1">&#39;Alpha2&#39;</span><span class="p">,</span> <span class="s1">&#39;Alpha3&#39;</span><span class="p">,</span> <span class="s1">&#39;Currency&#39;</span><span class="p">,</span> <span class="s1">&#39;Indicator&#39;</span><span class="p">,</span> <span class="n">value_true_name</span><span class="p">,</span> <span class="s1">&#39;Year&#39;</span><span class="p">]</span>
+
+        <span class="c1"># Select the path to the data</span>
+        <span class="n">DATA_PATH</span> <span class="o">=</span> <span class="n">DEFAULT_DATA_PATH</span> <span class="k">if</span> <span class="n">data_path</span> <span class="o">==</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">data_path</span>
+
+        <span class="c1"># Import Currency Code Database.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">CurrencyRelationshipsDB</span> <span class="o">=</span> <span class="n">pandas_str_column_to_list</span><span class="p">(</span><span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">DATA_PATH</span> <span class="o">+</span> <span class="s2">&quot;/CurrencyRelationshipsDB.csv&quot;</span>
+                                                            <span class="p">,</span> <span class="n">encoding</span> <span class="o">=</span> <span class="s2">&quot;ISO-8859-1&quot;</span>
+                                                            <span class="p">,</span> <span class="n">keep_default_na</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span>
+                                                            <span class="p">,</span> <span class="n">columns</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;Alpha2&#39;</span><span class="p">,</span> <span class="s1">&#39;Alpha3&#39;</span><span class="p">])</span>
+
+        <span class="c1"># Import Country Codes Database.</span>
+        <span class="n">country_codes</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">DATA_PATH</span> <span class="o">+</span> <span class="s2">&quot;/ISOAlphaCodesDB.csv&quot;</span><span class="p">,</span> <span class="n">encoding</span> <span class="o">=</span> <span class="s2">&quot;ISO-8859-1&quot;</span><span class="p">,</span> <span class="n">keep_default_na</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span>
+
+        <span class="c1"># Alpha2 --&gt; Alpha 3</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">alpha2_to_alpha3</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">country_codes</span><span class="p">[</span><span class="s1">&#39;Alpha2&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">tolist</span><span class="p">(),</span> <span class="n">country_codes</span><span class="p">[</span><span class="s1">&#39;Alpha3&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">tolist</span><span class="p">()))</span>
+
+        <span class="c1"># Alpha2 --&gt; Currency Code</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">alpha2_to_currency_code</span> <span class="o">=</span> <span class="nb">dict</span><span class="o">.</span><span class="n">fromkeys</span><span class="p">(</span><span class="nb">set</span><span class="p">([</span><span class="n">i</span> <span class="k">for</span> <span class="n">sublist</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">CurrencyRelationshipsDB</span><span class="o">.</span><span class="n">Alpha2</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">sublist</span><span class="p">]))</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">CurrencyRelationshipsDB</span><span class="o">.</span><span class="n">Alpha2</span><span class="o">.</span><span class="n">tolist</span><span class="p">(),</span> <span class="bp">self</span><span class="o">.</span><span class="n">CurrencyRelationshipsDB</span><span class="o">.</span><span class="n">CurrencyCode</span><span class="o">.</span><span class="n">tolist</span><span class="p">()):</span>
+            <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="n">i</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">alpha2_to_currency_code</span><span class="p">[</span><span class="n">j</span><span class="p">]</span> <span class="o">==</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">alpha2_to_currency_code</span><span class="p">[</span><span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="n">i</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+
+    <span class="k">def</span> <span class="nf">_wb_rowwise_extractor</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">wb_row</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+
+<span class="sd">        *Private Method*</span>
+<span class="sd">        Extracts desired (see return) row information from the raw World Bank download.</span>
+
+<span class="sd">        :param wb_row: a row of the raw World Bank Data (as a dataframe).</span>
+<span class="sd">        :type wb_row: dict</span>
+<span class="sd">        :return: dict with keys: Country, country id, Indicator, CPI, Year</span>
+<span class="sd">        :rtype: dict</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># dict with empty keys</span>
+        <span class="n">extracted_data_dict</span> <span class="o">=</span> <span class="nb">dict</span><span class="o">.</span><span class="n">fromkeys</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dict_keys</span><span class="p">)</span>
+
+        <span class="c1"># Populate extracted_data_dict</span>
+        <span class="n">extracted_data_dict</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">dict_keys</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span>  <span class="o">=</span>  <span class="n">wb_row</span><span class="p">[</span><span class="s1">&#39;country&#39;</span><span class="p">][</span><span class="s1">&#39;value&#39;</span><span class="p">]</span>
+        <span class="n">extracted_data_dict</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">dict_keys</span><span class="p">[</span><span class="mi">1</span><span class="p">]]</span>  <span class="o">=</span>  <span class="n">wb_row</span><span class="p">[</span><span class="s1">&#39;country&#39;</span><span class="p">][</span><span class="s1">&#39;id&#39;</span><span class="p">]</span>
+        <span class="n">extracted_data_dict</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">dict_keys</span><span class="p">[</span><span class="mi">2</span><span class="p">]]</span>  <span class="o">=</span>  <span class="n">wb_row</span><span class="p">[</span><span class="s1">&#39;indicator&#39;</span><span class="p">][</span><span class="s1">&#39;value&#39;</span><span class="p">]</span>
+        <span class="n">extracted_data_dict</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">dict_keys</span><span class="p">[</span><span class="mi">3</span><span class="p">]]</span>  <span class="o">=</span>  <span class="n">wb_row</span><span class="p">[</span><span class="s1">&#39;value&#39;</span><span class="p">]</span>
+        <span class="n">extracted_data_dict</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">dict_keys</span><span class="p">[</span><span class="mi">4</span><span class="p">]]</span>  <span class="o">=</span>  <span class="n">wb_row</span><span class="p">[</span><span class="s1">&#39;date&#39;</span><span class="p">]</span>
+
+        <span class="k">return</span> <span class="n">extracted_data_dict</span>
+
+    <span class="k">def</span> <span class="nf">_titler</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data_frame</span><span class="p">,</span> <span class="n">to_title</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+
+<span class="sd">        *Private Method*</span>
+<span class="sd">        Titles entries in the column of a pandas dataframe.</span>
+<span class="sd">        Includes some error handling.</span>
+
+<span class="sd">        :param to_title: a list of columns to apply the following string operations: ``column.lower().title()``</span>
+<span class="sd">        :type to_title: list</span>
+<span class="sd">        :param data_frame: a dataframe with columns to be titled.</span>
+<span class="sd">        :type data_frame: Pandas DataFrame</span>
+<span class="sd">        :return: DataFrame with the requested indicator information.</span>
+<span class="sd">        :rtype: Pandas DataFrame</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">df_cols</span> <span class="o">=</span> <span class="n">data_frame</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
+
+        <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">to_title</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">t</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">df_cols</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">%s</span><span class="s2"> is not a column in the data set&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">t</span><span class="p">))</span>
+            <span class="k">if</span> <span class="nb">any</span><span class="p">(</span><span class="n">x</span> <span class="ow">in</span> <span class="nb">str</span><span class="p">(</span><span class="n">data_frame</span><span class="p">[</span><span class="n">t</span><span class="p">]</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;float&#39;</span><span class="p">,</span> <span class="s1">&#39;int&#39;</span><span class="p">]):</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Cannot Title this column; </span><span class="si">%s</span><span class="s2"> is a numeric.&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">t</span><span class="p">))</span>
+
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">data_frame</span><span class="p">[</span><span class="n">t</span><span class="p">]</span> <span class="o">=</span> <span class="n">data_frame</span><span class="p">[</span><span class="n">t</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">str</span><span class="p">)</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span><span class="o">.</span><span class="n">title</span><span class="p">())</span>
+            <span class="k">except</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;Cannot convert the column &#39;</span><span class="si">%s</span><span class="s2">&#39; to a str&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">t</span><span class="p">))</span>
+
+        <span class="k">return</span> <span class="n">data_frame</span>
+
+<div class="viewcode-block" id="WorldBankParse.world_bank_pull"><a class="viewcode-back" href="../../code.html#sources.world_bank_interface.WorldBankParse.world_bank_pull">[docs]</a>    <span class="k">def</span> <span class="nf">world_bank_pull</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">to_title</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+
+<span class="sd">        Parse the information pulled from the world bank&#39;s API.</span>
+
+<span class="sd">        :param to_title: a list of column to title. Defaults to None.</span>
+<span class="sd">        :return: DataFrame with the requested indicator information.</span>
+<span class="sd">        :rtype: Pandas Dataframe</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">to_title</span> <span class="o">!=</span> <span class="kc">None</span> <span class="ow">and</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">to_title</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;title must be a list of column names (strings).&quot;</span><span class="p">)</span>
+
+        <span class="c1"># Generate a list populated with dicts for each row of the raw data</span>
+        <span class="n">dictionaries</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_wb_rowwise_extractor</span><span class="p">(</span><span class="n">w</span><span class="p">)</span> <span class="k">for</span> <span class="n">w</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">raw_data</span><span class="p">]</span>
+
+        <span class="c1"># Merge by key</span>
+        <span class="n">merged_dict</span> <span class="o">=</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="p">[</span><span class="n">x</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">dictionaries</span><span class="p">]</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">dictionaries</span><span class="p">[</span><span class="mi">0</span><span class="p">]}</span>
+
+        <span class="c1"># Merge into a single data frame</span>
+        <span class="n">data_frame</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="o">.</span><span class="n">from_dict</span><span class="p">(</span><span class="n">merged_dict</span><span class="p">)</span>
+
+        <span class="c1"># Title desired columns</span>
+        <span class="k">if</span> <span class="n">to_title</span> <span class="o">!=</span> <span class="kc">None</span><span class="p">:</span> <span class="n">data_frame</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_titler</span><span class="p">(</span><span class="n">data_frame</span><span class="p">,</span> <span class="n">to_title</span><span class="p">)</span>
+
+        <span class="c1"># Get Alpha3 from Alpha2</span>
+        <span class="n">data_frame</span><span class="p">[</span><span class="s1">&#39;Alpha3&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">data_frame</span><span class="p">[</span><span class="s1">&#39;Alpha2&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">alpha2_to_alpha3</span><span class="p">,</span> <span class="n">inplace</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span>
+
+        <span class="c1"># Replace failures to Match for Alpha3s with NaNs</span>
+        <span class="n">data_frame</span><span class="p">[</span><span class="s1">&#39;Alpha3&#39;</span><span class="p">][</span><span class="n">data_frame</span><span class="p">[</span><span class="s1">&#39;Alpha2&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="n">data_frame</span><span class="p">[</span><span class="s1">&#39;Alpha3&#39;</span><span class="p">]]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">NaN</span>
+
+        <span class="c1"># Get Currency Code from Alpha2</span>
+        <span class="n">data_frame</span><span class="p">[</span><span class="s1">&#39;Currency&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">data_frame</span><span class="p">[</span><span class="s1">&#39;Alpha2&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">alpha2_to_currency_code</span><span class="p">,</span> <span class="n">inplace</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span>
+
+        <span class="c1"># Replace failures to Match for Currency Codes with NaNs</span>
+        <span class="n">data_frame</span><span class="p">[</span><span class="s1">&#39;Currency&#39;</span><span class="p">][</span><span class="n">data_frame</span><span class="p">[</span><span class="s1">&#39;Alpha2&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="n">data_frame</span><span class="p">[</span><span class="s1">&#39;Currency&#39;</span><span class="p">]]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">NaN</span>
+
+        <span class="c1"># Sort by region and year</span>
+        <span class="n">data_frame</span><span class="o">.</span><span class="n">sort_values</span><span class="p">([</span><span class="s1">&#39;Country&#39;</span><span class="p">,</span> <span class="s1">&#39;Year&#39;</span><span class="p">],</span> <span class="n">ascending</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">inplace</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span>
+
+        <span class="c1"># Refresh the index</span>
+        <span class="n">data_frame</span><span class="o">.</span><span class="n">index</span> <span class="o">=</span> <span class="nb">range</span><span class="p">(</span><span class="n">data_frame</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+
+        <span class="c1"># Reorder and Return, along with CurrencyRelationshipsDB</span>
+        <span class="k">return</span> <span class="n">data_frame</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">final_col_order</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">CurrencyRelationshipsDB</span></div></div>
+
+
+<div class="viewcode-block" id="world_bank_pull_wrapper"><a class="viewcode-back" href="../../code.html#sources.world_bank_interface.world_bank_pull_wrapper">[docs]</a><span class="k">def</span> <span class="nf">world_bank_pull_wrapper</span><span class="p">(</span><span class="n">value_true_name</span><span class="p">,</span> <span class="n">indicator</span><span class="p">,</span> <span class="n">data_path</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">na_drop_col</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+
+<span class="sd">    Wrapper for the ``WorldBankParse().world_bank_pull()`` method.</span>
+<span class="sd">    Extracts world bank information based on a specific indicator and returns a Pandas DataFrame.</span>
+
+<span class="sd">    :param value_true_name: see ``WorldBankParse()``.</span>
+<span class="sd">    :type value_true_name: str</span>
+<span class="sd">    :param indicator: see ``WorldBankParse()``.</span>
+<span class="sd">    :type indicator: str</span>
+<span class="sd">    :param data_path: see ``WorldBankParse()``.</span>
+<span class="sd">    :type data_path: str</span>
+<span class="sd">    :param na_drop_col: list of columns (str) to drop from the final dataframe. Defaults to None</span>
+<span class="sd">    :type na_drop_col: list</span>
+<span class="sd">    :return: DataFrame with the requested indicator information.</span>
+<span class="sd">    :rtype: Pandas DateFrame</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># Get the data</span>
+    <span class="n">data_frame</span><span class="p">,</span> <span class="n">CurrencyRelationshipsDB</span> <span class="o">=</span> <span class="n">WorldBankParse</span><span class="p">(</span><span class="n">value_true_name</span><span class="p">,</span> <span class="n">indicator</span><span class="p">,</span> <span class="n">data_path</span><span class="p">)</span><span class="o">.</span><span class="n">world_bank_pull</span><span class="p">()</span>
+
+    <span class="c1"># Remove Nones from the value_true_name (e.g., CPI) column</span>
+    <span class="n">data_frame</span> <span class="o">=</span> <span class="n">data_frame</span><span class="p">[</span><span class="n">data_frame</span><span class="p">[</span><span class="n">value_true_name</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">str</span><span class="p">)</span> <span class="o">!=</span> <span class="s1">&#39;None&#39;</span><span class="p">]</span>
+
+    <span class="c1"># Refresh the index</span>
+    <span class="n">data_frame</span><span class="o">.</span><span class="n">index</span> <span class="o">=</span> <span class="nb">range</span><span class="p">(</span><span class="n">data_frame</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+
+    <span class="c1"># Drop NaNs in Columns</span>
+    <span class="k">if</span> <span class="n">na_drop_col</span> <span class="o">!=</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="n">na_drop_col</span><span class="p">:</span>
+            <span class="n">data_frame</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="n">col</span><span class="p">,</span> <span class="n">axis</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="n">inplace</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">data_frame</span><span class="p">,</span> <span class="n">CurrencyRelationshipsDB</span></div>
+
+
+
+
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2016, Tariq A. Hassan.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../../',
+            VERSION:'1.0.0',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true
+        };
+    </script>
+      <script type="text/javascript" src="../../_static/jquery.js"></script>
+      <script type="text/javascript" src="../../_static/underscore.js"></script>
+      <script type="text/javascript" src="../../_static/doctools.js"></script>
+      <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>
