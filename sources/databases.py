@@ -5,7 +5,6 @@
     Tools for Locating Required Databases
     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-
 """
 
 # Modules #
@@ -14,7 +13,7 @@ import pandas as pd
 import pkg_resources
 
 from shutil import copyfile
-from easymoney.support_money import twoD_nested_dict
+from easymoney.easy_pandas import twoD_nested_dict
 from sources.world_bank_interface import _world_bank_pull_wrapper
 from sources.ecb_interface import _ecb_xml_exchange_data
 
@@ -44,7 +43,6 @@ def _exchange_rates_from_datafile(exchange_rate_df, convert_to_dict = True):
         return DictExchangeRatesDB, currency_codes
     else:
         return exchange_rate_df, currency_codes
-
 
 class DatabaseManagment(object):
     """
@@ -208,7 +206,6 @@ class DatabaseManagment(object):
         # Need to Add Files is False
         elif not database_assessment[0]:
             return self._database_manager(data_path = database_assessment[1], missing_files = [])
-
 
 
 

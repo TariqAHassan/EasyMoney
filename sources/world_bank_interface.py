@@ -1,12 +1,12 @@
 #!/usr/bin/env python3
 
-'''
+"""
 
     Tools for Obtaining Data from the World Bank Group
     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+"""
 
-'''
 
 # Modules #
 import os
@@ -17,7 +17,8 @@ import numpy as np
 import pandas as pd
 import pkg_resources
 
-from easymoney.support_money import pandas_str_column_to_list
+
+from easymoney.easy_pandas import pandas_str_column_to_list
 
 
 DEFAULT_DATA_PATH = pkg_resources.resource_filename('sources', 'data')

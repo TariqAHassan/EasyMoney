@@ -5,7 +5,6 @@
     Database of which Nations use which Currency
     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-
 """
 
 # Modules #
@@ -17,8 +16,7 @@ import pandas as pd
 import pkg_resources
 
 
-from easymoney.support_money import DEFAULT_DATA_PATH
-from easymoney.support_money import pandas_list_column_to_str
+from easymoney.easy_pandas import pandas_list_column_to_str
 
 
 DEFAULT_DATA_PATH = pkg_resources.resource_filename('sources', 'data')
@@ -187,6 +185,9 @@ class CurrencyRelationships(object):
 
 # Save to Disk
 # pandas_list_column_to_str(CurrencyRelationships().relate(), ['Alpha2', 'Alpha3']).to_csv('CurrencyRelationshipsDB.csv', index = False)
+
+
+
 
 
 

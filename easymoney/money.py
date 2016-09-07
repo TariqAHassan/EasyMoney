@@ -5,7 +5,6 @@
     Main API Functionality
     ~~~~~~~~~~~~~~~~~~~~~~
 
-
 """
 
 # Modules #
@@ -25,17 +24,17 @@ from easymoney.support_money import floater
 from easymoney.support_money import key_value_flip
 from easymoney.support_money import min_max
 from easymoney.support_money import money_printer
-from easymoney.support_money import pandas_dictkey_to_key_unpack
-from easymoney.support_money import pandas_print_full
 from easymoney.support_money import prettify_list_of_strings
 from easymoney.support_money import remove_from_dict
 from easymoney.support_money import str_to_datetime
-from easymoney.support_money import twoD_nested_dict
+
+from easymoney.easy_pandas import pandas_dictkey_to_key_unpack
+from easymoney.easy_pandas import pandas_print_full
+from easymoney.easy_pandas import twoD_nested_dict
 
 from sources.databases import DatabaseManagment
 from sources.databases import _exchange_rates_from_datafile
 from sources.ecb_interface import ecb_currency_to_alpha2_dict
-
 
 
 class EasyPeasy(object):
@@ -750,7 +749,7 @@ class EasyPeasy(object):
 
         :param min_max_dates: if True, only report the minimum and maximum date for which data is avaliable;
                               if False, all dates for which which data is avaliable will be reported.
-        :type pretty_table: bool
+        :type min_max_dates: bool
         :return: DataFrame with all the currencies for which EasyMoney has data.
         :rtype: Pandas DataFrame
         """
@@ -812,7 +811,7 @@ class EasyPeasy(object):
         Determines the inflation (CPI) information cached.
         :param min_max_dates: if True, only report the minimum and maximum date for which data is avaliable;
                               if False, all dates for which which data is avaliable will be reported.
-        :type pretty_table: bool
+        :type min_max_dates: bool
         :return: a dataframe with all CPI information EasyMoney has, as well as date ranges the date exists for.
         :rtype: Pandas DataFrame
         """
@@ -930,7 +929,7 @@ class EasyPeasy(object):
         :type info: str
         :param min_max_dates: if True, only report the minimum and maximum date for which data is avaliable;
                               if False, all dates for which which data is avaliable will be reported.
-        :type pretty_table: bool
+        :type min_max_dates: bool
         :return: DataFrame with the requested information
         :rtype: Pandas DataFrame
         """
@@ -971,8 +970,8 @@ class EasyPeasy(object):
                              overlap.
         :type overlap_only: bool
         :param min_max_dates: if True, only report the minimum and maximum date for which data is avaliable;
-                              if False, all dates for which which data is avaliable will be reported. Defaults to True.
-        :type pretty_table: bool
+                              if False, all dates for which data is avaliable will be reported. Defaults to True.
+        :type min_max_dates: bool
         :return: DataFrame of Currency Information EasyMoney Understands.
         :rtype: Pandas DataFrame
         :raises ValueError: if
@@ -1048,9 +1047,6 @@ class EasyPeasy(object):
                         info_table[col] = info_table[col].map(full_date_to_datetime)
 
                 return info_table
-
-
-
 
 
 
