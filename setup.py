@@ -19,7 +19,7 @@ setup(
     license = "BSD",
     keywords = 'economics, finance',
     url = "https://github.com/TariqAHassan/EasyMoney.git",
-    packages = find_packages(),
+    packages = find_packages(exclude = ["tests.*", "tests"]),
     package_data = {'': ['*.csv', '*.p'],},
     data_files = [('', ["LICENSE.txt"])],
     install_requires = ['numpy', 'pandas', 'wbdata', 'requests'],

@@ -5,6 +5,7 @@
     Public API Unit Testing for EasyMoney
     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+
 """
 # Import the tool
 import os
@@ -22,7 +23,12 @@ from easymoney.money import EasyPeasy
 # Create an Instance of the EasyPeasy class.
 # It's *MUCH*, faster if this exists globaly rather than
 # initialized inside FunctionalityTests()...not clear why.
-ep = EasyPeasy()
+
+# Import Using the default method.
+ep_default = EasyPeasy()
+
+# Import from a cache of EasyMoney Databases
+ep_test_data = EasyPeasy(os.path.abspath("./test_data"))
 
 
 class OptionTests(unittest.TestCase):
@@ -39,7 +45,7 @@ class OptionTests(unittest.TestCase):
         Specific: test rformat = 'list'.
         """
         # Request a list of nations for which there is exchange rate information.
-        exchange_options_list = ep.options(info = "exchange", rformat = 'list', pretty_print = False)
+        exchange_options_list = ep_default.options(info = "exchange", rformat = 'list', pretty_print = False)
 
         # Assert exchange_options_list is, in fact, a list
         self.assertEqual(isinstance(exchange_options_list, list), True)
@@ -48,7 +54,7 @@ class OptionTests(unittest.TestCase):
         self.assertEqual(len(exchange_options_list) > 0, True)
 
         # Request a list of nations for which there is inflation information.
-        inflation_options_list = ep.options(info = "inflation", rformat = 'list', pretty_print = False)
+        inflation_options_list = ep_default.options(info = "inflation", rformat = 'list', pretty_print = False)
 
         # Assert inflation_options_list is, in fact, a list
         self.assertEqual(isinstance(inflation_options_list, list), True)
@@ -61,7 +67,7 @@ class OptionTests(unittest.TestCase):
         General: test the EasyPeasy().options() method.
         Specific: test rformat = 'table'.
         """
-        exchange_options_df = ep.options(info = "exchange", rformat = 'table', pretty_print = False)
+        exchange_options_df = ep_default.options(info = "exchange", rformat = 'table', pretty_print = False)
 
         # Assert exchange_options_df is a Pandas DataFrame
         self.assertEqual(isinstance(exchange_options_df, pd.DataFrame), True)
@@ -75,7 +81,7 @@ class OptionTests(unittest.TestCase):
         Specific: test rformat = 'table'.
         """
         # Request a Pandas DataFrame with all information information.
-        inflation_options_df = ep.options(info = "inflation", rformat = 'table', pretty_print = False)
+        inflation_options_df = ep_default.options(info = "inflation", rformat = 'table', pretty_print = False)
 
         # Assert inflation_options_list is a Pandas DataFrame
         self.assertEqual(isinstance(inflation_options_df, pd.DataFrame), True)
@@ -89,7 +95,7 @@ class OptionTests(unittest.TestCase):
         Specific: test rformat = 'table'.
         """
         # Request a Pandas DataFrame with all overlap information (between exchange rate and inflation).
-        overlap_options_df = ep.options(info = "all", rformat = 'table', overlap_only = True, pretty_print = False)
+        overlap_options_df = ep_default.options(info = "all", rformat = 'table', overlap_only = True, pretty_print = False)
 
         # Assert overlap_options_df is a Pandas DataFrame
         self.assertEqual(isinstance(overlap_options_df, pd.DataFrame), True)
@@ -115,19 +121,19 @@ class FunctionalityTests(unittest.TestCase):
         super(FunctionalityTests, self).__init__(*args, **kwargs)
 
         # Request a list of nations for which there is exchange rate information.
-        self.exchange_options_list = ep.options(info = "exchange", rformat = 'list', pretty_print = False)
+        self.exchange_options_list = ep_default.options(info = "exchange", rformat = 'list', pretty_print = False)
 
         # Request a list of nations for which there is inflation information.
-        self.inflation_options_list = ep.options(info = "inflation", rformat = 'list', pretty_print = False)
+        self.inflation_options_list = ep_default.options(info = "inflation", rformat = 'list', pretty_print = False)
 
         # Request a Pandas DataFrame with all inflation information.
-        self.inflation_options_df = ep.options(info = "inflation", rformat = 'table', pretty_print = False)
+        self.inflation_options_df = ep_default.options(info = "inflation", rformat = 'table', pretty_print = False)
 
         # Construct a {Alpha2: [min(inflation_data), max(inflation_data)]} dict w.r.t. the inflation_options_df.
         self.inflation_dict = dict(zip(self.inflation_options_df.Alpha2, self.inflation_options_df.Range))
 
         # Request a Pandas DataFrame with all overlap information (between exchange rate and inflation).
-        self.overlap_options_df = ep.options(info = "all", rformat = 'table', overlap_only = True, pretty_print = False)
+        self.overlap_options_df = ep_default.options(info = "all", rformat = 'table', overlap_only = True, pretty_print = False)
 
         # Construct a {Alpha2: [min(inflation_data), max(inflation_data)]} dict  w.r.t. the overlap_options_df.
         self.overlap_dict = dict(zip(self.overlap_options_df.Alpha2, self.overlap_options_df.InflationRange))
@@ -143,25 +149,25 @@ class FunctionalityTests(unittest.TestCase):
         """
 
         # (1) Request 'CAD' be mapped to its ISO ALpha2 Code.
-        CAD_alpha2 = ep.region_map(region = 'CAD', map_to = 'alpha2')
+        CAD_alpha2 = ep_default.region_map(region = 'CAD', map_to = 'alpha2')
 
         # Assert (1) is 'CA'
         self.assertEqual(CAD_alpha2, 'CA')
 
         # (2) Request 'CAD' be mapped to its ISO ALpha3 Code.
-        CAD_alpah3 = ep.region_map(region = 'CAD', map_to = 'alpha3')
+        CAD_alpah3 = ep_default.region_map(region = 'CAD', map_to = 'alpha3')
 
         # Assert (2) is 'CAN'
         self.assertEqual(CAD_alpah3, 'CAN')
 
         # (3) Request 'FR' be mapped to its Currency Code.
-        FR_currency = ep.region_map(region = 'FR', map_to = 'currency')
+        FR_currency = ep_default.region_map(region = 'FR', map_to = 'currency')
 
         # Assert (3) is 'EUR'
         self.assertEqual(FR_currency, 'EUR')
 
         # (4) Request 'FR' be mapped to its natural name.
-        FR_natural = ep.region_map(region = 'FR', map_to = 'natural')
+        FR_natural = ep_default.region_map(region = 'FR', map_to = 'natural')
 
         # Assert (4) is 'France'.
         self.assertEqual(FR_natural, 'France')
@@ -176,12 +182,12 @@ class FunctionalityTests(unittest.TestCase):
 
         # LCU --> EUR
         for c in self.exchange_options_list:
-            lcu_to_eur = ep.currency_converter(100, c, 'EUR', date = 'latest')
+            lcu_to_eur = ep_default.currency_converter(100, c, 'EUR', date = 'latest')
             self.assertEqual(isinstance(lcu_to_eur, (float, int)), True)
 
         # EUR --> LCU
         for c in self.exchange_options_list:
-            lcu_to_eur = ep.currency_converter(100, 'EUR', c, date = 'latest')
+            lcu_to_eur = ep_default.currency_converter(100, 'EUR', c, date = 'latest')
             self.assertEqual(isinstance(lcu_to_eur, (float, int)), True)
 
     def test_currency_converter_EUR_USD(self):
@@ -190,13 +196,13 @@ class FunctionalityTests(unittest.TestCase):
         Specific: Test Converting between USD and EUR against a known value.
         """
         # (1) On Sept 2, 2016, 100 EUR = 111.93 USD (based on ECB data).
-        sept2_2016_eur_to_usd = ep.currency_converter(100, 'EUR', 'USD', date = "2016-09-02")
+        sept2_2016_eur_to_usd = ep_default.currency_converter(100, 'EUR', 'USD', date = "2016-09-02")
 
         # Assert (1) is True.
         self.assertEqual(sept2_2016_eur_to_usd, 111.93)
 
         # (2) On Sept 2, 2016, 100 USD = 89.34 EUR (based on ECB data).
-        sept2_2016_usd_to_eur = ep.currency_converter(100, 'USD', 'EUR', date = "2016-09-02")
+        sept2_2016_usd_to_eur = ep_default.currency_converter(100, 'USD', 'EUR', date = "2016-09-02")
 
         # Assert (2) is True.
         self.assertEqual(sept2_2016_usd_to_eur, 89.34)
@@ -218,13 +224,13 @@ class FunctionalityTests(unittest.TestCase):
         for region, drange in self.inflation_dict.items():
 
             # Reqest the inflation rate for all possible regions.
-            rate = ep.inflation_rate(region, int(drange[0]), int(drange[1]))
+            rate = ep_default.inflation_rate(region, int(drange[0]), int(drange[1]))
 
             # Assert the returned result is numeric.
             self.assertEqual(isinstance(rate, (int, float)), True)
 
             # Request a dictionary of CPI information.
-            rate_dict = ep.inflation_rate(region, int(drange[0]), int(drange[1]), return_raw_cpi_dict = True)
+            rate_dict = ep_default.inflation_rate(region, int(drange[0]), int(drange[1]), return_raw_cpi_dict = True)
 
             # Asser rate_dict is, in fact, a dictionary.
             self.assertEqual(isinstance(rate_dict, dict), True)
@@ -245,19 +251,19 @@ class FunctionalityTests(unittest.TestCase):
 
         # Iterate though the inflation_dict dict.
         for region, drange in self.inflation_dict.items():
-            real_dollars = ep.inflation_calculator(100, region, int(drange[0]), int(drange[1]))
+            real_dollars = ep_default.inflation_calculator(100, region, int(drange[0]), int(drange[1]))
             self.assertEqual(isinstance(real_dollars, (int, float)), True)
 
         # (1) 100 (1990 USD) =~= 181.40 (2015 USD).
         # Similar result obtained at: http://www.bls.gov/data/inflation_calculator.htm).
-        US_inflation_1990_to_2015 = ep.inflation_calculator(100, "US", 1990, 2015)
+        US_inflation_1990_to_2015 = ep_default.inflation_calculator(100, "US", 1990, 2015)
 
         # Assert (1) is True.
         self.assertEqual(US_inflation_1990_to_2015, 181.4)
 
         # (2) 100 (1990 CAD) =~= 161.56 (2015 CAD).
         # Similar answer obtained at: http://www.bankofcanada.ca/rates/related/inflation-calculator/.
-        CA_inflation_1990_to_2015 = ep.inflation_calculator(100, "CA", 1990, 2015)
+        CA_inflation_1990_to_2015 = ep_default.inflation_calculator(100, "CA", 1990, 2015)
 
         # Assert (2) is True.
         self.assertEqual(CA_inflation_1990_to_2015, 161.56)
@@ -277,19 +283,19 @@ class FunctionalityTests(unittest.TestCase):
         for base in self.overlap_options_df.Alpha3.tolist():
             for region, drange in self.overlap_dict.items():
                 for d in drange:
-                    normalized_amount = ep.normalize(100, region, int(d), base_currency = base)
+                    normalized_amount = ep_default.normalize(100, region, int(d), base_currency = base)
 
                     # Assert normalized_amount is numeric.
                     self.assertEqual(isinstance(normalized_amount, (float, int)), True)
 
         # (1) 100 (2010 USD) =~= 108.70 (2015 USD) =~= 102.55 (2015-12-01 EUR).
-        norm_USD_to_EUR = ep.normalize(100, "USD", 2010, to_year = 2015, base_currency = "EUR", exchange_date = '2015-12-01')
+        norm_USD_to_EUR = ep_default.normalize(100, "USD", 2010, to_year = 2015, base_currency = "EUR", exchange_date = '2015-12-01')
 
         # Assert (1) is True.
         self.assertEqual(norm_USD_to_EUR, 102.55)
 
         # (2) 100 (2005 CAD) =~= 113.74 (2012 CAD) =~= 114.46 (2012-11-30 USD).
-        norm_CAD_to_USD = ep.normalize(100, "CAD", 2005, to_year = 2012, base_currency = "USD", exchange_date = '2012-11-30')
+        norm_CAD_to_USD = ep_default.normalize(100, "CAD", 2005, to_year = 2012, base_currency = "USD", exchange_date = '2012-11-30')
 
         # Assert (2) is True.
         self.assertEqual(norm_CAD_to_USD, 114.46)
