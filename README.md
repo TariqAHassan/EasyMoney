@@ -125,64 +125,9 @@ As can be seen above, the date ranges for which Inflation (InflationRange) and E
 (as well as when these two overlap) are provided. Additionally, the dates of (some) transitions from one currency to another 
 (CurrencyTransition) are noted.
 
-One can also gain access to *currency* and *inflation* information separately.
-```python
-# Currency Information Alone
-ep.options(info = 'exchange', pretty_print = True)
-
-# Inflation Infomation Alone
-ep.options(info = 'inflation', pretty_print = True)
-```
-
-Additionally, instead of printing a given data table, it can be returned as Pandas DataFrame.
-```python
-inflation_df = ep.options(info = 'inflation', pretty_print = False)
-```
-
-It is also possible to simply obtain a list of regions for which inflation information is available.
-```python
-inflation_list = ep.options(info = 'inflation', rformat = 'list', pretty_print = False)
-```
-This can also be done for exchange rate information.
-```python
-currency_list = ep.options(info = 'exchange', rformat = 'list', pretty_print = False)
-```
-
-*Note*: Errors may emerge when converting across currency transitions, e.g., CY (2005) → CY (2010).
-
 ####Databases
 
-It's also straightforward to gain access to the databases used
-by ``EasyPeasy()``.
-
-To see all of the International Organization for Standardization (ISO) Alpha2
-codes currently cached:
-```python
-ep.ISOAlphaCodesDB
-```
-
-To see all of the known transitions from one currency to another:
-```python
-ep.CurrencyTransitionDB
-```
-
-To see the raw Exchange Rate information currently cached:
-```python
-ep.ExchangeRatesDB
-```
-
-To see the raw Consumer Price Index (CPI) information currently cached:
-```python
-ep.ConsumerPriceIndexDB
-```
-
-Finally, to see the relationships between Country Names, ISO Alpha2/3 Codes
-and Currency Codes currently understood by ``EasyPeasy()``:
-```python
-ep.ConsumerPriceIndexDB
-```
-
-It's also easy to save these databases to disk so they can be used offline
+It's easy to save the databases used by ``EasyPeasy()`` to disk so they can be used offline
 or modified. One can simply pass a directory when creating an instance of the class.
 ```python
 ep = EasyPeasy('/path/of/your/choosing')
@@ -199,7 +144,7 @@ databases that are missing.
 
 ##Documentation
 
-For complete documentation, please click [here].
+For complete documentation, including a more extensive version of this document, please click [here].
 
 ------------------------------------------------------------------------
 
