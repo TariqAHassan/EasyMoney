@@ -15,9 +15,10 @@ import pandas as pd
 from easymoney.support_money import floater
 
 
-def ecb_xml_exchange_data(return_as = 'dict', ecb_extension = "/stats/eurofxref/eurofxref-hist.xml"):
+def _ecb_xml_exchange_data(return_as = 'dict', ecb_extension = "/stats/eurofxref/eurofxref-hist.xml"):
     """
 
+    *Private Method*
     | This tool goes out to the European Central Bank via their generously provided API
     | and coerces XML data into a dictionary.
     | Expects 'time', 'currency', 'rate' in the XML data.

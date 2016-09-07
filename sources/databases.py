@@ -15,8 +15,8 @@ import pkg_resources
 
 from shutil import copyfile
 from easymoney.support_money import twoD_nested_dict
-from sources.world_bank_interface import world_bank_pull_wrapper
-from sources.ecb_interface import ecb_xml_exchange_data
+from sources.world_bank_interface import _world_bank_pull_wrapper
+from sources.ecb_interface import _ecb_xml_exchange_data
 
 
 def _exchange_rates_from_datafile(exchange_rate_df, convert_to_dict = True):
@@ -49,8 +49,8 @@ def _exchange_rates_from_datafile(exchange_rate_df, convert_to_dict = True):
 class DatabaseManagment(object):
     """
 
-    *Private Class*
-    Set of tools for managing Databases used by EasyMoney
+    | *Private Class*
+    | Set of tools for managing Databases used by EasyMoney
 
     :param default_data_path: the default path to EasyMoney's included DataBases
     :type default_data_path: str
@@ -78,9 +78,9 @@ class DatabaseManagment(object):
     def _data_path_assessment(self):
         """
 
-        *Private Method*
-        Method to determine if required databases are present in a given directory.
-        If databases are missing, they their names are returned.
+        | *Private Method*
+        | Method to determine if required databases are present in a given directory.
+        | If databases are missing, they their names are returned.
 
         :return: Boolean for if files need to be installed in alt_database_dir; path to the data files or list of files to make.
                  Tuple of form the form: (bool, str OR list).
@@ -114,10 +114,10 @@ class DatabaseManagment(object):
     def _database_manager(self, data_path, missing_files):
         """
 
-        *Private Method*
-        This method will:
-            (1) Populate a data_path any with missing database.
-            (2) Import from the directory any present database.
+        | *Private Method*
+        | This method will:
+        |    (1) Populate a data_path any with missing database.
+        |    (2) Import from the directory any present database.
 
         :param data_path: path to a directory with EasyMoney databases
         :type data_path: str
@@ -158,12 +158,12 @@ class DatabaseManagment(object):
         if data_path == self.default_data_path:
 
             # Generate if the default path is being used
-            ExchangeRatesDB, currency_codes = ecb_xml_exchange_data(return_as = 'df')
+            ExchangeRatesDB, currency_codes = _ecb_xml_exchange_data(return_as = 'df')
 
         elif 'ExchangeRatesDB.csv' in missing_files:
 
             # Obtain exchange data
-            ExchangeRatesDB, currency_codes = ecb_xml_exchange_data(return_as = 'df')
+            ExchangeRatesDB, currency_codes = _ecb_xml_exchange_data(return_as = 'df')
 
             # Save the ExchangeRatesDB to alt_database_dir
             ExchangeRatesDB.to_csv(data_path + "/ExchangeRatesDB.csv", index = False)
@@ -173,12 +173,12 @@ class DatabaseManagment(object):
 
         # Generate and Write ConsumerPriceIndexDB, if needed.
         if data_path == self.default_data_path:
-            ConsumerPriceIndexDB, CurrencyRelationshipsDB = world_bank_pull_wrapper("CPI", "FP.CPI.TOTL")
+            ConsumerPriceIndexDB, CurrencyRelationshipsDB = _world_bank_pull_wrapper("CPI", "FP.CPI.TOTL")
 
         elif 'ConsumerPriceIndexDB.csv' in missing_files:
 
             # Obtain CPI Data (will also look for 'CurrencyRelationshipsDB.csv' in alt_database_dir).
-            ConsumerPriceIndexDB, CurrencyRelationshipsDB = world_bank_pull_wrapper("CPI", "FP.CPI.TOTL", data_path = data_path)
+            ConsumerPriceIndexDB, CurrencyRelationshipsDB = _world_bank_pull_wrapper("CPI", "FP.CPI.TOTL", data_path = data_path)
 
             # Save the ConsumerPriceIndexDB to alt_database_dir
             ConsumerPriceIndexDB.to_csv(data_path + "/ConsumerPriceIndexDB.csv", index = False)

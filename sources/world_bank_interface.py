@@ -126,9 +126,10 @@ class WorldBankParse(object):
 
         return data_frame
 
-    def world_bank_pull(self, to_title = None):
+    def _world_bank_pull(self, to_title = None):
         """
 
+        *Private Method*
         Parse the information pulled from the world bank's API.
 
         :param to_title: a list of column to title. Defaults to None.
@@ -172,9 +173,10 @@ class WorldBankParse(object):
         return data_frame[self.final_col_order], self.CurrencyRelationshipsDB
 
 
-def world_bank_pull_wrapper(value_true_name, indicator, data_path = None, na_drop_col = None):
+def _world_bank_pull_wrapper(value_true_name, indicator, data_path = None, na_drop_col = None):
     """
 
+    *Private Method*
     Wrapper for the ``WorldBankParse().world_bank_pull()`` method.
     Extracts world bank information based on a specific indicator and returns a Pandas DataFrame.
 
@@ -190,7 +192,7 @@ def world_bank_pull_wrapper(value_true_name, indicator, data_path = None, na_dro
     :rtype: Pandas DateFrame
     """
     # Get the data
-    data_frame, CurrencyRelationshipsDB = WorldBankParse(value_true_name, indicator, data_path).world_bank_pull()
+    data_frame, CurrencyRelationshipsDB = WorldBankParse(value_true_name, indicator, data_path)._world_bank_pull()
 
     # Remove Nones from the value_true_name (e.g., CPI) column
     data_frame = data_frame[data_frame[value_true_name].astype(str) != 'None']
