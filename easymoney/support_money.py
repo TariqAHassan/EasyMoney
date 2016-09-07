@@ -14,6 +14,8 @@ import datetime
 import numpy as np
 import pandas as pd
 
+from easymoney.easy_pandas import twoD_nested_dict
+
 
 # -------------------------------------------------------------------------------------------------------------------- #
 #                                                           Mathematical Tools                                         #
@@ -23,7 +25,6 @@ import pandas as pd
 def floater(input_to_process, just_check = False, override_to_int = False):
     """
 
-    *Private Method*
     Check if input can be converted to a floating point number.
 
     :param input_to_process: object.
@@ -44,7 +45,6 @@ def floater(input_to_process, just_check = False, override_to_int = False):
 def min_max(input_list, return_nans = False):
     """
 
-    *Private Method*
     Gets min and max of a list.
 
     :param input_list: a list of values.
@@ -64,7 +64,6 @@ def min_max(input_list, return_nans = False):
 def money_printer(money, currency=None, year=None, round_to=2):
     """
 
-    *Private Method*
     Pretty Prints an Amount of Money.
 
     :param money: a numeric amount.
@@ -98,24 +97,6 @@ def money_printer(money, currency=None, year=None, round_to=2):
 # -------------------------------------------------------------------------------------------------------------------- #
 #                                                      List Manipulation Tools                                         #
 # -------------------------------------------------------------------------------------------------------------------- #
-
-
-def strlist_to_list(to_parse, convert_to_str_first = False):
-    """
-
-    *Private Method*
-    Eval() work around for str(list) --> list.
-    For example: "[1992, '221-21', 2102, 'apples']" --> ['1992', '221-21', '2102', 'apples'].
-
-    :param to_parse: a string of a list.
-    :type to_parse: str
-    :param convert_to_str_first: convert to a string first (as a precaution). Defaults to False.
-    :type convert_to_str_first: bool
-    :return: string of a list to an actual list.
-    :return: list
-    """
-    str_list = str(to_parse) if convert_to_str_first else to_parse
-    return [i.strip().replace("'", "") for i in [j.split(",") for j in [str_list.replace("[", "").replace("]", "")]][0]]
 
 def prettify_list_of_strings(input_list, final_join = "and", all_commas_override = False):
     """
@@ -166,7 +147,8 @@ def _dict_key_remove(input_dict, to_remove = np.nan, wrt = 'both'):
     :type input_dict: dict
     :param to_remove: object to remove.
     :type to_remove: any
-    :param wrt: with respect to: 'key' for dict keys, 'value' for dict values, 'both' for both key and value. Defaults to 'both'.
+    :param wrt: (with respect to) 'key' for dict keys, 'value' for dict values, 'both' for both key and value.
+                Defaults to 'both'.
     :type wrt: str
     :return: a dictionary with the desired item removed.
     :rtype: dict
@@ -179,7 +161,6 @@ def _dict_key_remove(input_dict, to_remove = np.nan, wrt = 'both'):
 def remove_from_dict(input_dict, to_remove = [np.nan], wrt = 'both'):
     """
 
-    *Private Method*
     Remove a list of items from a dict; _dict_key_remove() wrapper.
 
     :param input_dict: any dictionary.
@@ -199,7 +180,6 @@ def remove_from_dict(input_dict, to_remove = [np.nan], wrt = 'both'):
 def key_value_flip(dictionary):
     """
 
-    *Private Method*
     Reverse the keys and values in a dictionary.
 
     :param dictionary: any dictionary (cannot be nested).
@@ -251,6 +231,31 @@ def dict_merge(first_dict, second_dict):
     # Return
     return new_dict
 
+def transition_dict_generator(data_frame, nest_col_a, nest_col_b, nest_col_c):
+    """
+
+    Generate a dictionary of currency transitions.
+
+    :param data_frame: see ``easy_pandas``'s ``twoD_nested_dict()`` method.
+    :type data_frame: Pandas DataFrame
+    :param nest_col_a: see ``easy_pandas``'s ``twoD_nested_dict()`` method.
+    :type nest_col_a: str
+    :param nest_col_b: see ``easy_pandas``'s ``twoD_nested_dict()`` method.
+    :type nest_col_b: str
+    :param nest_col_c: see ``easy_pandas``'s ``twoD_nested_dict()`` method.
+    :type nest_col_c: str
+    :return: a dictionary of currency transitions of the form {Alpha2 : ['date1 (CUR1), 'date2 (CUR2)'...]}
+    :rtype: dict
+    """
+    # Create a nested Dict
+    transitions_dict_raw = twoD_nested_dict(data_frame, nest_col_a, nest_col_b, nest_col_c, engine='fast')
+
+    # Combine nested dict's keys and values into a single string
+    transitions_dict_list = {k: [str(i) + " (" + j + ")" for i, j in v.items()] for k, v in transitions_dict_raw.items()}
+
+    # Sort by date and Return
+    return {k: sorted(v, key = lambda x: x[:4]) for k, v in transitions_dict_list.items()}
+
 
 # -------------------------------------------------------------------------------------------------------------------- #
 #                                                          Datetime Tools                                              #
@@ -260,7 +265,6 @@ def dict_merge(first_dict, second_dict):
 def str_to_datetime(list_of_dates, date_format = "%Y-%m-%d"):
     """
 
-    *Private Method*
     Converts a string to a datetime object.
 
     :param list_of_dates: a list of strings (dates).
@@ -277,7 +281,6 @@ def str_to_datetime(list_of_dates, date_format = "%Y-%m-%d"):
 def datetime_to_str(list_of_dates, date_format = "%Y-%m-%d"):
     """
 
-    *Private Method*
     Convert a datetime.datetime object to a string.
 
     :param list_of_dates: a list of datetimes.
@@ -313,7 +316,6 @@ def _floor_or_ceiling_date(year, dtype = 'floor'):
 def date_bounds_floor(date_ranges):
     """
 
-    *Private Method*
     This function rounds dates to their poles, i.e., max: YYYY --> YYYY-12-31; min: YYYY --> YYYY-01-01.
     and finds the floors maximum minimum date as well as the minimum maximum date (see date_ranges description).
 
