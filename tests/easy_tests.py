@@ -102,6 +102,21 @@ class OptionTests(unittest.TestCase):
         # Assert the number of rows in overlap_options_df is > 0.
         self.assertEqual(overlap_options_df.shape[0] > 0, True)
 
+    def test_options_df_all_dates(self):
+        """
+        General: test the EasyPeasy().options() method.
+        Specific: test min_max_dates = False.
+        """
+        # Request a Pandas DataFrame with all data information
+        all_dates_options_df = ep_default.options(info = "all", pretty_print = False, min_max_dates = False)
+
+        # Assert there are more than lists of two (i.e, [min, max] in the InflationRange column
+        self.assertEqual(max([len(l) for l in all_dates_options_df['InflationRange'] if isinstance(l, list)]) > 2, True)
+
+        # Assert there are more than lists of two (i.e, [min, max] in the CurrencyRange column
+        self.assertEqual(max([len(l) for l in all_dates_options_df['CurrencyRange'] if isinstance(l, list)]) > 2, True)
+
+
 class FunctionalityTests(unittest.TestCase):
     """
 

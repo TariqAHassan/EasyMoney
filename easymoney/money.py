@@ -9,6 +9,7 @@
 """
 
 # Modules #
+import copy
 import datetime
 import numpy as np
 import pandas as pd
@@ -473,7 +474,7 @@ class EasyPeasy(object):
         from the European Central Bank (ECB). This data contains the exchange rate from Euros (EUR) to
         many local currency units (LCUs).
 
-        **Formulae Used**.
+        **Formulae Used**
 
         Let :math:`LCU` be defined as:
 
@@ -741,15 +742,23 @@ class EasyPeasy(object):
                 date_ranges_dict[k] = date_values
             return date_ranges_dict
 
-    def _currency_options(self):
+    def _currency_options(self, min_max_dates):
         """
 
         *Private Method*
         Function to construct a dataframe of currencies for which EasyMoney has data on.
 
+        :param min_max_dates: if True, only report the minimum and maximum date for which data is avaliable;
+                              if False, all dates for which which data is avaliable will be reported.
+        :type pretty_table: bool
         :return: DataFrame with all the currencies for which EasyMoney has data.
         :rtype: Pandas DataFrame
         """
+        # Initialize
+        ex_dict_dates = None
+        all_date_ranges = None
+        eur_row_dates = None
+
         # Make a currency code of possible currency codes
         currency_ops = pd.DataFrame(self.currency_codes, columns = ["Currency"])
 
@@ -767,20 +776,26 @@ class EasyPeasy(object):
         # Add date information
         dates_dict = self._date_options(nested_date_dict = self.exchange_dict, keys_as_dates = True)
 
-        ex_dict_dates = dict((k, str(datetime_to_str(min_max(v)))) for k, v in dates_dict.items())
+        if min_max_dates:
+            ex_dict_dates = dict((k, str(datetime_to_str(min_max(v)))) for k, v in dates_dict.items())
+        else:
+            ex_dict_dates = dict((k, str(datetime_to_str(v))) for k, v in dates_dict.items())
 
         # Create Date Range Column
-        currency_ops['Range'] = pandas_dictkey_to_key_unpack(currency_ops['Alpha2'].astype(str), ex_dict_dates)
-        all_date_ranges = np.array(currency_ops['Range'].tolist())
+        currency_ops['Range'] = pandas_dictkey_to_key_unpack(currency_ops['Alpha2'].astype(str), ex_dict_dates).map(lambda x: sorted(x))
 
         # Create Row for Europe -- min and max are the min and max of all other conversion data,
         # because EUR is the base currency being used.
-        eur_row = pd.DataFrame({'Region': 'Europe', 'Currency': 'EUR', 'Alpha2': np.nan, 'Alpha3': np.nan,
-                                'Range': [[min(all_date_ranges[:,0]), max(all_date_ranges[:,1])]]},
-                                 index = [0], columns = currency_ops.columns.tolist())
 
-        # Append the Europe Row
-        currency_ops = currency_ops.append(eur_row, ignore_index = True)
+        if min_max_dates:
+            all_date_ranges = np.array(currency_ops['Range'].tolist())
+            eur_row_dates = [[min(all_date_ranges[:, 0]), max(all_date_ranges[:, 1])]]
+        else:
+            eur_row_dates = [sorted(set(self.exchange_dict.keys()))]
+
+        eur_row = pd.DataFrame({'Region': 'Europe', 'Currency': 'EUR', 'Alpha2': np.nan, 'Alpha3': np.nan,
+                                'Range': eur_row_dates},
+                                 index=[0], columns=currency_ops.columns.tolist())
 
         # Sort by Region
         currency_ops.sort_values(['Region'], ascending = [1], inplace = True)
@@ -790,22 +805,30 @@ class EasyPeasy(object):
 
         return currency_ops
 
-    def _inflation_options(self):
+    def _inflation_options(self, min_max_dates):
         """
 
         *Private Method*
         Determines the inflation (CPI) information cached.
-
+        :param min_max_dates: if True, only report the minimum and maximum date for which data is avaliable;
+                              if False, all dates for which which data is avaliable will be reported.
+        :type pretty_table: bool
         :return: a dataframe with all CPI information EasyMoney has, as well as date ranges the date exists for.
         :rtype: Pandas DataFrame
         """
+        # Initialize
+        cpi_dict_years = None
+
         cpi_ops = self.ConsumerPriceIndexDB[['Country', 'Currency', 'Alpha2', 'Alpha3']].drop_duplicates()
         cpi_ops.columns = ['Region', 'Currency', 'Alpha2', 'Alpha3']
         cpi_ops.index = range(cpi_ops.shape[0])
 
         dates_dict = self._date_options(nested_date_dict = self.cpi_dict, keys_as_dates = False, date_format = '%Y')
 
-        cpi_dict_years = dict((k, str(min_max([i.year for i in v]))) for k, v in dates_dict.items())
+        if min_max_dates:
+            cpi_dict_years = dict((k, str(min_max([i.year for i in v]))) for k, v in dates_dict.items())
+        else:
+            cpi_dict_years = dict((k, str([i.year for i in v])) for k, v in dates_dict.items())
 
         # Hacking the living daylights out of the pandas API
         cpi_ops['Range'] = pandas_dictkey_to_key_unpack(cpi_ops['Alpha2'], cpi_dict_years)
@@ -818,14 +841,32 @@ class EasyPeasy(object):
 
         return cpi_ops
 
+    def _date_overlap_calc(self, list_a, list_b):
+        """
+
+        *Private Method*
+        Tool to work out the the min and max date shared between two lists. Min date will be 'floored' and max date
+        will be 'ceilinged'. See ``date_bounds_floor()``.
+
+        :param list_a: of list of numerics
+        :type list_a: list
+        :param list_b: of list of numerics
+        :type list_b: list
+        :return: in pseudocode: [floor_date(min), ceiling_date(max)]
+        :rtype: list
+        """
+        return date_bounds_floor([min_max(list_a, True), min_max(list_b, True)])
+
     def _currency_inflation_options(self, currency_ops_df, cpi_ops_df):
         """
 
         *Private Method*
         Exchange Rate and Inflation information merged together.
 
-        :param currency_ops_df:
-        :param cpi_ops_df:
+        :param currency_ops_df: a dataframe of currency options
+        :type currency_ops_df: Pandas DataFrame
+        :param cpi_ops_df: a dataframe of CPI options
+        :type cpi_ops_df: Pandas DataFrame
         :return: a DataFrame with both Currency and Inflation information
         :rtype: Pandas DataFrame
         """
@@ -844,7 +885,7 @@ class EasyPeasy(object):
         data_frame['CurrencyRange'] = currency_cpi_mapping.map(lambda x: x if "," in str(x) and len(x[0]) != 2 else np.NaN)
 
         # Determine the Overlap in dates between CPI and Exchange
-        data_frame['Overlap'] = data_frame.apply(lambda row: date_bounds_floor([row['InflationRange'], row['CurrencyRange']]), axis = 1)
+        data_frame['Overlap'] = data_frame.apply(lambda row: self._date_overlap_calc(row['InflationRange'], row['CurrencyRange']), axis = 1)
 
         # Sort by mapping
         data_frame['TempSort'] = data_frame.CurrencyRange.map(lambda x: 'A' if str(x) != 'nan' else 'B')
@@ -879,7 +920,7 @@ class EasyPeasy(object):
         elif info == 'all':
             raise ValueError("Error in info: 'all' is only valid for when rformat is set to 'table'.")
 
-    def _table_option(self, info):
+    def _table_option(self, info, min_max_dates):
         """
 
         *Private Method*
@@ -887,6 +928,9 @@ class EasyPeasy(object):
 
         :param info: 'exchange' for exchange rate; 'inflation' for inflation information; 'all' for both.
         :type info: str
+        :param min_max_dates: if True, only report the minimum and maximum date for which data is avaliable;
+                              if False, all dates for which which data is avaliable will be reported.
+        :type pretty_table: bool
         :return: DataFrame with the requested information
         :rtype: Pandas DataFrame
         """
@@ -894,11 +938,12 @@ class EasyPeasy(object):
         info_table = None
 
         if info == 'exchange':
-            info_table = self._currency_options()
+            info_table = self._currency_options(min_max_dates)
         elif info == 'inflation':
-            info_table = self._inflation_options()
+            info_table = self._inflation_options(min_max_dates)
         elif info == 'all':
-            info_table = self._currency_inflation_options(self._currency_options(), self._inflation_options())
+            info_table = self._currency_inflation_options(  self._currency_options(min_max_dates)
+                                                          , self._inflation_options(min_max_dates))
 
         # Add date when Countries Changed curriency (only to Euro for now).
         # Note: Sadly, Pandas Series of dtype 'int' cannot contain NaNs. Using the 'object' dtype instead.
@@ -907,7 +952,7 @@ class EasyPeasy(object):
 
         return info_table
 
-    def options(self, info, rformat = 'table', pretty_table = True, pretty_print = True, overlap_only = False):
+    def options(self, info, rformat = 'table', pretty_table = True, pretty_print = True, overlap_only = False, min_max_dates = True):
         """
 
         An easy inferface to explore all of the terminology EasyMoney understands
@@ -925,6 +970,9 @@ class EasyPeasy(object):
         :param overlap_only: when info is set to 'all', keep only those rows for which exchange rate and inflation data
                              overlap.
         :type overlap_only: bool
+        :param min_max_dates: if True, only report the minimum and maximum date for which data is avaliable;
+                              if False, all dates for which which data is avaliable will be reported. Defaults to True.
+        :type pretty_table: bool
         :return: DataFrame of Currency Information EasyMoney Understands.
         :rtype: Pandas DataFrame
         :raises ValueError: if
@@ -970,7 +1018,7 @@ class EasyPeasy(object):
 
         # Generate a table
         elif rformat == 'table':
-            info_table = self._table_option(info)
+            info_table = self._table_option(info, min_max_dates)
             # Limit to overlap, if requested
             if overlap_only == True:
                 info_table.dropna(subset = ['Overlap'], how = 'all', inplace = True)

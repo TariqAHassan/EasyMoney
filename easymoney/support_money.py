@@ -321,7 +321,7 @@ def money_printer(money, currency = None, year = None, round_to = 2):
     else:
         return to_return
 
-def min_max(input_list):
+def min_max(input_list, return_nans = False):
     """
 
     *Private Method*
@@ -333,6 +333,8 @@ def min_max(input_list):
     :rtype: list
     """
     if not isinstance(input_list, list):
+        if return_nans and str(input_list) == 'nan':
+            return input_list
         raise ValueError("input_list must be a list.")
     try:
         return [min(input_list), max(input_list)]
@@ -443,7 +445,7 @@ def date_bounds_floor(date_ranges):
     dates = np.array(date_ranges)
 
     # Round dates to their poles.
-    rounded_dates = [[_floor_or_ceiling_date(i, dtype = j[1]) for i in dates[:,j[0]]] for j in [[0, 'floor'], [1, 'ceiling']]]
+    rounded_dates = [[_floor_or_ceiling_date(i, j[1]) for i in dates[:,j[0]]] for j in [[0, 'floor'], [1, 'ceiling']]]
 
     # Compute the floors and return
     return [max(rounded_dates[0]), min(rounded_dates[1])]

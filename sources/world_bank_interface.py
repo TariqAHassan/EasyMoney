@@ -26,6 +26,7 @@ DEFAULT_DATA_PATH = pkg_resources.resource_filename('sources', 'data')
 class WorldBankParse(object):
     """
 
+    | *Private Class*
     | Tools to obtain indicator data from the World Bank's API.
     | DO NOT WRITE PROCEDURES THAT SLAM THEIR SERVERS.
 
