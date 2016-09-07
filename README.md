@@ -164,7 +164,7 @@ This software is provided under a BSD License.
 
 ------------------------------------------------------------------------
 
-##References
+##Resources
 
 Indicators used:
 
