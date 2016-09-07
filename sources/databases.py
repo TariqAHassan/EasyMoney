@@ -11,6 +11,7 @@
 # Modules #
 import os
 import pandas as pd
+import pkg_resources
 
 from shutil import copyfile
 from easymoney.support_money import twoD_nested_dict
@@ -64,7 +65,7 @@ class DatabaseManagment(object):
         Initialize ``DatabaseManagment()`` Class.
 
         """
-        self.default_data_path = default_data_path
+        self.default_data_path = pkg_resources.resource_filename('sources', 'data')
         self.alt_database_dir = alt_database_dir
         self.required_databases =  [  'ISOAlphaCodesDB.csv'          # Included with EasyMoney.
                                     , 'CurrencyTransitionDB.csv'     # Included with EasyMoney.
