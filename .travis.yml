@@ -7,3 +7,5 @@ cache: pip3
 install: "pip3 install numpy pandas requests wbdata"
 # command to run tests
 script: python3 tests/easy_tests.py
+notifications:
+  email: false
