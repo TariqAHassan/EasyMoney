@@ -18,9 +18,6 @@ import pandas as pd
 import pkg_resources
 
 
-DEFAULT_DATA_PATH = pkg_resources.resource_filename('sources', 'data')
-
-
 # TO DO: Functions need to be better organized.
 
 

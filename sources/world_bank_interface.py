@@ -17,9 +17,11 @@ import numpy as np
 import pandas as pd
 import pkg_resources
 
-
-from easymoney.support_money import DEFAULT_DATA_PATH
+from pathlib import Path
 from easymoney.support_money import pandas_str_column_to_list
+
+
+DEFAULT_DATA_PATH = str(Path("../sources/data").resolve())
 
 
 class WorldBankParse(object):

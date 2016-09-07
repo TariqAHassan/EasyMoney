@@ -13,6 +13,8 @@ import os
 import pandas as pd
 import pkg_resources
 
+from pathlib import Path
+
 from shutil import copyfile
 from easymoney.support_money import twoD_nested_dict
 from sources.world_bank_interface import world_bank_pull_wrapper
@@ -59,13 +61,13 @@ class DatabaseManagment(object):
     """
 
 
-    def __init__(self, default_data_path, alt_database_dir):
+    def __init__(self, alt_database_dir):
         """
 
         Initialize ``DatabaseManagment()`` Class.
 
         """
-        self.default_data_path = pkg_resources.resource_filename('sources', 'data')
+        self.default_data_path = str(Path("../sources/data").resolve())
         self.alt_database_dir = alt_database_dir
         self.required_databases =  [  'ISOAlphaCodesDB.csv'          # Included with EasyMoney.
                                     , 'CurrencyTransitionDB.csv'     # Included with EasyMoney.

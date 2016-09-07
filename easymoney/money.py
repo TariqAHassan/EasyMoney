@@ -36,8 +36,6 @@ from sources.databases import _exchange_rates_from_datafile
 from sources.ecb_interface import ecb_currency_to_alpha2_dict
 
 
-from easymoney.support_money import DEFAULT_DATA_PATH
-
 
 class EasyPeasy(object):
     """
@@ -68,16 +66,8 @@ class EasyPeasy(object):
         # Fall back boolean
         self.fall_back = fall_back
 
-        # List of required Databases.
-        required_data_bases = [  'ISOAlphaCodesDB.csv'           #  Included with EasyMoney.
-                               , 'CurrencyTransitionDB.csv'      #  Included with EasyMoney.
-                               , 'CurrencyRelationshipsDB.csv'   #  Included with EasyMoney.
-                               , 'ExchangeRatesDB.csv'           #  Obtained from Online API(s).
-                               , 'ConsumerPriceIndexDB.csv'      #  Obtained from Online API(s).
-        ]
-
         # Obtain required databases
-        required_databases = DatabaseManagment(DEFAULT_DATA_PATH, alt_database_dir)._database_wizard()
+        required_databases = DatabaseManagment(alt_database_dir)._database_wizard()
 
         # Define Databases
         self.ISOAlphaCodesDB      = required_databases[0]
