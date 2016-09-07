@@ -139,6 +139,7 @@
 <span class="sd">&quot;&quot;&quot;</span>
 
 <span class="c1"># Modules #</span>
+<span class="kn">import</span> <span class="nn">copy</span>
 <span class="kn">import</span> <span class="nn">datetime</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
@@ -871,15 +872,23 @@
                 <span class="n">date_ranges_dict</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">date_values</span>
             <span class="k">return</span> <span class="n">date_ranges_dict</span>
 
-    <span class="k">def</span> <span class="nf">_currency_options</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">_currency_options</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">min_max_dates</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 
 <span class="sd">        *Private Method*</span>
 <span class="sd">        Function to construct a dataframe of currencies for which EasyMoney has data on.</span>
 
+<span class="sd">        :param min_max_dates: if True, only report the minimum and maximum date for which data is avaliable;</span>
+<span class="sd">                              if False, all dates for which which data is avaliable will be reported.</span>
+<span class="sd">        :type pretty_table: bool</span>
 <span class="sd">        :return: DataFrame with all the currencies for which EasyMoney has data.</span>
 <span class="sd">        :rtype: Pandas DataFrame</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Initialize</span>
+        <span class="n">ex_dict_dates</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="n">all_date_ranges</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="n">eur_row_dates</span> <span class="o">=</span> <span class="kc">None</span>
+
         <span class="c1"># Make a currency code of possible currency codes</span>
         <span class="n">currency_ops</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">currency_codes</span><span class="p">,</span> <span class="n">columns</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;Currency&quot;</span><span class="p">])</span>
 
@@ -897,20 +906,26 @@
         <span class="c1"># Add date information</span>
         <span class="n">dates_dict</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_date_options</span><span class="p">(</span><span class="n">nested_date_dict</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">exchange_dict</span><span class="p">,</span> <span class="n">keys_as_dates</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span>
 
-        <span class="n">ex_dict_dates</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">((</span><span class="n">k</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">datetime_to_str</span><span class="p">(</span><span class="n">min_max</span><span class="p">(</span><span class="n">v</span><span class="p">))))</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">dates_dict</span><span class="o">.</span><span class="n">items</span><span class="p">())</span>
+        <span class="k">if</span> <span class="n">min_max_dates</span><span class="p">:</span>
+            <span class="n">ex_dict_dates</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">((</span><span class="n">k</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">datetime_to_str</span><span class="p">(</span><span class="n">min_max</span><span class="p">(</span><span class="n">v</span><span class="p">))))</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">dates_dict</span><span class="o">.</span><span class="n">items</span><span class="p">())</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">ex_dict_dates</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">((</span><span class="n">k</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">datetime_to_str</span><span class="p">(</span><span class="n">v</span><span class="p">)))</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">dates_dict</span><span class="o">.</span><span class="n">items</span><span class="p">())</span>
 
         <span class="c1"># Create Date Range Column</span>
-        <span class="n">currency_ops</span><span class="p">[</span><span class="s1">&#39;Range&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">pandas_dictkey_to_key_unpack</span><span class="p">(</span><span class="n">currency_ops</span><span class="p">[</span><span class="s1">&#39;Alpha2&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">str</span><span class="p">),</span> <span class="n">ex_dict_dates</span><span class="p">)</span>
-        <span class="n">all_date_ranges</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">currency_ops</span><span class="p">[</span><span class="s1">&#39;Range&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">tolist</span><span class="p">())</span>
+        <span class="n">currency_ops</span><span class="p">[</span><span class="s1">&#39;Range&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">pandas_dictkey_to_key_unpack</span><span class="p">(</span><span class="n">currency_ops</span><span class="p">[</span><span class="s1">&#39;Alpha2&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">str</span><span class="p">),</span> <span class="n">ex_dict_dates</span><span class="p">)</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">x</span><span class="p">))</span>
 
         <span class="c1"># Create Row for Europe -- min and max are the min and max of all other conversion data,</span>
         <span class="c1"># because EUR is the base currency being used.</span>
-        <span class="n">eur_row</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span><span class="s1">&#39;Region&#39;</span><span class="p">:</span> <span class="s1">&#39;Europe&#39;</span><span class="p">,</span> <span class="s1">&#39;Currency&#39;</span><span class="p">:</span> <span class="s1">&#39;EUR&#39;</span><span class="p">,</span> <span class="s1">&#39;Alpha2&#39;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span> <span class="s1">&#39;Alpha3&#39;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span>
-                                <span class="s1">&#39;Range&#39;</span><span class="p">:</span> <span class="p">[[</span><span class="nb">min</span><span class="p">(</span><span class="n">all_date_ranges</span><span class="p">[:,</span><span class="mi">0</span><span class="p">]),</span> <span class="nb">max</span><span class="p">(</span><span class="n">all_date_ranges</span><span class="p">[:,</span><span class="mi">1</span><span class="p">])]]},</span>
-                                 <span class="n">index</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">columns</span> <span class="o">=</span> <span class="n">currency_ops</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">tolist</span><span class="p">())</span>
 
-        <span class="c1"># Append the Europe Row</span>
-        <span class="n">currency_ops</span> <span class="o">=</span> <span class="n">currency_ops</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">eur_row</span><span class="p">,</span> <span class="n">ignore_index</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">min_max_dates</span><span class="p">:</span>
+            <span class="n">all_date_ranges</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">currency_ops</span><span class="p">[</span><span class="s1">&#39;Range&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">tolist</span><span class="p">())</span>
+            <span class="n">eur_row_dates</span> <span class="o">=</span> <span class="p">[[</span><span class="nb">min</span><span class="p">(</span><span class="n">all_date_ranges</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]),</span> <span class="nb">max</span><span class="p">(</span><span class="n">all_date_ranges</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">])]]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">eur_row_dates</span> <span class="o">=</span> <span class="p">[</span><span class="nb">sorted</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">exchange_dict</span><span class="o">.</span><span class="n">keys</span><span class="p">()))]</span>
+
+        <span class="n">eur_row</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span><span class="s1">&#39;Region&#39;</span><span class="p">:</span> <span class="s1">&#39;Europe&#39;</span><span class="p">,</span> <span class="s1">&#39;Currency&#39;</span><span class="p">:</span> <span class="s1">&#39;EUR&#39;</span><span class="p">,</span> <span class="s1">&#39;Alpha2&#39;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span> <span class="s1">&#39;Alpha3&#39;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span>
+                                <span class="s1">&#39;Range&#39;</span><span class="p">:</span> <span class="n">eur_row_dates</span><span class="p">},</span>
+                                 <span class="n">index</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">columns</span><span class="o">=</span><span class="n">currency_ops</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">tolist</span><span class="p">())</span>
 
         <span class="c1"># Sort by Region</span>
         <span class="n">currency_ops</span><span class="o">.</span><span class="n">sort_values</span><span class="p">([</span><span class="s1">&#39;Region&#39;</span><span class="p">],</span> <span class="n">ascending</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">inplace</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span>
@@ -920,22 +935,30 @@
 
         <span class="k">return</span> <span class="n">currency_ops</span>
 
-    <span class="k">def</span> <span class="nf">_inflation_options</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">_inflation_options</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">min_max_dates</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 
 <span class="sd">        *Private Method*</span>
 <span class="sd">        Determines the inflation (CPI) information cached.</span>
-
+<span class="sd">        :param min_max_dates: if True, only report the minimum and maximum date for which data is avaliable;</span>
+<span class="sd">                              if False, all dates for which which data is avaliable will be reported.</span>
+<span class="sd">        :type pretty_table: bool</span>
 <span class="sd">        :return: a dataframe with all CPI information EasyMoney has, as well as date ranges the date exists for.</span>
 <span class="sd">        :rtype: Pandas DataFrame</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Initialize</span>
+        <span class="n">cpi_dict_years</span> <span class="o">=</span> <span class="kc">None</span>
+
         <span class="n">cpi_ops</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ConsumerPriceIndexDB</span><span class="p">[[</span><span class="s1">&#39;Country&#39;</span><span class="p">,</span> <span class="s1">&#39;Currency&#39;</span><span class="p">,</span> <span class="s1">&#39;Alpha2&#39;</span><span class="p">,</span> <span class="s1">&#39;Alpha3&#39;</span><span class="p">]]</span><span class="o">.</span><span class="n">drop_duplicates</span><span class="p">()</span>
         <span class="n">cpi_ops</span><span class="o">.</span><span class="n">columns</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;Region&#39;</span><span class="p">,</span> <span class="s1">&#39;Currency&#39;</span><span class="p">,</span> <span class="s1">&#39;Alpha2&#39;</span><span class="p">,</span> <span class="s1">&#39;Alpha3&#39;</span><span class="p">]</span>
         <span class="n">cpi_ops</span><span class="o">.</span><span class="n">index</span> <span class="o">=</span> <span class="nb">range</span><span class="p">(</span><span class="n">cpi_ops</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
 
         <span class="n">dates_dict</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_date_options</span><span class="p">(</span><span class="n">nested_date_dict</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cpi_dict</span><span class="p">,</span> <span class="n">keys_as_dates</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="n">date_format</span> <span class="o">=</span> <span class="s1">&#39;%Y&#39;</span><span class="p">)</span>
 
-        <span class="n">cpi_dict_years</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">((</span><span class="n">k</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">min_max</span><span class="p">([</span><span class="n">i</span><span class="o">.</span><span class="n">year</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">v</span><span class="p">])))</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">dates_dict</span><span class="o">.</span><span class="n">items</span><span class="p">())</span>
+        <span class="k">if</span> <span class="n">min_max_dates</span><span class="p">:</span>
+            <span class="n">cpi_dict_years</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">((</span><span class="n">k</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">min_max</span><span class="p">([</span><span class="n">i</span><span class="o">.</span><span class="n">year</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">v</span><span class="p">])))</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">dates_dict</span><span class="o">.</span><span class="n">items</span><span class="p">())</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">cpi_dict_years</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">((</span><span class="n">k</span><span class="p">,</span> <span class="nb">str</span><span class="p">([</span><span class="n">i</span><span class="o">.</span><span class="n">year</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">v</span><span class="p">]))</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">dates_dict</span><span class="o">.</span><span class="n">items</span><span class="p">())</span>
 
         <span class="c1"># Hacking the living daylights out of the pandas API</span>
         <span class="n">cpi_ops</span><span class="p">[</span><span class="s1">&#39;Range&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">pandas_dictkey_to_key_unpack</span><span class="p">(</span><span class="n">cpi_ops</span><span class="p">[</span><span class="s1">&#39;Alpha2&#39;</span><span class="p">],</span> <span class="n">cpi_dict_years</span><span class="p">)</span>
@@ -948,14 +971,32 @@
 
         <span class="k">return</span> <span class="n">cpi_ops</span>
 
+    <span class="k">def</span> <span class="nf">_date_overlap_calc</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">list_a</span><span class="p">,</span> <span class="n">list_b</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+
+<span class="sd">        *Private Method*</span>
+<span class="sd">        Tool to work out the the min and max date shared between two lists. Min date will be &#39;floored&#39; and max date</span>
+<span class="sd">        will be &#39;ceilinged&#39;. See ``date_bounds_floor()``.</span>
+
+<span class="sd">        :param list_a: of list of numerics</span>
+<span class="sd">        :type list_a: list</span>
+<span class="sd">        :param list_b: of list of numerics</span>
+<span class="sd">        :type list_b: list</span>
+<span class="sd">        :return: in pseudocode: [floor_date(min), ceiling_date(max)]</span>
+<span class="sd">        :rtype: list</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">date_bounds_floor</span><span class="p">([</span><span class="n">min_max</span><span class="p">(</span><span class="n">list_a</span><span class="p">,</span> <span class="kc">True</span><span class="p">),</span> <span class="n">min_max</span><span class="p">(</span><span class="n">list_b</span><span class="p">,</span> <span class="kc">True</span><span class="p">)])</span>
+
     <span class="k">def</span> <span class="nf">_currency_inflation_options</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">currency_ops_df</span><span class="p">,</span> <span class="n">cpi_ops_df</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 
 <span class="sd">        *Private Method*</span>
 <span class="sd">        Exchange Rate and Inflation information merged together.</span>
 
-<span class="sd">        :param currency_ops_df:</span>
-<span class="sd">        :param cpi_ops_df:</span>
+<span class="sd">        :param currency_ops_df: a dataframe of currency options</span>
+<span class="sd">        :type currency_ops_df: Pandas DataFrame</span>
+<span class="sd">        :param cpi_ops_df: a dataframe of CPI options</span>
+<span class="sd">        :type cpi_ops_df: Pandas DataFrame</span>
 <span class="sd">        :return: a DataFrame with both Currency and Inflation information</span>
 <span class="sd">        :rtype: Pandas DataFrame</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -974,7 +1015,7 @@
         <span class="n">data_frame</span><span class="p">[</span><span class="s1">&#39;CurrencyRange&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">currency_cpi_mapping</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span> <span class="k">if</span> <span class="s2">&quot;,&quot;</span> <span class="ow">in</span> <span class="nb">str</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">!=</span> <span class="mi">2</span> <span class="k">else</span> <span class="n">np</span><span class="o">.</span><span class="n">NaN</span><span class="p">)</span>
 
         <span class="c1"># Determine the Overlap in dates between CPI and Exchange</span>
-        <span class="n">data_frame</span><span class="p">[</span><span class="s1">&#39;Overlap&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">data_frame</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="k">lambda</span> <span class="n">row</span><span class="p">:</span> <span class="n">date_bounds_floor</span><span class="p">([</span><span class="n">row</span><span class="p">[</span><span class="s1">&#39;InflationRange&#39;</span><span class="p">],</span> <span class="n">row</span><span class="p">[</span><span class="s1">&#39;CurrencyRange&#39;</span><span class="p">]]),</span> <span class="n">axis</span> <span class="o">=</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="n">data_frame</span><span class="p">[</span><span class="s1">&#39;Overlap&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">data_frame</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="k">lambda</span> <span class="n">row</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_date_overlap_calc</span><span class="p">(</span><span class="n">row</span><span class="p">[</span><span class="s1">&#39;InflationRange&#39;</span><span class="p">],</span> <span class="n">row</span><span class="p">[</span><span class="s1">&#39;CurrencyRange&#39;</span><span class="p">]),</span> <span class="n">axis</span> <span class="o">=</span> <span class="mi">1</span><span class="p">)</span>
 
         <span class="c1"># Sort by mapping</span>
         <span class="n">data_frame</span><span class="p">[</span><span class="s1">&#39;TempSort&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">data_frame</span><span class="o">.</span><span class="n">CurrencyRange</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="s1">&#39;A&#39;</span> <span class="k">if</span> <span class="nb">str</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="o">!=</span> <span class="s1">&#39;nan&#39;</span> <span class="k">else</span> <span class="s1">&#39;B&#39;</span><span class="p">)</span>
@@ -1009,7 +1050,7 @@
         <span class="k">elif</span> <span class="n">info</span> <span class="o">==</span> <span class="s1">&#39;all&#39;</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Error in info: &#39;all&#39; is only valid for when rformat is set to &#39;table&#39;.&quot;</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">_table_option</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">info</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">_table_option</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">info</span><span class="p">,</span> <span class="n">min_max_dates</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 
 <span class="sd">        *Private Method*</span>
@@ -1017,6 +1058,9 @@
 
 <span class="sd">        :param info: &#39;exchange&#39; for exchange rate; &#39;inflation&#39; for inflation information; &#39;all&#39; for both.</span>
 <span class="sd">        :type info: str</span>
+<span class="sd">        :param min_max_dates: if True, only report the minimum and maximum date for which data is avaliable;</span>
+<span class="sd">                              if False, all dates for which which data is avaliable will be reported.</span>
+<span class="sd">        :type pretty_table: bool</span>
 <span class="sd">        :return: DataFrame with the requested information</span>
 <span class="sd">        :rtype: Pandas DataFrame</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -1024,11 +1068,12 @@
         <span class="n">info_table</span> <span class="o">=</span> <span class="kc">None</span>
 
         <span class="k">if</span> <span class="n">info</span> <span class="o">==</span> <span class="s1">&#39;exchange&#39;</span><span class="p">:</span>
-            <span class="n">info_table</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_currency_options</span><span class="p">()</span>
+            <span class="n">info_table</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_currency_options</span><span class="p">(</span><span class="n">min_max_dates</span><span class="p">)</span>
         <span class="k">elif</span> <span class="n">info</span> <span class="o">==</span> <span class="s1">&#39;inflation&#39;</span><span class="p">:</span>
-            <span class="n">info_table</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_inflation_options</span><span class="p">()</span>
+            <span class="n">info_table</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_inflation_options</span><span class="p">(</span><span class="n">min_max_dates</span><span class="p">)</span>
         <span class="k">elif</span> <span class="n">info</span> <span class="o">==</span> <span class="s1">&#39;all&#39;</span><span class="p">:</span>
-            <span class="n">info_table</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_currency_inflation_options</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_currency_options</span><span class="p">(),</span> <span class="bp">self</span><span class="o">.</span><span class="n">_inflation_options</span><span class="p">())</span>
+            <span class="n">info_table</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_currency_inflation_options</span><span class="p">(</span>  <span class="bp">self</span><span class="o">.</span><span class="n">_currency_options</span><span class="p">(</span><span class="n">min_max_dates</span><span class="p">)</span>
+                                                          <span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_inflation_options</span><span class="p">(</span><span class="n">min_max_dates</span><span class="p">))</span>
 
         <span class="c1"># Add date when Countries Changed curriency (only to Euro for now).</span>
         <span class="c1"># Note: Sadly, Pandas Series of dtype &#39;int&#39; cannot contain NaNs. Using the &#39;object&#39; dtype instead.</span>
@@ -1037,7 +1082,7 @@
 
         <span class="k">return</span> <span class="n">info_table</span>
 
-<div class="viewcode-block" id="EasyPeasy.options"><a class="viewcode-back" href="../../source/easymoney.html#easymoney.money.EasyPeasy.options">[docs]</a>    <span class="k">def</span> <span class="nf">options</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">info</span><span class="p">,</span> <span class="n">rformat</span> <span class="o">=</span> <span class="s1">&#39;table&#39;</span><span class="p">,</span> <span class="n">pretty_table</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">pretty_print</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">overlap_only</span> <span class="o">=</span> <span class="kc">False</span><span class="p">):</span>
+<div class="viewcode-block" id="EasyPeasy.options"><a class="viewcode-back" href="../../source/easymoney.html#easymoney.money.EasyPeasy.options">[docs]</a>    <span class="k">def</span> <span class="nf">options</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">info</span><span class="p">,</span> <span class="n">rformat</span> <span class="o">=</span> <span class="s1">&#39;table&#39;</span><span class="p">,</span> <span class="n">pretty_table</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">pretty_print</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">overlap_only</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="n">min_max_dates</span> <span class="o">=</span> <span class="kc">True</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 
 <span class="sd">        An easy inferface to explore all of the terminology EasyMoney understands</span>
@@ -1055,6 +1100,9 @@
 <span class="sd">        :param overlap_only: when info is set to &#39;all&#39;, keep only those rows for which exchange rate and inflation data</span>
 <span class="sd">                             overlap.</span>
 <span class="sd">        :type overlap_only: bool</span>
+<span class="sd">        :param min_max_dates: if True, only report the minimum and maximum date for which data is avaliable;</span>
+<span class="sd">                              if False, all dates for which which data is avaliable will be reported. Defaults to True.</span>
+<span class="sd">        :type pretty_table: bool</span>
 <span class="sd">        :return: DataFrame of Currency Information EasyMoney Understands.</span>
 <span class="sd">        :rtype: Pandas DataFrame</span>
 <span class="sd">        :raises ValueError: if</span>
@@ -1100,7 +1148,7 @@
 
         <span class="c1"># Generate a table</span>
         <span class="k">elif</span> <span class="n">rformat</span> <span class="o">==</span> <span class="s1">&#39;table&#39;</span><span class="p">:</span>
-            <span class="n">info_table</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_table_option</span><span class="p">(</span><span class="n">info</span><span class="p">)</span>
+            <span class="n">info_table</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_table_option</span><span class="p">(</span><span class="n">info</span><span class="p">,</span> <span class="n">min_max_dates</span><span class="p">)</span>
             <span class="c1"># Limit to overlap, if requested</span>
             <span class="k">if</span> <span class="n">overlap_only</span> <span class="o">==</span> <span class="kc">True</span><span class="p">:</span>
                 <span class="n">info_table</span><span class="o">.</span><span class="n">dropna</span><span class="p">(</span><span class="n">subset</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;Overlap&#39;</span><span class="p">],</span> <span class="n">how</span> <span class="o">=</span> <span class="s1">&#39;all&#39;</span><span class="p">,</span> <span class="n">inplace</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span>
@@ -1130,8 +1178,6 @@
                         <span class="n">info_table</span><span class="p">[</span><span class="n">col</span><span class="p">]</span> <span class="o">=</span> <span class="n">info_table</span><span class="p">[</span><span class="n">col</span><span class="p">]</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="n">full_date_to_datetime</span><span class="p">)</span>
 
                 <span class="k">return</span> <span class="n">info_table</span></div></div>
-
-
 
 
 

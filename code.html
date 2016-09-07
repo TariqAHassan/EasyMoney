@@ -387,7 +387,7 @@ Defaults to None.</li>
 
 <dl class="method">
 <dt id="easymoney.money.EasyPeasy.options">
-<code class="descname">options</code><span class="sig-paren">(</span><em>info</em>, <em>rformat='table'</em>, <em>pretty_table=True</em>, <em>pretty_print=True</em>, <em>overlap_only=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/easymoney/money.html#EasyPeasy.options"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#easymoney.money.EasyPeasy.options" title="Permalink to this definition">¶</a></dt>
+<code class="descname">options</code><span class="sig-paren">(</span><em>info</em>, <em>rformat='table'</em>, <em>pretty_table=True</em>, <em>pretty_print=True</em>, <em>overlap_only=False</em>, <em>min_max_dates=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/easymoney/money.html#EasyPeasy.options"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#easymoney.money.EasyPeasy.options" title="Permalink to this definition">¶</a></dt>
 <dd><p>An easy inferface to explore all of the terminology EasyMoney understands
 as well the dates for which data is available.</p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -402,6 +402,8 @@ as well the dates for which data is available.</p>
 Defaults to True.</li>
 <li><strong>overlap_only</strong> (<em>bool</em>) &#8211; when info is set to &#8216;all&#8217;, keep only those rows for which exchange rate and inflation data
 overlap.</li>
+<li><strong>min_max_dates</strong> &#8211; if True, only report the minimum and maximum date for which data is avaliable;
+if False, all dates for which which data is avaliable will be reported. Defaults to True.</li>
 </ul>
 </td>
 </tr>
