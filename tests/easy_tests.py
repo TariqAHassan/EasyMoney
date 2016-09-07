@@ -31,7 +31,7 @@ from easymoney.money import EasyPeasy
 # initialized inside FunctionalityTests()...not clear why.
 
 # Import Using the default method.
-ep_default = EasyPeasy(TEST_PATH)
+ep_default = EasyPeasy()
 
 # ep_default = EasyPeasy(os.path.abspath("../EasyMoney/sources/data"))
 

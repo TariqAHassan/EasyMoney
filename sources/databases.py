@@ -73,6 +73,7 @@ class DatabaseManagment(object):
                                     , 'ConsumerPriceIndexDB.csv'     # Obtained from Online API(s).
         ]
 
+
     def _data_path_assessment(self):
         """
 
@@ -92,7 +93,7 @@ class DatabaseManagment(object):
         # If alt_database_dir is None, use the default databases that are included with EasyMoney.
         if self.alt_database_dir == None:
             return False, self.default_data_path
-        elif os.path.isdir(self.alt_database_dir):
+        elif os.path.isdir(os.path.join(self.alt_database_dir)):
 
             # List of required files, if any, in the alt_database_dir.
             files_in_alterative_path = [x in os.listdir(self.alt_database_dir) for x in self.required_databases]
