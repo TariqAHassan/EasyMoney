@@ -29,7 +29,7 @@ from easymoney.money import EasyPeasy
 # initialized inside FunctionalityTests()...not clear why.
 
 # Import Using the default method.
-ep_default = EasyPeasy(os.path.abspath("../sources/data"))
+ep_default = EasyPeasy(os.path.abspath("../EasyMoney/sources/data"))
 
 # Import from a cache of EasyMoney Databases
 # ep_test_data = EasyPeasy(os.path.abspath("./test_data"))
