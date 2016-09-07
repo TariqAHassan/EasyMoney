@@ -11,10 +11,10 @@ except:
 
 setup(
     name = "easymoney",
-    version = "0.9.5",
+    version = "0.9.6",
     author = "Tariq A. Hassan",
     author_email = "laterallattice@gmail.com",
-    description = ("Tools for common monetary problems."),
+    description = ("Tools for Monetary Information and Conversions."),
     long_description = markdown_reader('README.md'),
     license = "BSD",
     keywords = 'economics, finance',

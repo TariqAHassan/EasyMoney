@@ -133,9 +133,7 @@ class DatabaseManagment(object):
         CurrencyTransitionDB = None
         currency_codes = None
         exchange_rate_df = None
-        all_exchange_data = None
         all_cpi_data = None
-        ExchangeRatesDB_alt = None
 
         # Determine the databases that ship with EasyMoney that missing from alt_database_dir.
         missing_shipped_files = [x for x in self.required_databases[0:3] if x in missing_files]
