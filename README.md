@@ -8,12 +8,12 @@ EasyMoney
 EasyMoney is a set of tools for:
 
 - computing inflation
+- currency conversions
 - adjusting a given currency for inflation
-- converting from one currency to another
 - 'normalizing' a currency, i.e., adjust for inflation and then convert to a base currency.
 - doing all of the above without having to memorize currency codes!
 
-**WARNING: Results may Contain Inaccuracies. See Below.**
+**Notice: This tool is for information purposes *only*.**
 
 ------------------------------------------------------------------------
 
@@ -175,10 +175,10 @@ Indicators used:
        	* Notes:
        		1. The ECB data used here can be obtained directly from the link provided above.
        		2. Rates are updated by the ECB around 16:00 CET.
-       		3. The ECB states, clearly, that usage for transaction purposes is strongly discouraged. This sentiment is echoed here; ***this tool is intended to be for information-purposes only***.
+       		3. The ECB states, clearly, that usage for transaction purposes is strongly discouraged. 
+       		   This sentiment is echoed here; ***as stated above, this tool is intended to be for information-purposes only***.
        		4. ALL EXCHANGE RESULTS OBTAINED FROM EASYMONEY ARE THE RESULT OF CALCULATIONS BASED ON ECB DATA. THAT IS, THESE RESULTS ARE NOT A DIRECT REPORTING OF ECB-PROVIDED DATA.
     
-
 <sup>†</sup>Sherouse, Oliver (2014). Wbdata. Arlington, VA. 
 
   [Consumer price index (2010 = 100)]: http://data.worldbank.org/indicator/FP.CPI.TOTL
