@@ -12,25 +12,22 @@ import os
 import sys
 import unittest
 import pandas as pd
-import pkg_resources
 
 # Allow access to modules
 sys.path.insert(0, os.path.abspath("."))
 sys.path.insert(0, os.path.abspath("../"))
 
-
 # Import the tool
 from easymoney.money import EasyPeasy
 
-# Create an Instance of the EasyPeasy class.
-# It's *MUCH*, faster if this exists globaly rather than
-# initialized inside FunctionalityTests()...not clear why.
+# Set the Data Path
+PATH = str(os.getcwd()).split('EasyMoney', 1)[0] + "EasyMoney/"
 
-# Import Using the default method.
-ep_default = EasyPeasy(str(os.getcwd()).split('EasyMoney', 1)[0] + "EasyMoney/sources/data")
+# Import from sources' data folder
+ep_default = EasyPeasy(PATH + "sources/data")
 
-# Import from a cache of EasyMoney Databases
-# ep_test_data = EasyPeasy(os.path.abspath("./test_data"))
+# Import from tests' test_data folder
+ep_alternative = EasyPeasy(PATH + "tests/test_data")
 
 
 class OptionTests(unittest.TestCase):
