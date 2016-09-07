@@ -123,7 +123,7 @@ class DatabaseManagment(object):
         :type data_path: str
         :param missing_files: a list of database files that a re missing from data_path
         :type missing_files: list
-        :return: ISOAlphaCodesDB, CurrencyTransitionDB, ExchangeRatesDB, currency_codes and ConsumerPriceIndexDB
+        :return: ISOAlphaCodesDB, CurrencyTransitionDB, ExchangeRatesDB, currency_codes, ConsumerPriceIndexDB, CurrencyRelationshipsDB
         :rtype: tuple
         """
         # Initialize
@@ -133,7 +133,6 @@ class DatabaseManagment(object):
         CurrencyTransitionDB = None
         currency_codes = None
         exchange_rate_df = None
-        all_cpi_data = None
 
         # Determine the databases that ship with EasyMoney that missing from alt_database_dir.
         missing_shipped_files = [x for x in self.required_databases[0:3] if x in missing_files]
@@ -169,28 +168,26 @@ class DatabaseManagment(object):
             # Save the ExchangeRatesDB to alt_database_dir
             ExchangeRatesDB.to_csv(data_path + "/ExchangeRatesDB.csv", index = False)
 
-        else: # Read it in from alt_database_dir, if not missing.
+        else: # Read in from alt_database_dir, if not missing.
             ExchangeRatesDB, currency_codes = _exchange_rates_from_datafile(pd.read_csv(data_path + "/ExchangeRatesDB.csv"),  False)
 
         # Generate and Write ConsumerPriceIndexDB, if needed.
         if data_path == self.default_data_path:
-            ConsumerPriceIndexDB = world_bank_pull_wrapper("CPI", "FP.CPI.TOTL")
+            ConsumerPriceIndexDB, CurrencyRelationshipsDB = world_bank_pull_wrapper("CPI", "FP.CPI.TOTL")
 
         elif 'ConsumerPriceIndexDB.csv' in missing_files:
 
             # Obtain CPI Data (will also look for 'CurrencyRelationshipsDB.csv' in alt_database_dir).
-            all_cpi_data = world_bank_pull_wrapper("CPI", "FP.CPI.TOTL", data_path = data_path)
+            ConsumerPriceIndexDB, CurrencyRelationshipsDB = world_bank_pull_wrapper("CPI", "FP.CPI.TOTL", data_path = data_path)
 
             # Save the ConsumerPriceIndexDB to alt_database_dir
-            all_cpi_data.to_csv(data_path + "/ConsumerPriceIndexDB.csv", index = False)
+            ConsumerPriceIndexDB.to_csv(data_path + "/ConsumerPriceIndexDB.csv", index = False)
 
-            # Save
-            ConsumerPriceIndexDB = all_cpi_data
-
-        else: # Read it in from alt_database_dir, if not missing.
+        else: # Read in from alt_database_dir, if not missing.
             ConsumerPriceIndexDB = pd.read_csv(data_path + "/ConsumerPriceIndexDB.csv")
+            CurrencyRelationshipsDB = pd.read_csv(data_path + "/CurrencyRelationshipsDB.csv")
 
-        return ISOAlphaCodesDB, CurrencyTransitionDB, ExchangeRatesDB, currency_codes, ConsumerPriceIndexDB
+        return ISOAlphaCodesDB, CurrencyTransitionDB, ExchangeRatesDB, currency_codes, ConsumerPriceIndexDB, CurrencyRelationshipsDB
 
     def _database_wizard(self):
         """
@@ -211,8 +208,6 @@ class DatabaseManagment(object):
         # Need to Add Files is False
         elif not database_assessment[0]:
             return self._database_manager(data_path = database_assessment[1], missing_files = [])
-
-
 
 
 

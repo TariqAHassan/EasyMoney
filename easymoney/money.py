@@ -70,11 +70,12 @@ class EasyPeasy(object):
         required_databases = DatabaseManagment(alt_database_dir)._database_wizard()
 
         # Define Databases
-        self.ISOAlphaCodesDB      = required_databases[0]
-        self.CurrencyTransitionDB = required_databases[1]
-        self.ExchangeRatesDB      = required_databases[2]
-        self.currency_codes       = required_databases[3]
-        self.ConsumerPriceIndexDB = required_databases[4]
+        self.ISOAlphaCodesDB         = required_databases[0]
+        self.CurrencyTransitionDB    = required_databases[1]
+        self.ExchangeRatesDB         = required_databases[2]
+        self.currency_codes          = required_databases[3]
+        self.ConsumerPriceIndexDB    = required_databases[4]
+        self.CurrencyRelationshipsDB = required_databases[5]
 
         # Convert the ExchangeRatesDB to a dict for faster look up speed.
         self.exchange_dict = _exchange_rates_from_datafile(self.ExchangeRatesDB)[0]

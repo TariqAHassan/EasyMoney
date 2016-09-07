@@ -150,6 +150,51 @@ currency_list = ep.options(info = 'exchange', rformat = 'list', pretty_print = F
 
 *Note*: Errors may emerge when converting across currency transitions, e.g., CY (2005) → CY (2010).
 
+####Databases
+
+It's also straightforward to gain access to the databases used
+by ``EasyPeasy()``.
+
+To see all of the International Organization for Standardization (ISO) Alpha2
+codes currently cached:
+```python
+ep.ISOAlphaCodesDB
+```
+
+To see all of the known transitions from one currency to another:
+```python
+ep.CurrencyTransitionDB
+```
+
+To see the raw Exchange Rate information currently cached:
+```python
+ep.ExchangeRatesDB
+```
+
+To see the raw Consumer Price Index (CPI) information currently cached:
+```python
+ep.ConsumerPriceIndexDB
+```
+
+Finally, to see the relationships between Country Names, ISO Alpha2/3 Codes
+and Currency Codes currently understood by ``EasyPeasy()``:
+```python
+ep.ConsumerPriceIndexDB
+```
+
+It's also easy to save these databases to disk so they can be used offline
+or modified. One can simply pass a directory when creating an instance of the class.
+```python
+ep = EasyPeasy('/path/of/your/choosing')
+```
+
+If this directory does not contain all of the required DataBases, it will 
+be populate it with them.
+
+If the directory already contains some of the required databases, ``EasyPeasy()``.
+will automagically read in the existing databases and generate only those
+databases that are missing. 
+
 ------------------------------------------------------------------------
 
 ##Documentation

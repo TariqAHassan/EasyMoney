@@ -56,7 +56,7 @@ class WorldBankParse(object):
         DATA_PATH = DEFAULT_DATA_PATH if data_path == None else data_path
 
         # Import Currency Code Database.
-        CurrencyRelationshipsDB = pandas_str_column_to_list(pd.read_csv(DATA_PATH + "/CurrencyRelationshipsDB.csv"
+        self.CurrencyRelationshipsDB = pandas_str_column_to_list(pd.read_csv(DATA_PATH + "/CurrencyRelationshipsDB.csv"
                                                             , encoding = "ISO-8859-1"
                                                             , keep_default_na = False)
                                                             , columns = ['Alpha2', 'Alpha3'])
@@ -68,8 +68,8 @@ class WorldBankParse(object):
         self.alpha2_to_alpha3 = dict(zip(country_codes['Alpha2'].tolist(), country_codes['Alpha3'].tolist()))
 
         # Alpha2 --> Currency Code
-        self.alpha2_to_currency_code = dict.fromkeys(set([i for sublist in CurrencyRelationshipsDB.Alpha2.tolist() for i in sublist]))
-        for i in zip(CurrencyRelationshipsDB.Alpha2.tolist(), CurrencyRelationshipsDB.CurrencyCode.tolist()):
+        self.alpha2_to_currency_code = dict.fromkeys(set([i for sublist in self.CurrencyRelationshipsDB.Alpha2.tolist() for i in sublist]))
+        for i in zip(self.CurrencyRelationshipsDB.Alpha2.tolist(), self.CurrencyRelationshipsDB.CurrencyCode.tolist()):
             for j in i[0]:
                 if self.alpha2_to_currency_code[j] == None:
                     self.alpha2_to_currency_code[j] = i[1]
@@ -168,8 +168,8 @@ class WorldBankParse(object):
         # Refresh the index
         data_frame.index = range(data_frame.shape[0])
 
-        # Reorder and Return
-        return data_frame[self.final_col_order]
+        # Reorder and Return, along with CurrencyRelationshipsDB
+        return data_frame[self.final_col_order], self.CurrencyRelationshipsDB
 
 
 def world_bank_pull_wrapper(value_true_name, indicator, data_path = None, na_drop_col = None):
@@ -190,7 +190,7 @@ def world_bank_pull_wrapper(value_true_name, indicator, data_path = None, na_dro
     :rtype: Pandas DateFrame
     """
     # Get the data
-    data_frame = WorldBankParse(value_true_name, indicator, data_path).world_bank_pull()
+    data_frame, CurrencyRelationshipsDB = WorldBankParse(value_true_name, indicator, data_path).world_bank_pull()
 
     # Remove Nones from the value_true_name (e.g., CPI) column
     data_frame = data_frame[data_frame[value_true_name].astype(str) != 'None']
@@ -203,7 +203,7 @@ def world_bank_pull_wrapper(value_true_name, indicator, data_path = None, na_dro
         for col in na_drop_col:
             data_frame.drop(col, axis = 1, inplace = True)
 
-    return data_frame
+    return data_frame, CurrencyRelationshipsDB
 
 
 
