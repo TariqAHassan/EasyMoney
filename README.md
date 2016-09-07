@@ -189,7 +189,7 @@ ep = EasyPeasy('/path/of/your/choosing')
 ```
 
 If this directory does not contain all of the required DataBases, it will 
-be populate it with them.
+be populated with them.
 
 If the directory already contains some of the required databases, ``EasyPeasy()``
 will automagically read in the existing databases and generate only those
