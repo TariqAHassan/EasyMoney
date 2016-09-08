@@ -83,7 +83,11 @@
             
                 <ul class="current">
 <li class="toctree-l1 current"><a class="current reference internal" href="#">EasyMoney</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="#overview">Overview</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#overview">Overview</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#project-summary">Project Summary</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#feature-summary">Feature Summary</a></li>
+</ul>
+</li>
 <li class="toctree-l2"><a class="reference internal" href="#dependencies">Dependencies</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#installation">Installation</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#examples">Examples</a><ul>
@@ -152,16 +156,30 @@
 <h1>EasyMoney<a class="headerlink" href="#easymoney" title="Permalink to this headline">¶</a></h1>
 <div class="section" id="overview">
 <h2>Overview<a class="headerlink" href="#overview" title="Permalink to this headline">¶</a></h2>
-<p>EasyMoney is a set of tools for:</p>
+<div class="section" id="project-summary">
+<h3>Project Summary<a class="headerlink" href="#project-summary" title="Permalink to this headline">¶</a></h3>
+<p>This package is primarily intended to be used in the domain of Data Science.
+Many data analysis projects involve analyzing money, often from very different sources.
+This can create a lot of problems when the time comes to compare these sources of information,
+which may be separated in time (inflation), currency (conversion) and the ways in which these
+sources refer to the currency being used (e.g., ISO Alpha2 Codes vs. Currency Codes).
+EasyMoney is intended to abstract away all such complexities to make comparisons across
+these dimensions extremely simple.</p>
+<p>It should also be noted that despite being targeted towards the world of
+data analysis, the tools provided by EasyMoney are intended to be of utility in
+wide range of domains.</p>
+</div>
+<div class="section" id="feature-summary">
+<h3>Feature Summary<a class="headerlink" href="#feature-summary" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
-<li>computing inflation</li>
-<li>currency conversions</li>
-<li>adjusting a given currency for inflation</li>
-<li>&#8216;normalizing&#8217; a currency, i.e., adjust for inflation and then convert
-to a base currency.</li>
-<li>doing all of the above without having to memorize currency codes!</li>
+<li>Computing Inflation</li>
+<li>Currency Conversion</li>
+<li>Adjusting a given currency for Inflation</li>
+<li>&#8216;Normalizing&#8217; a currency, i.e., adjust for inflation and then convert to a base currency.</li>
+<li>Relating ISO Alpha2/3 Codes to Currency Codes or a Country&#8217;s Natural Name.</li>
 </ul>
 <p><strong>NOTICE: THIS TOOL IS FOR INFORMATION PURPOSES ONLY.</strong></p>
+</div>
 </div>
 <hr class="docutils" />
 <div class="section" id="dependencies">
@@ -169,7 +187,7 @@ to a base currency.</li>
 <p>EasyMoney requires: <a class="reference external" href="http://www.numpy.org">numpy</a>,
 <a class="reference external" href="http://pandas.pydata.org">pandas</a>,
 <a class="reference external" href="http://docs.python-requests.org/en/master/">requests</a> and
-<a class="reference external" href="https://github.com/OliverSherouse/wbdata">wbdata</a>†.</p>
+<a class="reference external" href="https://github.com/OliverSherouse/wbdata">wbdata</a><sup>†</sup>.</p>
 <p>Internet access is required to create an instance of the main
 <code class="docutils literal"><span class="pre">EasyPeasy()</span></code> class. However, once EasyMoney has cached the latest
 data from online databases (see below), internet access is no longer
@@ -290,8 +308,7 @@ a3</th>
 Range</th>
 <th class="head">CurrencyRange</th>
 <th class="head">Overlap</th>
-<th class="head">CurrencyTr
-ansition</th>
+<th class="head">Transitions</th>
 </tr>
 </thead>
 <tbody valign="top">
@@ -330,7 +347,7 @@ lia</td>
 2007-12-31]</td>
 <td>[1999-01-04,
 2007-12-31]</td>
-<td>2008</td>
+<td>[2008 (EUR)]</td>
 </tr>
 <tr class="row-odd"><td>...</td>
 <td>...</td>
@@ -345,15 +362,14 @@ lia</td>
 </table>
 <p>As can be seen above, the date ranges for which Inflation
 (InflationRange) and Exchange Rate (CurrencyRange) data is available (as
-well as when these two overlap) are provided. Additionally, the dates of
-(some) transitions from one currency to another (CurrencyTransition) are
-noted.</p>
+well as when these two overlap) are provided. Additionally, the dates of known
+transitions from one currency to another are also provided.</p>
 <p>One can also gain access to <em>currency</em> and <em>inflation</em> information
 separately.</p>
 <div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="c1"># Currency Information Alone</span>
 <span class="n">ep</span><span class="o">.</span><span class="n">options</span><span class="p">(</span><span class="n">info</span> <span class="o">=</span> <span class="s1">&#39;exchange&#39;</span><span class="p">,</span> <span class="n">pretty_print</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span>
 
-<span class="c1"># Inflation Infomation Alone</span>
+<span class="c1"># Inflation Inflation Alone</span>
 <span class="n">ep</span><span class="o">.</span><span class="n">options</span><span class="p">(</span><span class="n">info</span> <span class="o">=</span> <span class="s1">&#39;inflation&#39;</span><span class="p">,</span> <span class="n">pretty_print</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span>
 </pre></div>
 </div>
@@ -401,16 +417,15 @@ Codes and Currency Codes currently understood by <code class="docutils literal">
 </pre></div>
 </div>
 <p>It&#8217;s also easy to save these databases to disk so they can be used
-offline or modified. One can simply pass a directory when creating an
-instance of the class.</p>
+offline or modified. To do so, one can simply pass a directory when creating an
+instance of the <code class="docutils literal"><span class="pre">EasyPeasy()</span></code> class.</p>
 <div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">ep</span> <span class="o">=</span> <span class="n">EasyPeasy</span><span class="p">(</span><span class="s1">&#39;/path/of/your/choosing&#39;</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>If this directory does not contain all of the required DataBases, it
-will be populated with them.</p>
-<p>If the directory already contains some of the required databases,
-<code class="docutils literal"><span class="pre">EasyPeasy()</span></code> will automagically read in the existing databases and
-generate only those databases that are missing.</p>
+will be populated with them. Conversely, if the the directory already contains
+some of the required databases, <code class="docutils literal"><span class="pre">EasyPeasy()</span></code> will automagically
+read in the existing databases and generate only those databases that are missing.</p>
 </div>
 </div>
 <hr class="docutils" />
@@ -433,8 +448,8 @@ link provided above.</li>
 <li>Rates are updated by the ECB around 16:00 CET.</li>
 <li>The ECB states, clearly, that usage for transaction purposes
 is strongly discouraged. This sentiment is echoed here;
-<strong>*as stated above, this tool is intended to be for
-information purposes only*</strong>.</li>
+<strong>as stated above, this tool is intended to be for
+information purposes only</strong>.</li>
 <li>ALL EXCHANGE RESULTS OBTAINED FROM EASYMONEY ARE THE RESULT
 OF CALCULATIONS BASED ON ECB DATA. THAT IS, THESE RESULTS
 ARE NOT A DIRECT REPORTING OF ECB-PROVIDED DATA.</li>
@@ -445,7 +460,7 @@ ARE NOT A DIRECT REPORTING OF ECB-PROVIDED DATA.</li>
 </ul>
 </li>
 </ol>
-<p>†Sherouse, Oliver (2014). Wbdata. Arlington, VA.</p>
+<p><sup>†</sup> Sherouse, Oliver (2014). Wbdata. Arlington, VA.</p>
 </div>
 </div>
 

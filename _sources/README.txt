@@ -4,14 +4,29 @@ EasyMoney
 Overview
 ~~~~~~~~
 
-EasyMoney is a set of tools for:
+Project Summary
+'''''''''''''''
 
--  computing inflation
--  currency conversions
--  adjusting a given currency for inflation
--  'normalizing' a currency, i.e., adjust for inflation and then convert
-   to a base currency.
--  doing all of the above without having to memorize currency codes!
+This package is primarily intended to be used in the domain of Data Science.
+Many data analysis projects involve analyzing money, often from very different sources.
+This can create a lot of problems when the time comes to compare these sources of information,
+which may be separated in time (inflation), currency (conversion) and the ways in which these
+sources refer to the currency being used (e.g., ISO Alpha2 Codes vs. Currency Codes).
+EasyMoney is intended to abstract away all such complexities to make comparisons across
+these dimensions extremely simple.
+
+It should also be noted that despite being targeted towards the world of
+data analysis, the tools provided by EasyMoney are intended to be of utility in
+wide range of domains.
+
+Feature Summary
+'''''''''''''''
+
+- Computing Inflation
+- Currency Conversion
+- Adjusting a given currency for Inflation
+- 'Normalizing' a currency, i.e., adjust for inflation and then convert to a base currency.
+- Relating ISO Alpha2/3 Codes to Currency Codes or a Country's Natural Name.
 
 **NOTICE: THIS TOOL IS FOR INFORMATION PURPOSES ONLY.**
 
@@ -23,7 +38,7 @@ Dependencies
 EasyMoney requires: `numpy <http://www.numpy.org>`__,
 `pandas <http://pandas.pydata.org>`__,
 `requests <http://docs.python-requests.org/en/master/>`__ and
-`wbdata <https://github.com/OliverSherouse/wbdata>`__\ †.
+`wbdata <https://github.com/OliverSherouse/wbdata>`__\ :sup:`†`.
 
 Internet access is required to create an instance of the main
 ``EasyPeasy()`` class. However, once EasyMoney has cached the latest
@@ -143,8 +158,8 @@ country that uses a common currency.
     ep.options(info = 'all', pretty_print = True, overlap_only = True)
 
 +--------+--------+------+------+-----------+----------------+----------------+------------+
-| Region | Curren | Alph | Alph | Inflation | CurrencyRange  | Overlap        | CurrencyTr |
-|        | cy     | a2   | a3   | Range     |                |                | ansition   |
+| Region | Curren | Alph | Alph | Inflation | CurrencyRange  | Overlap        |Transitions |
+|        | cy     | a2   | a3   | Range     |                |                |            |
 +========+========+======+======+===========+================+================+============+
 | Austra | AUD    | AU   | AUS  | [1960,    | [1999-01-04,   | [1999-01-04,   |            |
 | lia    |        |      |      | 2015]     | 2016-08-29]    | 2015-12-31]    |            |
@@ -152,7 +167,7 @@ country that uses a common currency.
 | Canada | CAD    | CA   | CAN  | [1960,    | [1999-01-04,   | [1999-01-04,   |            |
 |        |        |      |      | 2015]     | 2016-08-29]    | 2015-12-31]    |            |
 +--------+--------+------+------+-----------+----------------+----------------+------------+
-| Cyprus | EUR    | CY   | CYP  | [1960,    | [1999-01-04,   | [1999-01-04,   | 2008       |
+| Cyprus | EUR    | CY   | CYP  | [1960,    | [1999-01-04,   | [1999-01-04,   |[2008 (EUR)]|
 |        |        |      |      | 2015]     | 2007-12-31]    | 2007-12-31]    |            |
 +--------+--------+------+------+-----------+----------------+----------------+------------+
 | ...    | ...    | ...  | ...  | ...       | ...            | ...            | ...        |
@@ -160,9 +175,8 @@ country that uses a common currency.
 
 As can be seen above, the date ranges for which Inflation
 (InflationRange) and Exchange Rate (CurrencyRange) data is available (as
-well as when these two overlap) are provided. Additionally, the dates of
-(some) transitions from one currency to another (CurrencyTransition) are
-noted.
+well as when these two overlap) are provided. Additionally, the dates of known
+transitions from one currency to another are also provided.
 
 One can also gain access to *currency* and *inflation* information
 separately.
@@ -172,7 +186,7 @@ separately.
     # Currency Information Alone
     ep.options(info = 'exchange', pretty_print = True)
 
-    # Inflation Infomation Alone
+    # Inflation Inflation Alone
     ep.options(info = 'inflation', pretty_print = True)
 
 Additionally, instead of printing a given data table, it can be returned
@@ -237,19 +251,17 @@ Codes and Currency Codes currently understood by ``EasyPeasy()``:
     ep.ConsumerPriceIndexDB
 
 It's also easy to save these databases to disk so they can be used
-offline or modified. One can simply pass a directory when creating an
-instance of the class.
+offline or modified. To do so, one can simply pass a directory when creating an
+instance of the ``EasyPeasy()`` class.
 
 .. code:: python
 
     ep = EasyPeasy('/path/of/your/choosing')
 
 If this directory does not contain all of the required DataBases, it
-will be populated with them.
-
-If the directory already contains some of the required databases,
-``EasyPeasy()`` will automagically read in the existing databases and
-generate only those databases that are missing.
+will be populated with them. Conversely, if the the directory already contains
+some of the required databases, ``EasyPeasy()`` will automagically
+read in the existing databases and generate only those databases that are missing.
 
 --------------
 
@@ -276,10 +288,10 @@ Indicators used:
          2. Rates are updated by the ECB around 16:00 CET.
          3. The ECB states, clearly, that usage for transaction purposes
             is strongly discouraged. This sentiment is echoed here;
-            ***as stated above, this tool is intended to be for
-            information purposes only***.
+            **as stated above, this tool is intended to be for
+            information purposes only**.
          4. ALL EXCHANGE RESULTS OBTAINED FROM EASYMONEY ARE THE RESULT
             OF CALCULATIONS BASED ON ECB DATA. THAT IS, THESE RESULTS
             ARE NOT A DIRECT REPORTING OF ECB-PROVIDED DATA.
 
-†Sherouse, Oliver (2014). Wbdata. Arlington, VA.
+:sup:`†` Sherouse, Oliver (2014). Wbdata. Arlington, VA.
