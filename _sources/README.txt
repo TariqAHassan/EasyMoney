@@ -16,8 +16,8 @@ EasyMoney is intended to abstract away all such complexities to make comparisons
 these dimensions extremely simple.
 
 It should also be noted that despite being targeted towards the world of
-data analysis, the tools provided by EasyMoney are intended to be of utility in
-wide range of domains.
+data analysis, the tools provided by EasyMoney are likely to be useful 
+in many other domains.
 
 Feature Summary
 '''''''''''''''
