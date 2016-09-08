@@ -186,7 +186,7 @@ separately.
     # Currency Information Alone
     ep.options(info = 'exchange', pretty_print = True)
 
-    # Inflation Inflation Alone
+    # Inflation Information Alone
     ep.options(info = 'inflation', pretty_print = True)
 
 Additionally, instead of printing a given data table, it can be returned
