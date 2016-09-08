@@ -52,19 +52,19 @@ class DatabaseManagment(object):
 
     :param default_data_path: the default path to EasyMoney's included DataBases
     :type default_data_path: str
-    :param alt_database_dir: an alternate default path to EasyMoney's included DataBases
-    :type alt_database_dir: str
+    :param database_path: an alternate default path to EasyMoney's included DataBases
+    :type database_path: str
     """
 
 
-    def __init__(self, alt_database_dir):
+    def __init__(self, database_path):
         """
 
         Initialize ``DatabaseManagment()`` Class.
 
         """
         self.default_data_path = pkg_resources.resource_filename('sources', 'data')
-        self.alt_database_dir = alt_database_dir
+        self.database_path = database_path
         self.required_databases =  [  'ISOAlphaCodesDB.csv'          # Included with EasyMoney.
                                     , 'CurrencyTransitionDB.csv'     # Included with EasyMoney.
                                     , 'CurrencyRelationshipsDB.csv'  # Included with EasyMoney.
@@ -80,7 +80,7 @@ class DatabaseManagment(object):
         | Method to determine if required databases are present in a given directory.
         | If databases are missing, they their names are returned.
 
-        :return: Boolean for if files need to be installed in alt_database_dir; path to the data files or list of files to make.
+        :return: Boolean for if files need to be installed in database_path; path to the data files or list of files to make.
                  Tuple of form the form: (bool, str OR list).
                  False <---> Path to all needed databases.
                  True  <---> [list of files to generate].
@@ -89,21 +89,21 @@ class DatabaseManagment(object):
         # Initialize
         files_in_alterative_path = list()
 
-        # If alt_database_dir is None, use the default databases that are included with EasyMoney.
-        if self.alt_database_dir == None:
+        # If database_path is None, use the default databases that are included with EasyMoney.
+        if self.database_path == None:
             return False, self.default_data_path
-        elif isinstance(self.alt_database_dir, str):
+        elif isinstance(self.database_path, str):
 
-            # List of required files, if any, in the alt_database_dir.
-            files_in_alterative_path = [x in os.listdir(self.alt_database_dir) for x in self.required_databases]
+            # List of required files, if any, in the database_path.
+            files_in_alterative_path = [x in os.listdir(self.database_path) for x in self.required_databases]
 
-            # All Databases Present in the self.alt_database_dir.
+            # All Databases Present in the self.database_path.
             if all(files_in_alterative_path):
-                return False, self.alt_database_dir
-            # Some Databases present in the alt_database_dir.
+                return False, self.database_path
+            # Some Databases present in the database_path.
             elif any(files_in_alterative_path):
-                return True, [x for x in self.required_databases if x not in os.listdir(self.alt_database_dir)]
-            # No Databases present in the alt_database_dir.
+                return True, [x for x in self.required_databases if x not in os.listdir(self.database_path)]
+            # No Databases present in the database_path.
             elif list(set(files_in_alterative_path)) == [False]:
                 return True, self.required_databases
         else:
@@ -132,7 +132,7 @@ class DatabaseManagment(object):
         currency_codes = None
         exchange_rate_df = None
 
-        # Determine the databases that ship with EasyMoney that missing from alt_database_dir.
+        # Determine the databases that ship with EasyMoney that missing from database_path.
         missing_shipped_files = [x for x in self.required_databases[0:3] if x in missing_files]
 
         # Read in ISOAlphaCodesDB.
@@ -147,7 +147,7 @@ class DatabaseManagment(object):
         elif 'CurrencyTransitionDB.csv' not in missing_files:
             CurrencyTransitionDB = pd.read_csv(data_path + "/CurrencyTransitionDB.csv")
 
-        # Copy missing databases from EasyMoney's cache to alt_database_dir. (dbc = database copy).
+        # Copy missing databases from EasyMoney's cache to database_path. (dbc = database copy).
         if len(missing_shipped_files) > 0:
             for dbc in missing_shipped_files:
                 copyfile(self.default_data_path + "/" + dbc, data_path + "/" + dbc)
@@ -163,10 +163,10 @@ class DatabaseManagment(object):
             # Obtain exchange data
             ExchangeRatesDB, currency_codes = _ecb_xml_exchange_data(return_as = 'df')
 
-            # Save the ExchangeRatesDB to alt_database_dir
+            # Save the ExchangeRatesDB to database_path
             ExchangeRatesDB.to_csv(data_path + "/ExchangeRatesDB.csv", index = False)
 
-        else: # Read in from alt_database_dir, if not missing.
+        else: # Read in from database_path, if not missing.
             ExchangeRatesDB, currency_codes = _exchange_rates_from_datafile(pd.read_csv(data_path + "/ExchangeRatesDB.csv"),  False)
 
         # Generate and Write ConsumerPriceIndexDB, if needed.
@@ -175,13 +175,13 @@ class DatabaseManagment(object):
 
         elif 'ConsumerPriceIndexDB.csv' in missing_files:
 
-            # Obtain CPI Data (will also look for 'CurrencyRelationshipsDB.csv' in alt_database_dir).
+            # Obtain CPI Data (will also look for 'CurrencyRelationshipsDB.csv' in database_path).
             ConsumerPriceIndexDB, CurrencyRelationshipsDB = _world_bank_pull_wrapper("CPI", "FP.CPI.TOTL", data_path = data_path)
 
-            # Save the ConsumerPriceIndexDB to alt_database_dir
+            # Save the ConsumerPriceIndexDB to database_path
             ConsumerPriceIndexDB.to_csv(data_path + "/ConsumerPriceIndexDB.csv", index = False)
 
-        else: # Read in from alt_database_dir, if not missing.
+        else: # Read in from database_path, if not missing.
             ConsumerPriceIndexDB = pd.read_csv(data_path + "/ConsumerPriceIndexDB.csv")
             CurrencyRelationshipsDB = pd.read_csv(data_path + "/CurrencyRelationshipsDB.csv")
 
@@ -201,7 +201,7 @@ class DatabaseManagment(object):
 
         # Need to Add Files is True
         if database_assessment[0]:
-            return self._database_manager(data_path = self.alt_database_dir, missing_files = database_assessment[1])
+            return self._database_manager(data_path = self.database_path, missing_files = database_assessment[1])
 
         # Need to Add Files is False
         elif not database_assessment[0]:

@@ -8,10 +8,16 @@
 """
 
 # Modules #
+import sys
 import copy
 import datetime
 import numpy as np
 import pandas as pd
+
+try:
+    from fuzzywuzzy import process
+except:
+    pass
 
 from warnings import warn
 from collections import defaultdict
@@ -41,21 +47,33 @@ from sources.ecb_interface import ecb_currency_to_alpha2_dict
 class EasyPeasy(object):
     """
 
-    Tools for converting one currency to another, looking up inflation information, adjusting for inflation, and more!
+    Tools for Monetary Information and Conversions.
 
-    :param alt_database_dir: an alterative path to the database files. If this directory does not
-                              contain the required databases, those missing will be pulled from the web
-                              and placed there. Otherwise, the databases therein there will
-                              supplant those used by automatically EasyMoney. Defaults to None.
-    :type alt_database_dir: str
-    :param precision: number of places to round to. Defaults to 2.
+    :param database_path: an alternative path to the database files. If this directory does not all of
+                          contain the required databases, those that are missing will be generated.
+                          Otherwise, the databases therein will supplant those used by automatically EasyMoney.
+                          Defaults to None.
+    :type database_path: str
+    :param precision: number of places to round to when returning results. Defaults to 2.
     :type precision: int
     :param fall_back: if True, fall back to closest possible date for which data is available. Defaults to True.
     :type fall_back: bool
+    :param fuzzy_match_threshold: a threshold for fuzzy matching confidence (requires the ``fuzzywuzzy`` package).
+                                  The value must be an integer between 0 and 100. The *suggested* minimum values is 85.
+                                  This will only impact attempts to match on natural names, e.g., attempting to match
+                                  'Canada' by passing 'Canadian'. Defaults to None.
+
+                                  .. warning::
+
+                                        Fuzzy matching may yield inaccurate results.
+
+                                        Whenever possible, use terminology *exactly* as it appears in ``options()``.
+
+    :type fuzzy_match_threshold: int
     """
 
 
-    def __init__(self, alt_database_dir = None, precision = 2, fall_back = True):
+    def __init__(self, database_path = None, precision = 2, fall_back = True, fuzzy_match_threshold = None):
         """
 
         Initialize the ``EasyPeasy()`` class.
@@ -67,8 +85,24 @@ class EasyPeasy(object):
         # Fall back boolean
         self.fall_back = fall_back
 
+        # Try to import fuzzywuzzy, if requested.
+        if isinstance(fuzzy_match_threshold, int):
+            if 'fuzzywuzzy' not in sys.modules:
+                raise ImportError("to use 'fuzzy_match_threshold' please install 'fuzzywuzzy'.\n"
+                                  "For optimal performance, please also consider installing 'python-Levenshtein'.")
+        elif fuzzy_match_threshold != None and not isinstance(fuzzy_match_threshold, int):
+            raise ValueError("fuzzy_match_threshold must be an intiger.")
+
+        # Issue warning if the threshold is below 85
+        # (arbitrary, but this appears to mark begining of notable decrements in accuracy).
+        if fuzzy_match_threshold != None and fuzzy_match_threshold < 85:
+            warn('\nLow fuzzy_match_threshold. Please Consider Increasing this Value.')
+
+        # Set fuzzy_match_threshold
+        self.fuzzy_match_threshold = fuzzy_match_threshold
+
         # Obtain required databases
-        required_databases = DatabaseManagment(alt_database_dir)._database_wizard()
+        required_databases = DatabaseManagment(database_path)._database_wizard()
 
         # Define Databases
         self.ISOAlphaCodesDB         = required_databases[0]
@@ -114,7 +148,7 @@ class EasyPeasy(object):
         """
 
         *Private Method*
-        Determines the closest date for which data is avaliable.
+        Determines the closest date for which data is available.
 
         :param list_of_dates: a list of datetimes.
         :type list_of_dates: list
@@ -147,6 +181,31 @@ class EasyPeasy(object):
         else:
             return datetime_to_str([best_match], date_format = date_format)[0]
 
+    def _fuzzy_search(self, region):
+        """
+
+        *Private Method*
+        Use the fuzzywuzzy package to map the region to an ISO Alpha2 Code
+
+        :param region:
+        :type region: str
+        :return:
+        :rtype: str
+        """
+        # Precaution to block usage of fuzzywuzzy if it is not enabled.
+        if self.fuzzy_match_threshold == None:
+            return None
+
+        # Try to get the best match for the region
+        best_match = process.extractOne(region, self.region_to_alpha2.keys())
+
+        # Return the best match if the confidence
+        # is greater than, or equal to, fuzzy_match_threshold.
+        if best_match[1] >= self.fuzzy_match_threshold:
+            return self.region_to_alpha2[best_match[0]]
+        else:
+            return None
+
     def _region_type(self, region):
         """
 
@@ -159,27 +218,43 @@ class EasyPeasy(object):
         :rtype: str
         :raises ValueError: if ``region`` is not recognized by EasyMoney (see ``options()``).
         """
+        if not isinstance(region, str):
+            raise TypeError("'%s' is not a string." % (str(region)))
+
         # Initialize
         currency_region = None
+        fuzzy_match = None
 
-        if region in ecb_currency_to_alpha2_dict.keys():
-            return ecb_currency_to_alpha2_dict[region], "currency"
-        elif region in self.alpha3_to_alpha2.values():
+        if region.upper() in ecb_currency_to_alpha2_dict.keys():
+            return ecb_currency_to_alpha2_dict[region.upper()], "currency"
+
+        elif region.upper() in self.alpha3_to_alpha2.values():
             return region, "alpha2"
-        elif region in self.alpha3_to_alpha2.keys():
-            return self.alpha3_to_alpha2[region], "alpha3"
-        elif region in self.currency_to_alpha2.keys():
-            currency_region = self.currency_to_alpha2[region]
+
+        elif region.upper() in self.alpha3_to_alpha2.keys():
+            return self.alpha3_to_alpha2[region.upper()], "alpha3"
+
+        elif region.upper() in self.currency_to_alpha2.keys():
+            currency_region = self.currency_to_alpha2[region.upper()]
             if len(currency_region) == 1:
                 return currency_region[0], "currency"
             else:
                 raise ValueError("'%s' is used in several countries thus cannot be mapped to a single nation." % (region))
+
         elif region.lower().title() in self.region_to_alpha2.keys():
             return self.region_to_alpha2[region.lower().title()], "natural"
+
+        elif self.fuzzy_match_threshold != None:
+            fuzzy_match = self._fuzzy_search(region)
+            if fuzzy_match != None:
+                return fuzzy_match, "natural"
+            else:
+                raise ValueError("Region Error. '%s' could not be matched to a known country. See options()." % (region))
+
         else:
             raise ValueError("Region Error. '%s' is not recognized by EasyMoney. See options()." % (region))
 
-    def region_map(self, region, map_to = 'alpha2'):
+    def region_map(self, region, map_to = 'alpha2', return_region_type = False):
         """
 
         Map a 'region' to any one of: ISO Alpha2, ISO Alpha3 or Currency Code as well as its Natural Name.
@@ -197,12 +272,15 @@ class EasyPeasy(object):
         :param map_to: 'alpha2', 'alpha3' 'currency' or 'natural' for ISO Alpha2, ISO Alpha2, Currency Code and
                         Natural Names, respectively. Defaults to 'alpha2'.
         :type map_to: str
+        :param return_region_type: if True return the type of input supplied (one of:'alpha2', 'alpha3' 'currency' or 'natural')
+                                   Defaults to False.
+        :type return_region_type: bool
         :return: the desired mapping from region to ISO Alpha2.
-        :rtype: str
+        :rtype: str or tuple
         :raises ValueError: if *map_to* is not one of 'alpha2', 'alpha3', 'currency' or 'natural'.
 
         .. warning::
-            Attempts to map common curriencies to a single nation will fail.
+            Attempts to map common currencies to a single nation will fail.
 
 
             For instance: ``EasyPeasy().region_map(region = 'EUR', map_to = 'alpha2')`` will fail because the Euro (EUR)
@@ -212,15 +290,16 @@ class EasyPeasy(object):
         # Initialize
         error_list = None
         map_to_options = ['alpha2', 'alpha3', 'currency', 'natural']
+        mapping = None
 
         # Check that map_to is valid.
         if map_to not in map_to_options:
             raise ValueError("map_to must be one of: %s." % (prettify_list_of_strings(map_to_options, 'or')))
 
         # Seperately handle requests for map_to == 'currency' when region is a currency used by several nations.
-        if region in self.currency_to_alpha2.keys() and len(self.currency_to_alpha2[region]) > 1:
+        if region.upper() in self.currency_to_alpha2.keys() and len(self.currency_to_alpha2[region.upper()]) > 1:
             if map_to == 'currency':
-                return region
+                return region.upper()
             else:
                 raise ValueError("The '%s' currency is used in multiple nations and thus cannot be mapped to a single one." \
                  % (region))
@@ -230,13 +309,15 @@ class EasyPeasy(object):
 
         # Return iso code (alpha2 or 3), currency code or natural name
         if map_to == 'alpha2':
-            return alpha2_mapping
+            mapping = alpha2_mapping
         elif map_to == 'alpha3':
-            return self.alpha2_to_alpha3[alpha2_mapping]
+            mapping = self.alpha2_to_alpha3[alpha2_mapping]
         elif map_to == 'currency':
-            return self.alpha2_to_currency[alpha2_mapping]
+            mapping = self.alpha2_to_currency[alpha2_mapping]
         elif map_to == 'natural':
-            return self.alpha2_to_region[alpha2_mapping]
+            mapping = self.alpha2_to_region[alpha2_mapping]
+
+        return (mapping, raw_region_type) if return_region_type else mapping
 
     def _try_to_get_CPI(self, region, year):
         """
@@ -244,7 +325,7 @@ class EasyPeasy(object):
         *Private Method*
         Function to look up CPI information in the cached database information.
 
-        :param region: a region (currency codes may work, provided they are not common curriencies, e.g., Euro).
+        :param region: a region (currency codes may work, provided they are not common currencies, e.g., Euro).
         :type region: str
         :param year: year for which CPI information is desired.
         :type year: int
@@ -260,7 +341,7 @@ class EasyPeasy(object):
         # convert region to alpha2
         cpi_region = self.region_map(region, map_to = 'alpha2')
 
-        # Get most recent CPI year avaliable
+        # Get most recent CPI year available
         if cpi_region not in self.cpi_dict.keys():
             raise LookupError("Could not find inflation information for '%s'." % (str(region)))
 
@@ -298,7 +379,7 @@ class EasyPeasy(object):
         |   :math:`c_{1}` = CPI of the region in *year_b*.
         |   :math:`c_{2}` = CPI of the region in *year_a*.
 
-        :param region: a region (currency codes may work, provided they are not common curriencies, e.g., Euro).
+        :param region: a region (currency codes may work, provided they are not common currencies, e.g., Euro).
         :type region: str
         :param year_a: start year.
         :type year_a: int
@@ -347,7 +428,7 @@ class EasyPeasy(object):
 
         Adjusts a given amount of money for inflation.
 
-        :param amount: a montary amount, e.g., 5.23.
+        :param amount: a monetary amount, e.g., 5.23.
         :type amount: float or int
         :param region: a geographical region, e.g., 'US'.
         :type region: str
@@ -509,7 +590,7 @@ class EasyPeasy(object):
         :param to_currency: the currency the amount is to be converted into.
         :type to_currency: str
         :param date: date of data to perform the conversion with. Dates must be of the form: ``YYYY-MM-DD`` or ``YYYY``.
-                     Defaults to "latest" (which will use the most recent data avaliable).
+                     Defaults to "latest" (which will use the most recent data available).
 
                      .. warning::
                          If a date of the form *YYYY*  is passed, the average exchange rate will be returned for that entire year.
@@ -548,7 +629,7 @@ class EasyPeasy(object):
         to_currency_fn = self.region_map(to_currency, map_to = "currency")
 
         # Return amount unaltered if self-conversion was requested.
-        if from_currency_fn == to_currency_fn:
+        if not pretty_print and from_currency_fn == to_currency_fn:
             return amount
 
         # From Euro to some currency
@@ -577,7 +658,7 @@ class EasyPeasy(object):
         if not pretty_print:
             return rounded_amount
         else:
-            print(money_printer(rounded_amount, to_currency, round_to = self.round_to))
+            print(money_printer(rounded_amount, self.region_map(to_currency, 'currency'), round_to = self.round_to))
 
     def normalize(self, amount, currency, from_year, to_year = "latest", base_currency = "EUR", exchange_date = None, pretty_print = False):
         """
@@ -588,7 +669,7 @@ class EasyPeasy(object):
           See ``options(info = 'all', overlap_only = True)`` for an exhaustive listing of valid values to pass to this method.
         |
         | Currency Normalization occurs in two steps:
-        |       1. Adjust the currency for inflation, e.g., 100 (2010 :math:`CUR_{1}`) :math:`\longrightarrow` x (2015 :math:`CUR_{1}`).
+        |       1. Adjust the currency for inflation, e.g., 100 (2010 :math:`CUR_{1}`) → x (2015 :math:`CUR_{1}`).
         |       2. Convert the adjusted amount into the *base_currency*.
 
         :param amount: a numeric amount of money.
@@ -597,7 +678,7 @@ class EasyPeasy(object):
         :type currency: str
         :param from_year: a year. For legal values see ``options()``.
         :type from_year: int
-        :param to_year: a year. For legal values see ``options()``. Defaults to 'latest' (which will use the most recent data avaliable).
+        :param to_year: a year. For legal values see ``options()``. Defaults to 'latest' (which will use the most recent data available).
 
                         .. warning::
                             If *to_year* is set to a specific year rather than to its default ('latest') and
@@ -629,7 +710,7 @@ class EasyPeasy(object):
 
                                (b) *to_year* is not numeric (``float`` or ``int``) OR
 
-                               (c) *to_year* is greater than the year for which most recent inflation information is avaliable.
+                               (c) *to_year* is greater than the year for which most recent inflation information is available.
         """
         # Initialize
         most_recent_cpi_record = None
@@ -657,11 +738,11 @@ class EasyPeasy(object):
             else:
                 raise ValueError("to_year invalid; '%s' is not numeric (intiger or float).")
         elif to_year != "latest" and float(to_year) > float(most_recent_cpi_record):
-            raise ValueError("No data avaliable for '%s' in %s. Try %s or earlier." % (currency, str(to_year), str(most_recent_cpi_record)))
+            raise ValueError("No data available for '%s' in %s. Try %s or earlier." % (currency, str(to_year), str(most_recent_cpi_record)))
         else:
             inflation_year_b = most_recent_cpi_record
             if float(inflation_year_b) <= (datetime.datetime.now().year - 2):
-                warn("Inflation information not avaliable for '%s', using %s." % (to_year, inflation_year_b))
+                warn("Inflation information not available for '%s', using %s." % (to_year, inflation_year_b))
 
         # Adjust input for inflation
         currency_adj_inflation = self.inflation_calculator(amount, from_region, from_year, inflation_year_b)
@@ -676,13 +757,13 @@ class EasyPeasy(object):
         if not pretty_print:
             return adjusted_amount
         else:
-            print(money_printer(adjusted_amount, to_currency, round_to = self.round_to))
+            print(money_printer(adjusted_amount, self.region_map(to_currency, 'currency'), round_to = self.round_to))
 
     def _date_options(self, nested_date_dict, keys_as_dates = False, date_format = "%Y-%m-%d"):
         """
 
         *Private Method*
-        Function that figures out how to return dates for which data is avaliable.
+        Function that figures out how to return dates for which data is available.
 
         Expected structures:
             1. ``keys_as_dates = True``:  ``{DATE: {KEY: VALUE}, DATE: {KEY: VALUE}...}``; DATE: ``YYYY-MM-DD``
@@ -748,8 +829,8 @@ class EasyPeasy(object):
         *Private Method*
         Function to construct a dataframe of currencies for which EasyMoney has data on.
 
-        :param min_max_dates: if True, only report the minimum and maximum date for which data is avaliable;
-                              if False, all dates for which which data is avaliable will be reported.
+        :param min_max_dates: if True, only report the minimum and maximum date for which data is available;
+                              if False, all dates for which which data is available will be reported.
         :type min_max_dates: bool
         :return: DataFrame with all the currencies for which EasyMoney has data.
         :rtype: Pandas DataFrame
@@ -793,9 +874,12 @@ class EasyPeasy(object):
         else:
             eur_row_dates = [sorted(set(self.exchange_dict.keys()))]
 
-        eur_row = pd.DataFrame({'Region': 'Europe', 'Currency': 'EUR', 'Alpha2': np.nan, 'Alpha3': np.nan,
+        eur_row = pd.DataFrame({'Region': 'Euro', 'Currency': 'EUR', 'Alpha2': np.nan, 'Alpha3': np.nan,
                                 'Range': eur_row_dates},
-                                 index=[0], columns=currency_ops.columns.tolist())
+                                 index = [0], columns = currency_ops.columns.tolist())
+
+        # Append the Europe Row
+        currency_ops = currency_ops.append(eur_row, ignore_index = True)
 
         # Sort by Region
         currency_ops.sort_values(['Region'], ascending = [1], inplace = True)
@@ -810,8 +894,8 @@ class EasyPeasy(object):
 
         *Private Method*
         Determines the inflation (CPI) information cached.
-        :param min_max_dates: if True, only report the minimum and maximum date for which data is avaliable;
-                              if False, all dates for which which data is avaliable will be reported.
+        :param min_max_dates: if True, only report the minimum and maximum date for which data is available;
+                              if False, all dates for which which data is available will be reported.
         :type min_max_dates: bool
         :return: a dataframe with all CPI information EasyMoney has, as well as date ranges the date exists for.
         :rtype: Pandas DataFrame
@@ -928,8 +1012,8 @@ class EasyPeasy(object):
 
         :param info: 'exchange' for exchange rate; 'inflation' for inflation information; 'all' for both.
         :type info: str
-        :param min_max_dates: if True, only report the minimum and maximum date for which data is avaliable;
-                              if False, all dates for which which data is avaliable will be reported.
+        :param min_max_dates: if True, only report the minimum and maximum date for which data is available;
+                              if False, all dates for which which data is available will be reported.
         :type min_max_dates: bool
         :return: DataFrame with the requested information
         :rtype: Pandas DataFrame
@@ -948,7 +1032,7 @@ class EasyPeasy(object):
         # Get years Countries changed curriency.
         # Note: sadly, Pandas Series of dtype 'int' cannot contain NaNs. Using the 'object' dtype instead.
         transitions = pandas_dictkey_to_key_unpack(info_table['Alpha2'], self.transitions_dict, True).map(
-            lambda x: x if len(x[0]) > 2 else '')
+            lambda x: x if str(x) != 'nan' and len(x[0]) > 2 else '')
 
         # add to info_table
         info_table['Transitions'] = transitions
@@ -964,12 +1048,12 @@ class EasyPeasy(object):
                 , min_max_dates = True):
         """
 
-        An easy inferface to explore all of the terminology EasyMoney understands
+        An easy interface to explore all of the terminology EasyMoney understands
         as well the dates for which data is available.
 
         :param info: 'exchange', 'inflation' or 'all' ('all' requires rformat is set to 'table').
         :type info: str
-        :param rformat: 'table' for a table or 'list' for just the currecy codes, alone. Defaults to 'table'.
+        :param rformat: 'table' for a table or 'list' for just the currency codes, alone. Defaults to 'table'.
         :type rformat: str
         :param pretty_table: prettifies the options table. Defaults to True.
         :type pretty_table: bool
@@ -979,8 +1063,8 @@ class EasyPeasy(object):
         :param overlap_only: when info is set to 'all', keep only those rows for which exchange rate and inflation data
                              overlap.
         :type overlap_only: bool
-        :param min_max_dates: if True, only report the minimum and maximum date for which data is avaliable;
-                              if False, all dates for which data is avaliable will be reported. Defaults to True.
+        :param min_max_dates: if True, only report the minimum and maximum date for which data is available;
+                              if False, all dates for which data is available will be reported. Defaults to True.
         :type min_max_dates: bool
         :return: DataFrame of Currency Information EasyMoney Understands.
         :rtype: Pandas DataFrame
@@ -1003,7 +1087,7 @@ class EasyPeasy(object):
 
         # Check options request
         if info not in info_options:
-            raise ValueError("info must be one of: %s" % (prettify_list_of_strings(info_options, 'or')))
+            raise ValueError("'%' not recognized. Info must be one of: %s." % (prettify_list_of_strings(info_options, 'or')))
 
         # Create a lambda to convert the InflationRange lists to lists of ints (from lists of strings).
         year_to_int = lambda x: np.NaN if 'nan' in str(x) else [[floater(i, False, True) for i in x]][0]

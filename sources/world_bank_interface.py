@@ -70,8 +70,8 @@ class WorldBankParse(object):
         self.alpha2_to_alpha3 = dict(zip(country_codes['Alpha2'].tolist(), country_codes['Alpha3'].tolist()))
 
         # Alpha2 --> Currency Code
-        self.alpha2_to_currency_code = dict.fromkeys(set([i for sublist in self.CurrencyRelationshipsDB.Alpha2.tolist() for i in sublist]))
-        for i in zip(self.CurrencyRelationshipsDB.Alpha2.tolist(), self.CurrencyRelationshipsDB.CurrencyCode.tolist()):
+        self.alpha2_to_currency_code = dict.fromkeys(set([i for sublist in self.CurrencyRelationshipsDB['Alpha2'].tolist() for i in sublist]))
+        for i in zip(self.CurrencyRelationshipsDB['Alpha2'].tolist(), self.CurrencyRelationshipsDB['CurrencyCode'].tolist()):
             for j in i[0]:
                 if self.alpha2_to_currency_code[j] == None:
                     self.alpha2_to_currency_code[j] = i[1]
