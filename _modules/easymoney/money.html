@@ -291,7 +291,7 @@
 <span class="sd">                           instead of a string.</span>
 <span class="sd">        :type date_format: str</span>
 <span class="sd">        :return: the closet date, as ranked by the standard python sorting algo. (sorted() method).</span>
-<span class="sd">        :rtype: list</span>
+<span class="sd">        :rtype: ``list``</span>
 <span class="sd">        :raises AttributeError: if fall_back is set to False.</span>
 <span class="sd">        :raises ValueError: if an element in list_of_dates is not of class datetime.datetime.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -320,7 +320,7 @@
 <span class="sd">        :param region:</span>
 <span class="sd">        :type region: str</span>
 <span class="sd">        :return:</span>
-<span class="sd">        :rtype: str</span>
+<span class="sd">        :rtype: ``str``</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># Precaution to block usage of fuzzywuzzy if it is not enabled.</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">fuzzy_match_threshold</span> <span class="o">==</span> <span class="kc">None</span><span class="p">:</span>
@@ -345,7 +345,7 @@
 <span class="sd">        :param region: a region (Alpha2, Alpha3, Natural Name or currency code).</span>
 <span class="sd">        :type region: str</span>
 <span class="sd">        :return: ISO Alpha2 code.</span>
-<span class="sd">        :rtype: str</span>
+<span class="sd">        :rtype: ``str``</span>
 <span class="sd">        :raises ValueError: if ``region`` is not recognized by EasyMoney (see ``options()``).</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">region</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
@@ -406,7 +406,7 @@
 <span class="sd">                                   Defaults to False.</span>
 <span class="sd">        :type return_region_type: bool</span>
 <span class="sd">        :return: the desired mapping from region to ISO Alpha2.</span>
-<span class="sd">        :rtype: str or tuple</span>
+<span class="sd">        :rtype: ``str`` or ``tuple``</span>
 <span class="sd">        :raises ValueError: if *map_to* is not one of &#39;alpha2&#39;, &#39;alpha3&#39;, &#39;currency&#39; or &#39;natural&#39;.</span>
 
 <span class="sd">        .. warning::</span>
@@ -460,7 +460,7 @@
 <span class="sd">        :param year: year for which CPI information is desired.</span>
 <span class="sd">        :type year: int</span>
 <span class="sd">        :return: CPI information in the requested region for the requested year.</span>
-<span class="sd">        :rtype: float</span>
+<span class="sd">        :rtype: ``float``</span>
 <span class="sd">        :raises LookupError: if cannot obtain CPI information from the database.</span>
 <span class="sd">        :raises AttributeError: if not fall_back</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -524,7 +524,7 @@
 <span class="sd">                        Note: returns *nan* if :math:`c_{1}` or :math:`c_{2}` are *nan* OR :math:`c_{2}` is zero.</span>
 
 <span class="sd">                 (b) a dictionary of CPI information with years as keys, CPI as values.</span>
-<span class="sd">        :rtype: float, dict or *nan*</span>
+<span class="sd">        :rtype: ``float``, ``dict`` or ``nan``</span>
 <span class="sd">        :raises ValueError: if year_b is None and return_raw_cpi_dict is False.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># Get the CPI for year_b and year_a</span>
@@ -569,7 +569,7 @@
 <span class="sd">        :param pretty_print: if True, pretty prints the result otherwise returns the result as a float. Defaults to False.</span>
 <span class="sd">        :type pretty_print: bool</span>
 <span class="sd">        :return: :math:`amount \cdot inflation \space rate`.</span>
-<span class="sd">        :rtype: float</span>
+<span class="sd">        :rtype: ``float``</span>
 <span class="sd">        :raises ValueError: if  year_a occurs after year_b.</span>
 <span class="sd">        :raises KeyError: if inflation (CPI) information cannot be found in the inflation database.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -732,7 +732,7 @@
 <span class="sd">        :param pretty_print: if True, pretty prints the table otherwise returns the table as a pandas DataFrame. Defaults to False.</span>
 <span class="sd">        :type pretty_print: bool</span>
 <span class="sd">        :return: converted currency.</span>
-<span class="sd">        :rtype: float</span>
+<span class="sd">        :rtype: ``float``</span>
 <span class="sd">        :raises ValueError: if</span>
 
 <span class="sd">                            (a) pretty_print is not a boolean</span>
@@ -906,7 +906,7 @@
 <span class="sd">        :param date_format: a date format. Defaults to &quot;%Y-%m-%d&quot;.</span>
 <span class="sd">        :type date_format: str</span>
 <span class="sd">        :return: a date options dict.</span>
-<span class="sd">        :rtype: dict</span>
+<span class="sd">        :rtype: ``dict``</span>
 <span class="sd">        :raises ValueError: keys_as_dates is not boolean (True or False).</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># Initialize</span>
@@ -963,7 +963,7 @@
 <span class="sd">                              if False, all dates for which which data is available will be reported.</span>
 <span class="sd">        :type min_max_dates: bool</span>
 <span class="sd">        :return: DataFrame with all the currencies for which EasyMoney has data.</span>
-<span class="sd">        :rtype: Pandas DataFrame</span>
+<span class="sd">        :rtype: ``Pandas DataFrame``</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># Initialize</span>
         <span class="n">ex_dict_dates</span> <span class="o">=</span> <span class="kc">None</span>
@@ -1028,7 +1028,7 @@
 <span class="sd">                              if False, all dates for which which data is available will be reported.</span>
 <span class="sd">        :type min_max_dates: bool</span>
 <span class="sd">        :return: a dataframe with all CPI information EasyMoney has, as well as date ranges the date exists for.</span>
-<span class="sd">        :rtype: Pandas DataFrame</span>
+<span class="sd">        :rtype: ``Pandas DataFrame``</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># Initialize</span>
         <span class="n">cpi_dict_years</span> <span class="o">=</span> <span class="kc">None</span>
@@ -1067,7 +1067,7 @@
 <span class="sd">        :param list_b: of list of numerics</span>
 <span class="sd">        :type list_b: list</span>
 <span class="sd">        :return: in pseudocode: [floor_date(min), ceiling_date(max)]</span>
-<span class="sd">        :rtype: list</span>
+<span class="sd">        :rtype: ``list``</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="n">date_bounds_floor</span><span class="p">([</span><span class="n">min_max</span><span class="p">(</span><span class="n">list_a</span><span class="p">,</span> <span class="kc">True</span><span class="p">),</span> <span class="n">min_max</span><span class="p">(</span><span class="n">list_b</span><span class="p">,</span> <span class="kc">True</span><span class="p">)])</span>
 
@@ -1082,7 +1082,7 @@
 <span class="sd">        :param cpi_ops_df: a dataframe of CPI options</span>
 <span class="sd">        :type cpi_ops_df: Pandas DataFrame</span>
 <span class="sd">        :return: a DataFrame with both Currency and Inflation information</span>
-<span class="sd">        :rtype: Pandas DataFrame</span>
+<span class="sd">        :rtype: ``Pandas DataFrame``</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># Use the cpi_ops_df as a base</span>
         <span class="n">data_frame</span> <span class="o">=</span> <span class="n">cpi_ops_df</span>
@@ -1124,7 +1124,7 @@
 <span class="sd">        :param info: &#39;exchange&#39; for exchange rate; &#39;inflation&#39; for inflation information; &#39;all&#39; for both.</span>
 <span class="sd">        :type info: str</span>
 <span class="sd">        :return: a list of &#39;exchange&#39; (currency codes) or &#39;inflation&#39; (regions) EasyMoney recognizes.</span>
-<span class="sd">        :rtype: list</span>
+<span class="sd">        :rtype: ``list``</span>
 <span class="sd">        :raises ValueError: if info is not either &#39;exchange&#39; or &#39;inflation&#39;.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">info</span> <span class="o">==</span> <span class="s1">&#39;exchange&#39;</span><span class="p">:</span>
@@ -1146,7 +1146,7 @@
 <span class="sd">                              if False, all dates for which which data is available will be reported.</span>
 <span class="sd">        :type min_max_dates: bool</span>
 <span class="sd">        :return: DataFrame with the requested information</span>
-<span class="sd">        :rtype: Pandas DataFrame</span>
+<span class="sd">        :rtype: ``Pandas DataFrame``</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># Initialize</span>
         <span class="n">info_table</span> <span class="o">=</span> <span class="kc">None</span>
@@ -1197,7 +1197,7 @@
 <span class="sd">                              if False, all dates for which data is available will be reported. Defaults to True.</span>
 <span class="sd">        :type min_max_dates: bool</span>
 <span class="sd">        :return: DataFrame of Currency Information EasyMoney Understands.</span>
-<span class="sd">        :rtype: Pandas DataFrame</span>
+<span class="sd">        :rtype: ``Pandas DataFrame``</span>
 <span class="sd">        :raises ValueError: if</span>
 
 <span class="sd">                            (a) rformat is not either &#39;list&#39; or &#39;table&#39; OR</span>
