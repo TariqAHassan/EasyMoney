@@ -28,15 +28,17 @@ from easymoney.support_money import dict_list_unpack
 from easymoney.support_money import dict_merge
 from easymoney.support_money import floater
 from easymoney.support_money import key_value_flip
+from easymoney.support_money import list_flatten
 from easymoney.support_money import min_max
 from easymoney.support_money import money_printer
 from easymoney.support_money import prettify_list_of_strings
 from easymoney.support_money import remove_from_dict
-from easymoney.support_money import transition_dict_generator
 from easymoney.support_money import str_to_datetime
 
 from easymoney.easy_pandas import pandas_dictkey_to_key_unpack
 from easymoney.easy_pandas import pandas_print_full
+from easymoney.easy_pandas import pandas_list_column_to_str
+from easymoney.easy_pandas import prettify_all_pandas_list_cols
 from easymoney.easy_pandas import twoD_nested_dict
 
 from sources.databases import DatabaseManagment
@@ -49,10 +51,10 @@ class EasyPeasy(object):
 
     Tools for Monetary Information and Conversions.
 
-    :param database_path: an alternative path to the database files. If this directory does not all of
-                          contain the required databases, those that are missing will be generated.
-                          Otherwise, the databases therein will supplant those used by automatically EasyMoney.
-                          Defaults to None.
+    :param database_path: an alternative path to the database files.
+                          Databases therein will supplant those used automatically by EasyMoney.
+                          If this directory does not contain all of the required databases, those that are missing will
+                          be generated. Defaults to None.
     :type database_path: str
     :param precision: number of places to round to when returning results. Defaults to 2.
     :type precision: int
@@ -112,11 +114,32 @@ class EasyPeasy(object):
         self.ConsumerPriceIndexDB    = required_databases[4]
         self.CurrencyRelationshipsDB = required_databases[5]
 
+        # Transition Tuples
+        t_tuples_lambda = lambda x: (x['OldCurrency'], x['NewCurrency'], x['Date'])
+        self.CurrencyTransitionDB['transition_tuples'] = self.CurrencyTransitionDB.apply(t_tuples_lambda, axis = 1)
+
+        # Exchange Rates Dates as strings.
+        self.ExchangeRatesDB['Date'] = self.ExchangeRatesDB['Date'].astype(str)
+
+        # Group Dates by Currency
+        currency_ex_dates = self.ExchangeRatesDB.groupby('Currency')['Date'].apply(
+            lambda x: sorted(x.tolist())).reset_index()
+
+        # Convert currency_ex_dates to Dict
+        self.currency_ex_dict = dict(zip(currency_ex_dates['Currency'].tolist(), currency_ex_dates['Date'].tolist()))
+
         # Convert the ExchangeRatesDB to a dict for faster look up speed.
         self.exchange_dict = _exchange_rates_from_datafile(self.ExchangeRatesDB)[0]
 
+        # Find the min and max exchange date in the dictionary
+        min_exchange_date = pd.to_datetime(self.ExchangeRatesDB['Date'].min()).year
+        max_exchange_date = pd.to_datetime(self.ExchangeRatesDB['Date'].max()).year
+
         # Create currency transitions dictionary
-        self.transitions_dict = transition_dict_generator(self.CurrencyTransitionDB, 'Alpha2', 'Date', 'NewCurrency')
+        # with only those transitions ocurring between min and max.
+        self.transition_dict = self.CurrencyTransitionDB[
+            self.CurrencyTransitionDB['Date'].between(min_exchange_date, max_exchange_date)].groupby(
+            'Alpha2').apply(lambda x: x['transition_tuples'].tolist()).to_dict()
 
         # Create CPI dict
         self.cpi_dict = twoD_nested_dict(self.ConsumerPriceIndexDB, 'Alpha2', 'Year', 'CPI', to_float = ['CPI'], to_int = ['Year'])
@@ -161,7 +184,7 @@ class EasyPeasy(object):
                            instead of a string.
         :type date_format: str
         :return: the closet date, as ranked by the standard python sorting algo. (sorted() method).
-        :rtype: list
+        :rtype: ``list``
         :raises AttributeError: if fall_back is set to False.
         :raises ValueError: if an element in list_of_dates is not of class datetime.datetime.
         """
@@ -190,7 +213,7 @@ class EasyPeasy(object):
         :param region:
         :type region: str
         :return:
-        :rtype: str
+        :rtype: ``str``
         """
         # Precaution to block usage of fuzzywuzzy if it is not enabled.
         if self.fuzzy_match_threshold == None:
@@ -215,7 +238,7 @@ class EasyPeasy(object):
         :param region: a region (Alpha2, Alpha3, Natural Name or currency code).
         :type region: str
         :return: ISO Alpha2 code.
-        :rtype: str
+        :rtype: ``str``
         :raises ValueError: if ``region`` is not recognized by EasyMoney (see ``options()``).
         """
         if not isinstance(region, str):
@@ -229,7 +252,7 @@ class EasyPeasy(object):
             return ecb_currency_to_alpha2_dict[region.upper()], "currency"
 
         elif region.upper() in self.alpha3_to_alpha2.values():
-            return region, "alpha2"
+            return region.upper(), "alpha2"
 
         elif region.upper() in self.alpha3_to_alpha2.keys():
             return self.alpha3_to_alpha2[region.upper()], "alpha3"
@@ -276,7 +299,7 @@ class EasyPeasy(object):
                                    Defaults to False.
         :type return_region_type: bool
         :return: the desired mapping from region to ISO Alpha2.
-        :rtype: str or tuple
+        :rtype: ``str`` or ``tuple``
         :raises ValueError: if *map_to* is not one of 'alpha2', 'alpha3', 'currency' or 'natural'.
 
         .. warning::
@@ -284,7 +307,7 @@ class EasyPeasy(object):
 
 
             For instance: ``EasyPeasy().region_map(region = 'EUR', map_to = 'alpha2')`` will fail because the Euro (EUR)
-            is used in several nations, and thus a request to map it to a single ISO Alpha2 country code creates insurmountable
+            is used in several nations and thus a request to map it to a single ISO Alpha2 country code creates insurmountable
             ambiguity.
         """
         # Initialize
@@ -330,7 +353,7 @@ class EasyPeasy(object):
         :param year: year for which CPI information is desired.
         :type year: int
         :return: CPI information in the requested region for the requested year.
-        :rtype: float
+        :rtype: ``float``
         :raises LookupError: if cannot obtain CPI information from the database.
         :raises AttributeError: if not fall_back
         """
@@ -394,7 +417,7 @@ class EasyPeasy(object):
                         Note: returns *nan* if :math:`c_{1}` or :math:`c_{2}` are *nan* OR :math:`c_{2}` is zero.
 
                  (b) a dictionary of CPI information with years as keys, CPI as values.
-        :rtype: float, dict or *nan*
+        :rtype: ``float``, ``dict`` or ``nan``
         :raises ValueError: if year_b is None and return_raw_cpi_dict is False.
         """
         # Get the CPI for year_b and year_a
@@ -439,7 +462,7 @@ class EasyPeasy(object):
         :param pretty_print: if True, pretty prints the result otherwise returns the result as a float. Defaults to False.
         :type pretty_print: bool
         :return: :math:`amount \cdot inflation \space rate`.
-        :rtype: float
+        :rtype: ``float``
         :raises ValueError: if  year_a occurs after year_b.
         :raises KeyError: if inflation (CPI) information cannot be found in the inflation database.
         """
@@ -478,11 +501,11 @@ class EasyPeasy(object):
         else:
             print(money_printer(adjusted_amount, self.region_map(region, 'currency'), round_to = self.round_to))
 
-    def _eur_to_lcu(self, currency, date = "latest", return_max_date = False, date_format = "%Y-%m-%d"):
+    def _base_cur_to_lcu(self, currency, date = "latest", return_max_date = False, date_format = "%Y-%m-%d"):
         """
 
         *Private Method*
-        Convert from Euros to a local currency unit, e.g., CAD.
+        Convert from a base currency (Euros if usin ECB data) to a local currency unit, e.g., CAD.
 
         :param currency: a currency code or region
         :type currency: str
@@ -602,7 +625,7 @@ class EasyPeasy(object):
         :param pretty_print: if True, pretty prints the table otherwise returns the table as a pandas DataFrame. Defaults to False.
         :type pretty_print: bool
         :return: converted currency.
-        :rtype: float
+        :rtype: ``float``
         :raises ValueError: if
 
                             (a) pretty_print is not a boolean
@@ -634,11 +657,11 @@ class EasyPeasy(object):
 
         # From Euro to some currency
         if from_currency_fn == "EUR":
-            converted_amount = self._eur_to_lcu(to_currency_fn, date) * float(amount)
+            converted_amount = self._base_cur_to_lcu(to_currency_fn, date) * float(amount)
 
         # From some currency to Euro
-        elif self._eur_to_lcu(to_currency_fn) == "EUR":
-            conversion_to_invert = self._eur_to_lcu(from_currency, date)
+        elif self._base_cur_to_lcu(to_currency_fn) == "EUR":
+            conversion_to_invert = self._base_cur_to_lcu(from_currency, date)
 
             if conversion_to_invert == 0.0:
                 raise AttributeError("Cannot converted to '%s'." % (to_currency_fn))
@@ -646,10 +669,10 @@ class EasyPeasy(object):
 
         # from_currency --> Euro --> to_currency
         else:
-            conversion_to_invert = self._eur_to_lcu(from_currency_fn, date)
+            conversion_to_invert = self._base_cur_to_lcu(from_currency_fn, date)
             if conversion_to_invert == 0.0:
                 raise AttributeError("Cannot converted from '%s'." % (from_currency))
-            converted_amount = conversion_to_invert**-1 * self._eur_to_lcu(to_currency_fn, date) * float(amount)
+            converted_amount = conversion_to_invert**-1 * self._base_cur_to_lcu(to_currency_fn, date) * float(amount)
 
         # Round
         rounded_amount = round(converted_amount, self.round_to)
@@ -703,7 +726,7 @@ class EasyPeasy(object):
                               Defaults to None.
         :type exchange_date: str
         :return: amount adjusted for inflation and converted into the base currency.
-        :type: float
+        :rtype: ``float``
         :raises ValueError: if:
 
                                (a) *from_currency* does not map onto a specific region,
@@ -759,69 +782,96 @@ class EasyPeasy(object):
         else:
             print(money_printer(adjusted_amount, self.region_map(to_currency, 'currency'), round_to = self.round_to))
 
-    def _date_options(self, nested_date_dict, keys_as_dates = False, date_format = "%Y-%m-%d"):
+    def _currency_duplicate_remover(self, currency_ops):
+
+        df = copy.deepcopy(currency_ops)
+
+        # Generate the list of all overlapping currencies
+        new_currency_col = df.groupby('Alpha2').apply(lambda x: x['Currency'].tolist()).reset_index()
+
+        # Count the number of Each instance of the Alpha2 Column
+        alpha2_counts = df['Alpha2'].value_counts().reset_index()
+
+        # Return those Alpha2 Codes that exist more than twice
+        multi_alpha2 = alpha2_counts[alpha2_counts['Alpha2'] >= 2]['index'].tolist()
+
+        # Function to check if a row should be removed
+        def _keep(currency, alpha2):
+            if currency in self.CurrencyTransitionDB['OldCurrency'].tolist() and alpha2 in multi_alpha2:
+                return False
+            else:
+                return True
+
+        # Drop Duplicates
+        df = df[df.apply(lambda row: _keep(row['Currency'], row['Alpha2']), axis=1)]
+
+        # Refresh the index and return
+        return df.reset_index(drop=True), multi_alpha2
+
+    def _currency_transition_integrator(self, currency_ops, currency_ops_no_dups, multi_alpha2, min_max_dates):
         """
 
         *Private Method*
-        Function that figures out how to return dates for which data is available.
+        Solutions to some *VERY* tricky problems.
 
-        Expected structures:
-            1. ``keys_as_dates = True``:  ``{DATE: {KEY: VALUE}, DATE: {KEY: VALUE}...}``; DATE: ``YYYY-MM-DD``
-            2. ``keys_as_dates = False``: ``{KEY: {DATE: VALUE}, KEY: {DATE: VALUE}...}``; DATE: ``YYYY``
-
-        :param nested_date_dict: nested dictionary.
-        :type nested_date_dict: dict
-        :param keys_as_dates: whether or not the date information exists as the key or the key of the nested dict. Defaults to False.
-        :type keys_as_dates: bool
-        :param date_format: a date format. Defaults to "%Y-%m-%d".
-        :type date_format: str
-        :return: a date options dict.
-        :rtype: dict
-        :raises ValueError: keys_as_dates is not boolean (True or False).
+        :param currency_ops:
+        :param currency_ops_no_dups:
+        :param multi_alpha2:
+        :param min_max_dates:
+        :return:
         """
-        # Initialize
-        date_values = None
-        date_ranges_dict = dict()
-        key_key_dict = None
-        zipped_key_key = None
-        flattened_key_key = None
 
-        # Input Check
-        if not isinstance(keys_as_dates, bool):
-            raise ValueError('keys_as_dates must be a boolean.')
+        df = copy.deepcopy(currency_ops_no_dups)
 
-        # i.e., exchange_dict
-        if keys_as_dates:
+        # Create a dict of multi_alpha2's with the full range of exchange information available
+        # (regarless of currency used).
+        merged_multi_dates = {k: sorted(list_flatten(currency_ops[currency_ops['Alpha2'] == k]['CurrencyRange']))
+                              for k in multi_alpha2}
 
-            # Replace the string keys with datetimes; populate with nested keys provided they have float values
-            # (i.e., data exists for that date).
-            key_key_dict = {str_to_datetime([k], date_format)[0]: [k2 for k2, v2 in v.items() if floater(v2, True)] \
-                            for k, v in nested_date_dict.items()}
+        # min_max dates, if requested
+        multi_dates = {k: min_max(v) for k, v in merged_multi_dates.items()} if min_max_dates else merged_multi_dates
 
-            # Collapse to 2D list of lists by key
-            zipped_key_key = [[[v_i, k] for v_i in v] for k, v in key_key_dict.items()]
+        # Replace CurrencyRange of multi_alpha2's with the full range of date information for that Alpha2
+        df['CurrencyRange'] = df.apply(
+            lambda x: x['CurrencyRange'] if x['Alpha2'] not in multi_dates.keys() else multi_dates[x['Alpha2']]
+            , axis=1)
 
-            # Flatten the list for processing
-            flattened_key_key = [i for s in zipped_key_key for i in s]
+        # Add Transitions
+        df['Transitions'] = df['Alpha2'].map(
+            lambda x: self.transition_dict[x] if x in self.transition_dict.keys() else np.NaN)
 
-            # Create a new default dict
-            date_ranges_dict = defaultdict(list)
+        # For countries with noted transitions, update their Currency to the most recent used.
+        def most_recent_transition(transitions):
+            return list(filter(lambda x: str(x[2]) == max(np.array(transitions)[:, 2]), transitions))[0]
 
-            # Populate with dates; {Country : [Datetimes]}.
-            for k, v in flattened_key_key:
-                date_ranges_dict[k].append(v)
+        # Create a temp. column of currencies to update
+        df['CurrenciesToUpdate'] = df['Transitions'].map(
+            lambda x: x if str(x) == 'nan' else most_recent_transition(x))
 
-            # Convert Keys to Alpha2 and return
-            return dict((self.region_map(k), v) for k, v in date_ranges_dict.items())
+        # Define function to get CurrencyRange following merge
+        def date_range_update(current_range, new_currency, min_max_dates):
+            new_range = df['CurrencyRange'][df['Currency'] == new_currency].tolist()[0]
+            merged_dates = sorted(list_flatten([current_range, new_range]))
+            return min_max(merged_dates) if min_max_dates else merged_dates
 
-        # i.e., cpi_dict
-        elif not keys_as_dates:
-            date_ranges_dict = dict.fromkeys(nested_date_dict.keys()) # should be using region_map() here.
-            # Get the date range for each key in the nested dict
-            for k in date_ranges_dict:
-                date_values = sorted(str_to_datetime(nested_date_dict[k].keys(), date_format = date_format))
-                date_ranges_dict[k] = date_values
-            return date_ranges_dict
+        # Update Date CurrencyRange
+        df['CurrencyRange'] = df.apply(
+            lambda x: x['CurrencyRange'] if str(x['CurrenciesToUpdate']) == 'nan' \
+                else date_range_update(x['CurrencyRange'], x['CurrenciesToUpdate'][1], min_max_dates)
+            , axis=1)
+
+        # Update Currency
+        df['Currency'] = df.apply(
+            lambda x: x['Currency'] if str(x['CurrenciesToUpdate']) == 'nan' else x['CurrenciesToUpdate'][1],
+            axis=1)
+
+        # Drop 'CurrenciesToUpdate'.
+        df.drop('CurrenciesToUpdate', 1, inplace=True)
+
+        # Sort Transitions
+        df['Transitions'] = df['Transitions'].map(lambda x: sorted(x, key=lambda y: y[2]) if str(x) != 'nan' else x)
+
+        return df
 
     def _currency_options(self, min_max_dates):
         """
@@ -833,15 +883,14 @@ class EasyPeasy(object):
                               if False, all dates for which which data is available will be reported.
         :type min_max_dates: bool
         :return: DataFrame with all the currencies for which EasyMoney has data.
-        :rtype: Pandas DataFrame
+        :rtype: ``Pandas DataFrame``
         """
         # Initialize
-        ex_dict_dates = None
         all_date_ranges = None
         eur_row_dates = None
 
         # Make a currency code of possible currency codes
-        currency_ops = pd.DataFrame(self.currency_codes, columns = ["Currency"])
+        currency_ops = pd.DataFrame(self.currency_codes, columns=["Currency"])
 
         # Make the Alpha2 Column
         currency_ops['Alpha2'] = currency_ops["Currency"].replace(
@@ -855,39 +904,41 @@ class EasyPeasy(object):
         currency_ops = currency_ops[['Region', 'Currency', 'Alpha2', 'Alpha3']]
 
         # Add date information
-        dates_dict = self._date_options(nested_date_dict = self.exchange_dict, keys_as_dates = True)
-
-        if min_max_dates:
-            ex_dict_dates = dict((k, str(datetime_to_str(min_max(v)))) for k, v in dates_dict.items())
-        else:
-            ex_dict_dates = dict((k, str(datetime_to_str(v))) for k, v in dates_dict.items())
+        def currency_ex_dict_lookup(x, min_max_dates):
+            try:
+                return min_max(self.currency_ex_dict[x]) if min_max_dates else sorted(self.currency_ex_dict[x])
+            except:
+                return np.NaN
 
         # Create Date Range Column
-        currency_ops['Range'] = pandas_dictkey_to_key_unpack(currency_ops['Alpha2'].astype(str), ex_dict_dates).map(lambda x: sorted(x))
-
-        # Create Row for Europe -- min and max are the min and max of all other conversion data,
-        # because EUR is the base currency being used.
+        currency_ops['CurrencyRange'] = currency_ops['Currency'].map(
+            lambda x: currency_ex_dict_lookup(x, min_max_dates))
 
         if min_max_dates:
-            all_date_ranges = np.array(currency_ops['Range'].tolist())
-            eur_row_dates = [[min(all_date_ranges[:, 0]), max(all_date_ranges[:, 1])]]
+            all_date_ranges = np.array(currency_ops['CurrencyRange'].tolist())
+            eur_row_dates = [min(all_date_ranges[:, 0]), max(all_date_ranges[:, 1])]
         else:
-            eur_row_dates = [sorted(set(self.exchange_dict.keys()))]
+            eur_row_dates = sorted(set([i for s in currency_ops['CurrencyRange'].tolist() for i in s]))
 
         eur_row = pd.DataFrame({'Region': 'Euro', 'Currency': 'EUR', 'Alpha2': np.nan, 'Alpha3': np.nan,
-                                'Range': eur_row_dates},
-                                 index = [0], columns = currency_ops.columns.tolist())
+                                'CurrencyRange': [eur_row_dates]}, index=[0], columns=currency_ops.columns.tolist())
 
         # Append the Europe Row
-        currency_ops = currency_ops.append(eur_row, ignore_index = True)
+        currency_ops = currency_ops.append(eur_row, ignore_index=True)
 
         # Sort by Region
-        currency_ops.sort_values(['Region'], ascending = [1], inplace = True)
+        currency_ops.sort_values(['Region'], ascending=[1], inplace=True)
 
         # Correct Index
-        currency_ops.index = range(currency_ops.shape[0])
+        currency_ops.reset_index(drop=True, inplace=True)
 
-        return currency_ops
+        # Remove Duplicates
+        currency_ops_no_dups = self._currency_duplicate_remover(currency_ops)
+
+        return self._currency_transition_integrator(  currency_ops
+                                                    , currency_ops_no_dups[0]
+                                                    , currency_ops_no_dups[1]
+                                                    , min_max_dates)
 
     def _inflation_options(self, min_max_dates):
         """
@@ -898,7 +949,7 @@ class EasyPeasy(object):
                               if False, all dates for which which data is available will be reported.
         :type min_max_dates: bool
         :return: a dataframe with all CPI information EasyMoney has, as well as date ranges the date exists for.
-        :rtype: Pandas DataFrame
+        :rtype: ``Pandas DataFrame``
         """
         # Initialize
         cpi_dict_years = None
@@ -907,7 +958,7 @@ class EasyPeasy(object):
         cpi_ops.columns = ['Region', 'Currency', 'Alpha2', 'Alpha3']
         cpi_ops.index = range(cpi_ops.shape[0])
 
-        dates_dict = self._date_options(nested_date_dict = self.cpi_dict, keys_as_dates = False, date_format = '%Y')
+        dates_dict = {k: sorted(str_to_datetime(v.keys(), "%Y")) for k, v in self.cpi_dict.items()}
 
         if min_max_dates:
             cpi_dict_years = dict((k, str(min_max([i.year for i in v]))) for k, v in dates_dict.items())
@@ -915,10 +966,10 @@ class EasyPeasy(object):
             cpi_dict_years = dict((k, str([i.year for i in v])) for k, v in dates_dict.items())
 
         # Hacking the living daylights out of the pandas API
-        cpi_ops['Range'] = pandas_dictkey_to_key_unpack(cpi_ops['Alpha2'], cpi_dict_years)
+        cpi_ops['InflationRange'] = pandas_dictkey_to_key_unpack(cpi_ops['Alpha2'], cpi_dict_years)
 
         # Sort by Region and Return
-        cpi_ops.sort_values(['Region'], ascending = [1], inplace = True)
+        cpi_ops.sort_values(['InflationRange'], ascending = [1], inplace = True)
 
         # Correct Index
         cpi_ops.index = range(cpi_ops.shape[0])
@@ -937,53 +988,61 @@ class EasyPeasy(object):
         :param list_b: of list of numerics
         :type list_b: list
         :return: in pseudocode: [floor_date(min), ceiling_date(max)]
-        :rtype: list
+        :rtype: ``list``
         """
         return date_bounds_floor([min_max(list_a, True), min_max(list_b, True)])
 
-    def _currency_inflation_options(self, currency_ops_df, cpi_ops_df):
+    def _currency_inflation_options(self, min_max_dates):
         """
 
         *Private Method*
         Exchange Rate and Inflation information merged together.
 
-        :param currency_ops_df: a dataframe of currency options
-        :type currency_ops_df: Pandas DataFrame
-        :param cpi_ops_df: a dataframe of CPI options
-        :type cpi_ops_df: Pandas DataFrame
+        :param min_max_dates:
+        :type min_max_dates: bool
         :return: a DataFrame with both Currency and Inflation information
-        :rtype: Pandas DataFrame
+        :rtype: ``Pandas DataFrame``
         """
-        # Use the cpi_ops_df as a base
-        data_frame = cpi_ops_df
+        # Column Order
+        col_order = ['Region', 'Currency', 'Alpha2', 'Alpha3', 'InflationRange', 'CurrencyRange', 'Overlap', 'Transitions']
 
-        # Make a dict of currency ranges from the currency_ops_df
-        currency_range = remove_from_dict(dict(zip(currency_ops_df['Alpha2'], [str(i) for i in currency_ops_df['Range']])))
+        # Generate the Currency Options
+        currency_ops_df = self._currency_options(min_max_dates)
 
-        # Create a pandas series that maps values in currency_range to the cpi Alpha2 col.
-        currency_cpi_mapping = pandas_dictkey_to_key_unpack(data_frame['Alpha2'], currency_range)
+        # Generate the Inflation Options
+        cpi_ops_df = self._inflation_options(min_max_dates)
 
-        data_frame.rename(columns = {'Range': 'InflationRange'}, inplace = True)
+        # Define only Columns to include in currency_ops_df when merging
+        currency_cols = (currency_ops_df.columns.difference(cpi_ops_df.columns)).tolist() + ['Alpha2']
 
-        # Replace with NaNs those that could not be mapped
-        data_frame['CurrencyRange'] = currency_cpi_mapping.map(lambda x: x if "," in str(x) and len(x[0]) != 2 else np.NaN)
+        # Merge on Inflation options
+        df = pd.merge(cpi_ops_df, currency_ops_df[currency_cols], on='Alpha2', how='left')
 
         # Determine the Overlap in dates between CPI and Exchange
-        data_frame['Overlap'] = data_frame.apply(lambda row: self._date_overlap_calc(row['InflationRange'], row['CurrencyRange']), axis = 1)
+        df['Overlap'] = df.apply(lambda row: self._date_overlap_calc(row['InflationRange'], row['CurrencyRange']), axis=1)
 
         # Sort by mapping
-        data_frame['TempSort'] = data_frame.CurrencyRange.map(lambda x: 'A' if str(x) != 'nan' else 'B')
+        df['TempSort'] = df['CurrencyRange'].map(lambda x: 'A' if str(x) != 'nan' else 'B')
 
         # Apply sorting
-        data_frame.sort_values(['TempSort', 'Region'], ascending = [1, 1], inplace = True)
+        df.sort_values(['TempSort', 'Region'], ascending=[1, 1], inplace=True)
 
         # Drop the Sorting Column
-        data_frame.drop('TempSort', axis = 1, inplace = True)
+        df.drop('TempSort', axis=1, inplace=True)
 
         # Refresh the index
-        data_frame.index = range(data_frame.shape[0])
+        df.reset_index(drop=True, inplace=True)
 
-        return data_frame
+        # Overlap, Add Base Currency and Non Overlap
+        overlap_subset = df[df['Overlap'].astype(str) != 'nan']
+        base_cur_row = currency_ops_df[currency_ops_df['Region'] == 'Euro']
+        non_overlap_subset = df[df['Overlap'].astype(str) == 'nan']
+
+        # Concat
+        df = pd.concat([overlap_subset, base_cur_row, non_overlap_subset], ignore_index=True, axis=0)
+
+        # Reorder Columns
+        return df[col_order]
 
     def _list_option(self, info):
         """
@@ -994,7 +1053,7 @@ class EasyPeasy(object):
         :param info: 'exchange' for exchange rate; 'inflation' for inflation information; 'all' for both.
         :type info: str
         :return: a list of 'exchange' (currency codes) or 'inflation' (regions) EasyMoney recognizes.
-        :rtype: list
+        :rtype: ``list``
         :raises ValueError: if info is not either 'exchange' or 'inflation'.
         """
         if info == 'exchange':
@@ -1016,7 +1075,7 @@ class EasyPeasy(object):
                               if False, all dates for which which data is available will be reported.
         :type min_max_dates: bool
         :return: DataFrame with the requested information
-        :rtype: Pandas DataFrame
+        :rtype: ``Pandas DataFrame``
         """
         # Initialize
         info_table = None
@@ -1026,16 +1085,71 @@ class EasyPeasy(object):
         elif info == 'inflation':
             info_table = self._inflation_options(min_max_dates)
         elif info == 'all':
-            info_table = self._currency_inflation_options(  self._currency_options(min_max_dates)
-                                                          , self._inflation_options(min_max_dates))
+            info_table = self._currency_inflation_options(min_max_dates)
 
-        # Get years Countries changed curriency.
-        # Note: sadly, Pandas Series of dtype 'int' cannot contain NaNs. Using the 'object' dtype instead.
-        transitions = pandas_dictkey_to_key_unpack(info_table['Alpha2'], self.transitions_dict, True).map(
-            lambda x: x if str(x) != 'nan' and len(x[0]) > 2 else '')
+        return info_table
 
-        # add to info_table
-        info_table['Transitions'] = transitions
+    def _table_pretty_print(self, info_table, min_max_dates):
+        """
+
+        *Private Method*
+        Manipulations to pretty print the input DataFrame
+
+        :param info_table:
+        :type info_table: Pandas DataFrame
+        :return:
+        :rtype:
+        """
+        # Convert all lists into strings seperated by " : " if min_max else ", " (exclude Transitions column).
+        info_table = prettify_all_pandas_list_cols(data_frame=info_table
+                                                   , join_on=(" : " if min_max_dates else ", ")
+                                                   , exclude=['Transitions']
+                                                   , bracket_wrap=True)
+
+        # Join Transitions on commas, regardless of min_max_dates.
+        def transition_pretty_print_formater(t):
+            return str(t[2]) + " (" + t[0] + " to " + t[1] + ")"
+
+        if 'Transitions' in info_table.columns.tolist():
+            info_table['Transitions'] = info_table['Transitions'].map(
+                lambda x: ", ".join([transition_pretty_print_formater(t) for t in x]) if str(x) != 'nan' else x)
+
+        # Replace nans with whitespace
+        for col in info_table.columns:
+            info_table[col] = info_table[col].map(
+                lambda x: x if x != 'NAN' and str(x).lower().strip() != 'nan' else '')
+
+        # Replace number indexes with empty strings.
+        info_table.index = ['' for i in range(info_table.shape[0])]
+
+        # Pretty print the table
+        pandas_print_full(info_table)
+
+    def _options_as_raw_dataframe(self, info_table):
+        """
+
+        *Private Method*
+        Manipulations to return the dataframe for general use.
+
+        :param info_table:
+        :type info_table:
+        :return:
+        :rtype:
+        """
+        # Create a lambda to convert the InflationRange lists to lists of ints (from lists of strings).
+        year_to_int = lambda x: np.NaN if 'nan' in str(x) else [[floater(i, False, True) for i in x]][0]
+
+        # InflationRange --> list of ints
+        if 'InflationRange' in info_table.columns:
+            info_table['InflationRange'] = info_table['InflationRange'].map(year_to_int)
+
+        # CurrencyRange and Overlap columns --> list of datetimes
+        date_columns_in_table = [i for i in info_table.columns if i in ['CurrencyRange', 'Overlap']]
+
+        # Convert to date_columns to datetimes
+        if len(date_columns_in_table) > 0:
+            for col in date_columns_in_table:
+                info_table[col] = info_table[col].map(lambda x: np.NaN if str(x) == 'nan' else str_to_datetime(x))
 
         return info_table
 
@@ -1067,7 +1181,7 @@ class EasyPeasy(object):
                               if False, all dates for which data is available will be reported. Defaults to True.
         :type min_max_dates: bool
         :return: DataFrame of Currency Information EasyMoney Understands.
-        :rtype: Pandas DataFrame
+        :rtype: ``Pandas DataFrame``
         :raises ValueError: if
 
                             (a) rformat is not either 'list' or 'table' OR
@@ -1075,25 +1189,14 @@ class EasyPeasy(object):
                             (b) *overlap_only* is True while info is not 'all' and rformat is not 'table'.
 
         """
-        # This is a jumbo function.
-        # However, at this time it will not be factored it any further (see all the 'option' functions above)
-        # because, despite its size, it now it represent is a single (long) thought.
-
         # Initialize
         info_table = None
         list_options = None
         date_columns_in_table = None
-        info_options = ['exchange', 'inflation', 'all']
 
         # Check options request
-        if info not in info_options:
-            raise ValueError("'%' not recognized. Info must be one of: %s." % (prettify_list_of_strings(info_options, 'or')))
-
-        # Create a lambda to convert the InflationRange lists to lists of ints (from lists of strings).
-        year_to_int = lambda x: np.NaN if 'nan' in str(x) else [[floater(i, False, True) for i in x]][0]
-
-        # Create a lambda to convert the CurrencyRange and Overlap columns to datetime
-        full_date_to_datetime = lambda x: np.NaN if str(x) == 'nan' else str_to_datetime(x)
+        if info not in ['exchange', 'inflation', 'all']:
+            raise ValueError("'%' not recognized. Info must be one of 'exchange', 'inflation' or 'all'." % (info))
 
         # Check value suppled to rformat
         if rformat not in ['list', 'table']:
@@ -1111,36 +1214,21 @@ class EasyPeasy(object):
 
         # Generate a table
         elif rformat == 'table':
+
+            # Generate Requested Table
             info_table = self._table_option(info, min_max_dates)
+
             # Limit to overlap, if requested
-            if overlap_only == True:
-                info_table.dropna(subset = ['Overlap'], how = 'all', inplace = True)
+            if overlap_only == True: info_table.dropna(subset = ['Overlap'], how = 'all', inplace = True)
 
             # Print the full table or return
             if pretty_print:
-                # Replace number indexes with empty strings.
-                if pretty_table:
-                    info_table.index = ['' for i in range(info_table.shape[0])]
-
-                # Pretty print the table
-                pandas_print_full(info_table)
-
+                self._table_pretty_print(info_table, min_max_dates)
             elif not pretty_print:
-                # InflationRange --> list of ints
-                if 'InflationRange' in info_table.columns:
-                    info_table['InflationRange'] = info_table['InflationRange'].map(year_to_int)
+                return self._options_as_raw_dataframe(info_table)
 
-                # Replace the '' in the Transitions column with NaNs
-                info_table['Transitions'] = \
-                    info_table['Transitions'].map(lambda x: np.NaN if str(x).strip() == '' else [x])
 
-                # CurrencyRange and Overlap columns --> list of datetimes
-                date_columns_in_table = [i for i in info_table.columns if i in ['CurrencyRange', 'Overlap']]
-                if len(date_columns_in_table) > 0:
-                    for col in date_columns_in_table:
-                        info_table[col] = info_table[col].map(full_date_to_datetime)
 
-                return info_table
 
 
 

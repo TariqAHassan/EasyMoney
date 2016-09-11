@@ -131,6 +131,15 @@ def prettify_list_of_strings(input_list, final_join = "and", all_commas_override
     elif len(input_list) > 2:
         return ", ".join(input_list[:-1]) + final_join_with_tails + input_list[-1]
 
+def list_flatten(input_list):
+    """
+
+    :param input_list:
+    :type input_list:
+    :return:
+    :rtype:
+    """
+    return [i for s in input_list for i in s]
 
 # -------------------------------------------------------------------------------------------------------------------- #
 #                                                          Dictionary Tools                                            #
@@ -231,30 +240,30 @@ def dict_merge(first_dict, second_dict):
     # Return
     return new_dict
 
-def transition_dict_generator(data_frame, nest_col_a, nest_col_b, nest_col_c):
-    """
-
-    Generate a dictionary of currency transitions.
-
-    :param data_frame: see ``easy_pandas``'s ``twoD_nested_dict()`` method.
-    :type data_frame: Pandas DataFrame
-    :param nest_col_a: see ``easy_pandas``'s ``twoD_nested_dict()`` method.
-    :type nest_col_a: str
-    :param nest_col_b: see ``easy_pandas``'s ``twoD_nested_dict()`` method.
-    :type nest_col_b: str
-    :param nest_col_c: see ``easy_pandas``'s ``twoD_nested_dict()`` method.
-    :type nest_col_c: str
-    :return: a dictionary of currency transitions of the form {Alpha2 : ['date1 (CUR1), 'date2 (CUR2)'...]}
-    :rtype: dict
-    """
-    # Create a nested Dict
-    transitions_dict_raw = twoD_nested_dict(data_frame, nest_col_a, nest_col_b, nest_col_c, engine='fast')
-
-    # Combine nested dict's keys and values into a single string
-    transitions_dict_list = {k: [str(i) + " (" + j + ")" for i, j in v.items()] for k, v in transitions_dict_raw.items()}
-
-    # Sort by date and Return
-    return {k: sorted(v, key = lambda x: x[:4]) for k, v in transitions_dict_list.items()}
+# def transition_dict_generator(data_frame, nest_col_a, nest_col_b, nest_col_c):
+#     """
+#
+#     Generate a dictionary of currency transitions.
+#
+#     :param data_frame: see ``easy_pandas``'s ``twoD_nested_dict()`` method.
+#     :type data_frame: Pandas DataFrame
+#     :param nest_col_a: see ``easy_pandas``'s ``twoD_nested_dict()`` method.
+#     :type nest_col_a: str
+#     :param nest_col_b: see ``easy_pandas``'s ``twoD_nested_dict()`` method.
+#     :type nest_col_b: str
+#     :param nest_col_c: see ``easy_pandas``'s ``twoD_nested_dict()`` method.
+#     :type nest_col_c: str
+#     :return: a dictionary of currency transitions of the form {Alpha2 : ['date1 (CUR1), 'date2 (CUR2)'...]}
+#     :rtype: dict
+#     """
+#     # Create a nested Dict
+#     transitions_dict_raw = twoD_nested_dict(data_frame, nest_col_a, nest_col_b, nest_col_c, engine='fast')
+#
+#     # Combine nested dict's keys and values into a single string
+#     transitions_dict_list = {k: [str(i) + " (" + j + ")" for i, j in v.items()] for k, v in transitions_dict_raw.items()}
+#
+#     # Sort by date and Return
+#     return {k: sorted(v, key = lambda x: x[:4]) for k, v in transitions_dict_list.items()}
 
 
 # -------------------------------------------------------------------------------------------------------------------- #

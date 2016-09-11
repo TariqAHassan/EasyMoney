@@ -21,12 +21,19 @@ sys.path.insert(0, os.path.abspath("../"))
 from easymoney.money import EasyPeasy
 
 # Set the Data Path
-PATH = str(os.getcwd()).split('EasyMoney', 1)[0] + "EasyMoney/"
+currrent_dir = str(os.getcwd())
+
+PATH = ''
+if 'EasyMoney' in currrent_dir:
+    PATH = currrent_dir.split('EasyMoney', 1)[0] + "EasyMoney/"
+elif 'easymoney' in currrent_dir:
+    PATH = currrent_dir.split('easymoney', 1)[0] + "easymoney/"
+
 
 # Import from sources' data folder
 ep_default = EasyPeasy(PATH + "sources/data")
 
-# Import from tests' test_data folder
+# Import all Data from tests' test_data folder
 ep_alternative = EasyPeasy(PATH + "tests/test_data")
 
 
@@ -116,7 +123,6 @@ class OptionTests(unittest.TestCase):
         # Assert there are more than lists of two (i.e, [min, max] in the CurrencyRange column
         self.assertEqual(max([len(l) for l in all_dates_options_df['CurrencyRange'] if isinstance(l, list)]) > 2, True)
 
-
 class FunctionalityTests(unittest.TestCase):
     """
 
@@ -144,13 +150,13 @@ class FunctionalityTests(unittest.TestCase):
         self.inflation_options_df = ep_default.options(info = "inflation", rformat = 'table', pretty_print = False)
 
         # Construct a {Alpha2: [min(inflation_data), max(inflation_data)]} dict w.r.t. the inflation_options_df.
-        self.inflation_dict = dict(zip(self.inflation_options_df.Alpha2, self.inflation_options_df.Range))
+        self.inflation_dict = dict(zip(self.inflation_options_df['Alpha2'], self.inflation_options_df['InflationRange']))
 
         # Request a Pandas DataFrame with all overlap information (between exchange rate and inflation).
         self.overlap_options_df = ep_default.options(info = "all", rformat = 'table', overlap_only = True, pretty_print = False)
 
         # Construct a {Alpha2: [min(inflation_data), max(inflation_data)]} dict  w.r.t. the overlap_options_df.
-        self.overlap_dict = dict(zip(self.overlap_options_df.Alpha2, self.overlap_options_df.InflationRange))
+        self.overlap_dict = dict(zip(self.overlap_options_df['Alpha2'], self.overlap_options_df['InflationRange']))
 
     def test_region_map(self):
         """

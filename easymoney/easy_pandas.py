@@ -212,7 +212,7 @@ def twoD_nested_dict(data_frame
     elif engine == 'fast':
         return _fast_pd_nester(data_frame, nest_col_a, nest_col_b, nest_col_c, keys_to_str)
 
-def pandas_list_column_to_str(data_frame, columns):
+def pandas_list_column_to_str(data_frame, columns, join_on = ", ", bracket_wrap = False):
     """
 
     Tool for converting the columns in a Pandas DataFrame
@@ -222,14 +222,18 @@ def pandas_list_column_to_str(data_frame, columns):
     :type data_frame: Pandas DataFrame
     :param columns: a list of columns in the DataFrame
     :type columns: list
+    :param join_on: a string to join on. Defaults to ", ".
+    :type join_on: str
     :return: a DataFrame with the columns altered in the manner described above.
     :rtype: Pandas DataFrame
     """
-    data_frame = copy.deepcopy(data_frame)
+    df = copy.deepcopy(data_frame)
     for col in columns:
-        data_frame[col] = data_frame[col].map(lambda x: ", ".join([str(i) if not isinstance(i, str) else i for i in x]))
+        df[col] = df[col].map(lambda x: join_on.join(x) if str(x) != 'nan' else x)
+        if bracket_wrap:
+            df[col] = df[col].map(lambda x: "[" + str(x) + "]" if str(x) != 'nan' else x)
 
-    return data_frame
+    return df
 
 def pandas_str_column_to_list(data_frame, columns):
     """
@@ -250,11 +254,44 @@ def pandas_str_column_to_list(data_frame, columns):
 
     return data_frame
 
+def type_in_series(series):
+    """
+    Return the types of objects in a Pandas Series
+    :param series:
+    :type series: Pandas Series
+    :return:
+    :rtype: list
+    """
+    return list(set([type(i).__name__ if str(i).strip() not in ['nan', ''] else 'nan' for i in series]))
 
+def prettify_all_pandas_list_cols(data_frame, join_on = ", ", allow_nan = True, exclude = [], bracket_wrap = False):
+    """
 
+    Converts all columns with only lists to list-seperated-strings.
 
+    :param data_frame:
+    :type data_frame: Pandas DataFrame
+    :param nan: allow nans
+    :type nan: bool
+    :param join_on: a string to join on. Defaults to ", ".
+    :type join_on: str
+    :param exclude: columns to exclude Defaults to an empty-list, [].
+    :type exclude: list
+    :param bracket_wrap: wrap in brackets
+    :type bracket_wrap: bool
+    :return:
+    :rtype: Pandas DataFrame
+    """
+    allowed = [['list'], ['list', 'nan']] if allow_nan else [['list']]
 
+    # Find allowed columns
+    cols_to_prettify = \
+        [c for c in data_frame.columns if sorted(type_in_series(data_frame[c])) in allowed and c not in exclude]
 
+    if len(cols_to_prettify) == 0:
+        return data_frame
+    else:
+        return pandas_list_column_to_str(data_frame, cols_to_prettify, join_on, bracket_wrap)
 
 
 

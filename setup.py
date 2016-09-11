@@ -17,7 +17,7 @@ setup(
     description = ("Tools for Monetary Information and Conversions."),
     long_description = markdown_reader('README.md'),
     license = "BSD",
-    keywords = 'economics, finance',
+    keywords = 'economics, finance, inflation, currency converter, data analysis, data science',
     url = "https://github.com/TariqAHassan/EasyMoney.git",
     packages = find_packages(exclude = [  "tests.*"
                                         , "tests"
@@ -31,6 +31,7 @@ setup(
                    , "Natural Language :: English"
                    , "Intended Audience :: Financial and Insurance Industry"
                    , "Intended Audience :: Science/Research"
+                   , "Programming Language :: Python :: 3.4"
                    , "Programming Language :: Python :: 3.5"
                    , "Environment :: MacOS X"
                    , "License :: OSI Approved :: BSD License"
