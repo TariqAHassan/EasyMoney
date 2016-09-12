@@ -52,6 +52,7 @@ class DataNavigator(object):
     :type database_path: str
     """
 
+
     def __init__(self, database_path):
         """
 
@@ -71,7 +72,7 @@ class DataNavigator(object):
 
         # Transition Tuples
         t_tuples_lambda = lambda x: (x['OldCurrency'], x['NewCurrency'], x['Date'])
-        self.CurrencyTransitionDB['transition_tuples'] = self.CurrencyTransitionDB.apply(t_tuples_lambda, axis=1)
+        self.CurrencyTransitionDB['TransitionTuples'] = self.CurrencyTransitionDB.apply(t_tuples_lambda, axis=1)
 
         # Exchange Rates Dates as strings.
         self.ExchangeRatesDB['Date'] = self.ExchangeRatesDB['Date'].astype(str)
@@ -90,7 +91,7 @@ class DataNavigator(object):
         # Currency transitions dictionary (only those transitions between min and max year).
         self.transition_dict = self.CurrencyTransitionDB[
             self.CurrencyTransitionDB['Date'].between(min_exchange_date, max_exchange_date)].groupby(
-            'Alpha2').apply(lambda x: x['transition_tuples'].tolist()).to_dict()
+            'Alpha2').apply(lambda x: x['TransitionTuples'].tolist()).to_dict()
 
         # Create CPI dict
         self.cpi_dict = twoD_nested_dict(self.ConsumerPriceIndexDB, 'Alpha2', 'Year', 'CPI', to_float=['CPI']
@@ -133,7 +134,6 @@ class DataNavigator(object):
         :return: currency_ops with duplicates removed
         :rtype: Pandas DataFrame
         """
-
         df = copy.deepcopy(currency_ops)
 
         # Generate the list of all overlapping currencies
@@ -186,7 +186,6 @@ class DataNavigator(object):
         :return: dataframe with information
         :rtype: ``Pandas DataFrame``
         """
-
         df = copy.deepcopy(currency_ops_no_dups)
 
         # Create a dict of multi_alpha2's with the full range of exchange information available
@@ -282,7 +281,7 @@ class DataNavigator(object):
             all_date_ranges = np.array(currency_ops['CurrencyRange'].tolist())
             eur_row_dates = [min(all_date_ranges[:, 0]), max(all_date_ranges[:, 1])]
         else:
-            eur_row_dates = sorted(set([i for s in currency_ops['CurrencyRange'].tolist() for i in s]))
+            eur_row_dates = sorted(set(list_flatten(currency_ops['CurrencyRange'].tolist())))
 
         eur_row = pd.DataFrame({'Region': 'Euro', 'Currency': 'EUR', 'Alpha2': np.nan, 'Alpha3': np.nan,
                                 'CurrencyRange': [eur_row_dates]}, index=[0], columns=currency_ops.columns.tolist())
@@ -463,6 +462,8 @@ class DataNavigator(object):
 
         :param info_table: yeild from ``_table_option()``.
         :type info_table: Pandas DataFrame
+        :param min_max_dates: see ``_table_option()``.
+        :type min_max_dates: bool
         """
         # Convert all lists into strings seperated by " : " if min_max else ", " (exclude Transitions column).
         info_table = prettify_all_pandas_list_cols(data_frame=info_table
@@ -522,20 +523,6 @@ class DataNavigator(object):
                     info_table[col] = info_table[col].map(lambda x: np.NaN if str(x) == 'nan' else str_to_datetime(x))
 
         return info_table
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 

@@ -75,6 +75,7 @@ def money_printer(money, currency=None, year=None, round_to=2):
     money_to_handle = str(round(floater(money), round_to))
     split_money = money_to_handle.split(".")
     to_return = None
+    to_print = None
 
     if len(split_money[1]) == 1:
         to_return = money_to_handle + "0"
@@ -89,10 +90,11 @@ def money_printer(money, currency=None, year=None, round_to=2):
         tail = (str(year) if year != None else '') + \
                (" " if isinstance(currency, str) and year != None else '') + \
                (str(currency) if isinstance(currency, str) else '')
-        return to_return + (" " + tail if isinstance(currency, str) and year == None else " (" + tail + ")")
+        to_print = to_return + (" " + tail if isinstance(currency, str) and year == None else " (" + tail + ")")
     else:
-        return to_return
+        to_print = to_return
 
+    print(to_print)
 
 # -------------------------------------------------------------------------------------------------------------------- #
 #                                                      List Manipulation Tools                                         #
@@ -330,11 +332,29 @@ def date_bounds_floor(date_ranges):
     # Compute the floors and return
     return [max(rounded_dates[0]), min(rounded_dates[1])]
 
+def year_from_string(year):
+    """
 
+    Function to return the year from a given date format or the current date
+    if year is 'latest'.
 
+    :param year: a year
+    :type year: str
+    :return: year
+    :rtype: ``int``
+    """
+    if year == 'latest':
+        year = datetime.datetime.today().year
+    else:
+        try:
+            year = str_to_datetime(str(year), date_format="%Y-%m-%d").year
+        except ValueError as e:
+            try:
+                year = str_to_datetime(str(year), date_format="%Y").year
+            except:
+                raise ValueError("Could not extract year information from '%s'." % (str(year)))
 
-
-
+    return year
 
 
 

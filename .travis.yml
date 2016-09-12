@@ -6,7 +6,7 @@ python:
 cache: pip3
 install: "pip3 install fuzzywuzzy numpy pandas requests wbdata"
 # command to run tests
-script: python3 tests/easy_tests.py
+script: python3 -W"ignore" tests/easy_tests.py
 notifications:
     on_success: never
     on_failure: never

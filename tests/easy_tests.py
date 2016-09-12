@@ -11,6 +11,7 @@
 import os
 import sys
 import unittest
+import warnings
 import pandas as pd
 
 # Allow access to modules
@@ -29,12 +30,15 @@ if 'EasyMoney' in currrent_dir:
 elif 'easymoney' in currrent_dir:
     PATH = currrent_dir.split('easymoney', 1)[0] + "easymoney/"
 
-
-# Import from sources' data folder
+# Import from sources' data directory.
 ep_default = EasyPeasy(PATH + "sources/data")
 
-# Import all Data from tests' test_data folder
+# Import from sources' data directory and enable fuzzy search
+ep_fuzzy = EasyPeasy(PATH + "sources/data", fuzzy_match_threshold = 85)
+
+# Import all Data from tests' test_data directory.
 ep_alternative = EasyPeasy(PATH + "tests/test_data")
+
 
 
 class OptionTests(unittest.TestCase):
@@ -202,13 +206,21 @@ class FunctionalityTests(unittest.TestCase):
 
         # LCU --> EUR
         for c in self.exchange_options_list:
-            lcu_to_eur = ep_default.currency_converter(100, c, 'EUR', date = 'latest')
-            self.assertEqual(isinstance(lcu_to_eur, (float, int)), True)
+            try:
+                lcu_to_eur = ep_default.currency_converter(100, c, 'EUR', date = 'latest')
+            except ValueError as e:
+                if 'is not valid in' not in str(e):
+                    raise ValueError("Could not convert '%s' in to 'EUR'" % (c))
+                self.assertEqual(isinstance(lcu_to_eur, (float, int)), True)
 
         # EUR --> LCU
         for c in self.exchange_options_list:
-            lcu_to_eur = ep_default.currency_converter(100, 'EUR', c, date = 'latest')
-            self.assertEqual(isinstance(lcu_to_eur, (float, int)), True)
+            try:
+                lcu_to_eur = ep_default.currency_converter(100, 'EUR', c, date = 'latest')
+            except ValueError as e:
+                if 'is not valid in' not in str(e):
+                    raise ValueError("Could not convert '%s' in to 'EUR'" % (c))
+                self.assertEqual(isinstance(lcu_to_eur, (float, int)), True)
 
     def test_currency_converter_EUR_USD(self):
         """
@@ -303,19 +315,33 @@ class FunctionalityTests(unittest.TestCase):
         for base in self.overlap_options_df.Alpha3.tolist():
             for region, drange in self.overlap_dict.items():
                 for d in drange:
-                    normalized_amount = ep_default.normalize(100, region, int(d), base_currency = base)
+                    try:
+                        normalized_amount = ep_default.normalize(100, region, int(d), base_currency = base)
+                    except ValueError as e:
+                        if 'is not valid in' not in str(e):
+                            raise ValueError("Could not normalize '%s' in %s." % (region, str(d)))
 
-                    # Assert normalized_amount is numeric.
-                    self.assertEqual(isinstance(normalized_amount, (float, int)), True)
+                        # Assert normalized_amount is numeric.
+                        self.assertEqual(isinstance(normalized_amount, (float, int)), True)
 
         # (1) 100 (2010 USD) =~= 108.70 (2015 USD) =~= 102.55 (2015-12-01 EUR).
-        norm_USD_to_EUR = ep_default.normalize(100, "USD", 2010, to_year = 2015, base_currency = "EUR", exchange_date = '2015-12-01')
+        norm_USD_to_EUR = ep_default.normalize(100
+                                               , currency="USD"
+                                               , from_year=2010
+                                               , to_year = 2015
+                                               , base_currency = "EUR"
+                                               , exchange_date = '2015-12-01')
 
         # Assert (1) is True.
         self.assertEqual(norm_USD_to_EUR, 102.55)
 
         # (2) 100 (2005 CAD) =~= 113.74 (2012 CAD) =~= 114.46 (2012-11-30 USD).
-        norm_CAD_to_USD = ep_default.normalize(100, "CAD", 2005, to_year = 2012, base_currency = "USD", exchange_date = '2012-11-30')
+        norm_CAD_to_USD = ep_default.normalize(100
+                                               , currency="CAD"
+                                               , from_year=2005
+                                               , to_year = 2012
+                                               , base_currency = "USD"
+                                               , exchange_date = '2012-11-30')
 
         # Assert (2) is True.
         self.assertEqual(norm_CAD_to_USD, 114.46)
@@ -327,6 +353,22 @@ class FunctionalityTests(unittest.TestCase):
         #       (ii)  http://www.bankofcanada.ca/rates/related/inflation-calculator/
         #       (iii) http://www.bankofcanada.ca/rates/exchange/10-year-converter/
 
+    def test_fuzzy_search(self):
+        """
+        General: Test Fuzzy Search instance of EasyPeasy().
+        Specific: test EasyPeasy().normalize() method.
+        """
+        # (2) 100 (2005 CAD) =~= 113.74 (2012 CAD) =~= 114.46 (2012-11-30 USD).
+        #     Use 'Canadian' as a subsitue for 'CAD'.
+        norm_CAD_to_USD = ep_fuzzy.normalize(100
+                                             , currency="Canadian"
+                                             , from_year=2005
+                                             , to_year=2012
+                                             , base_currency="USD"
+                                             , exchange_date='2012-11-30')
+
+        # Assert (2) is True.
+        self.assertEqual(norm_CAD_to_USD, 114.46)
 
 
 # Run Tests.
