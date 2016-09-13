@@ -124,8 +124,8 @@ class OptionTests(unittest.TestCase):
         # Assert there are more than lists of two (i.e, [min, max] in the InflationRange column
         self.assertEqual(max([len(l) for l in all_dates_options_df['InflationRange'] if isinstance(l, list)]) > 2, True)
 
-        # Assert there are more than lists of two (i.e, [min, max] in the CurrencyRange column
-        self.assertEqual(max([len(l) for l in all_dates_options_df['CurrencyRange'] if isinstance(l, list)]) > 2, True)
+        # Assert there are more than lists of two (i.e, [min, max] in the ExchangeRange column
+        self.assertEqual(max([len(l) for l in all_dates_options_df['ExchangeRange'] if isinstance(l, list)]) > 2, True)
 
 class FunctionalityTests(unittest.TestCase):
     """

@@ -58,10 +58,17 @@ class EasyPeasy(object):
                                         Whenever possible, use terminology *exactly* as it appears in ``options()``.
 
     :type fuzzy_match_threshold: int
+    :param base_currency: a currency to use as the base currency. Defaults to 'EUR'.
+    :type base_currency: str
     """
 
 
-    def __init__(self, database_path = None, precision = 2, fall_back = True, fuzzy_match_threshold = None):
+    def __init__(self
+                 , database_path = None
+                 , precision = 2
+                 , fall_back = True
+                 , fuzzy_match_threshold = None
+                 , base_currency = 'EUR'):
         """
 
         Initialize the ``EasyPeasy()`` class.
@@ -90,7 +97,7 @@ class EasyPeasy(object):
         self.fuzzy_match_threshold = fuzzy_match_threshold
 
         # Instantiate the class housing all required data and tools for exploring it.
-        self.nav_data = DataNavigator(database_path)
+        self.nav_data = DataNavigator(database_path=database_path, base_currency=base_currency)
 
         # Define Databases
         self.ISOAlphaCodesDB = self.nav_data.ISOAlphaCodesDB
@@ -205,6 +212,7 @@ class EasyPeasy(object):
     def _currency_transition_handler(self, region, year, map_to):
         """
 
+        *Private Method*
         Procedure:
         Check if the region is in the transition database.
             - if it is, work out its alpha2 code
@@ -978,8 +986,8 @@ class EasyPeasy(object):
 
         # Check value suppled to rformat
         if rformat not in ['list', 'table']:
-            raise ValueError("'%s' is an invalid setting for rformat.\nPlease use 'table' for a table (pandas dataframe)"
-                             " or 'exchange' for the currency codes as a list.")
+            raise ValueError("'%s' is an invalid setting for rformat.\nPlease use 'table' for a table (Pandas DataFrame)"
+                             " or 'list' for the currency codes as a list.")
 
         # Check overlap_only is applicable.
         if (overlap_only and info != 'all') or (overlap_only and rformat == 'list'):
