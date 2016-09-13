@@ -104,6 +104,7 @@
 <li class="toctree-l3"><a class="reference internal" href="#databases">Databases</a></li>
 </ul>
 </li>
+<li class="toctree-l2"><a class="reference internal" href="#license">License</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#resources">Resources</a></li>
 </ul>
 </li>
@@ -158,16 +159,13 @@
 <h2>Overview<a class="headerlink" href="#overview" title="Permalink to this headline">¶</a></h2>
 <div class="section" id="project-summary">
 <h3>Project Summary<a class="headerlink" href="#project-summary" title="Permalink to this headline">¶</a></h3>
-<p>This package is primarily intended to be used in the domain of Data Science.
-Many data analysis projects involve analyzing money, often from very different sources.
-This can create a lot of problems when the time comes to compare these sources of information,
-which may be separated in time (inflation), currency (conversion) and the ways in which these
-sources refer to the currency being used (e.g., ISO Alpha2 Codes vs. Currency Codes).
-EasyMoney is intended to abstract away all such complexities to make comparisons across
-these dimensions extremely simple.</p>
-<p>It should also be noted that despite being targeted towards the world of
-data analysis, the tools provided by EasyMoney are likely to be useful
-in many other domains.</p>
+<p>This package is primarily intended to be used in the domain of Data Science to simplify
+the process of analysing data sets which contain money information. Often, the financial information
+within, or often between, data sets is be separated in time (inflation), currency (conversion)
+and/or the ways in which these sources refer to the currency being used (e.g., ISO Alpha2 Codes vs. Currency Codes).
+Conventionally, this has required handcrafting a patchwork of techniques and tools to control for these differences on a
+case-by-case basis. EasyMoney is intended to streamline this process to make comparisons across these dimensions
+extremely simple and straightforward.</p>
 </div>
 <div class="section" id="feature-summary">
 <h3>Feature Summary<a class="headerlink" href="#feature-summary" title="Permalink to this headline">¶</a></h3>
@@ -176,7 +174,7 @@ in many other domains.</p>
 <li>Currency Conversion</li>
 <li>Adjusting a given currency for Inflation</li>
 <li>&#8216;Normalizing&#8217; a currency, i.e., adjust for inflation and then convert to a base currency.</li>
-<li>Relating ISO Alpha2/3 Codes to Currency Codes or a Country&#8217;s Natural Name.</li>
+<li>Relating ISO Alpha2/3 Codes, Currency Codes and a region&#8217;s Natural Name.</li>
 </ul>
 <p><strong>NOTICE: THIS TOOL IS FOR INFORMATION PURPOSES ONLY.</strong></p>
 </div>
@@ -188,10 +186,6 @@ in many other domains.</p>
 <a class="reference external" href="http://pandas.pydata.org">pandas</a>,
 <a class="reference external" href="http://docs.python-requests.org/en/master/">requests</a> and
 <a class="reference external" href="https://github.com/OliverSherouse/wbdata">wbdata</a><sup>†</sup>.</p>
-<p>Internet access is required to create an instance of the main
-<code class="docutils literal"><span class="pre">EasyPeasy()</span></code> class. However, once EasyMoney has cached the latest
-data from online databases (see below), internet access is no longer
-required.</p>
 </div>
 <hr class="docutils" />
 <div class="section" id="installation">
@@ -278,76 +272,73 @@ common currency, inflation may differ.</p>
 <li>Region Names (as they appear in <code class="docutils literal"><span class="pre">options()</span></code>)</li>
 <li>ISO Alpha2 Codes</li>
 <li>ISO Alpha3 Codes</li>
-<li>Currency Codes*</li>
+<li>Currency Codes</li>
 </ul>
-<p>*This may fail when attempting to obtain inflation information about a
-country that uses a common currency.</p>
 <div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">ep</span><span class="o">.</span><span class="n">options</span><span class="p">(</span><span class="n">info</span> <span class="o">=</span> <span class="s1">&#39;all&#39;</span><span class="p">,</span> <span class="n">pretty_print</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">overlap_only</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span>
 </pre></div>
 </div>
 <table border="1" class="docutils">
 <colgroup>
-<col width="10%" />
-<col width="10%" />
-<col width="7%" />
-<col width="7%" />
-<col width="13%" />
-<col width="19%" />
-<col width="19%" />
+<col width="12%" />
+<col width="11%" />
+<col width="8%" />
+<col width="8%" />
+<col width="12%" />
+<col width="18%" />
+<col width="18%" />
 <col width="14%" />
 </colgroup>
 <thead valign="bottom">
 <tr class="row-odd"><th class="head">Region</th>
-<th class="head">Curren
-cy</th>
-<th class="head">Alph
-a2</th>
-<th class="head">Alph
-a3</th>
+<th class="head">Currency</th>
+<th class="head">Alpha2</th>
+<th class="head">Alpha3</th>
 <th class="head">Inflation
 Range</th>
-<th class="head">CurrencyRange</th>
+<th class="head">Exchange
+Range</th>
 <th class="head">Overlap</th>
 <th class="head">Transitions</th>
 </tr>
 </thead>
 <tbody valign="top">
-<tr class="row-even"><td>Austra
-lia</td>
+<tr class="row-even"><td>Australia</td>
 <td>AUD</td>
 <td>AU</td>
 <td>AUS</td>
 <td>[1960,
 2015]</td>
-<td>[1999-01-04,
-2016-08-29]</td>
-<td>[1999-01-04,
+<td>[1999-01-04 :
+2016-09-12]</td>
+<td>[1999-01-04 :
 2015-12-31]</td>
 <td>&nbsp;</td>
 </tr>
-<tr class="row-odd"><td>Canada</td>
-<td>CAD</td>
-<td>CA</td>
-<td>CAN</td>
-<td>[1960,
-2015]</td>
-<td>[1999-01-04,
-2016-08-29]</td>
-<td>[1999-01-04,
-2015-12-31]</td>
-<td>&nbsp;</td>
-</tr>
-<tr class="row-even"><td>Cyprus</td>
+<tr class="row-odd"><td>Austria</td>
 <td>EUR</td>
-<td>CY</td>
-<td>CYP</td>
+<td>AT</td>
+<td>AUT</td>
 <td>[1960,
 2015]</td>
-<td>[1999-01-04,
-2007-12-31]</td>
-<td>[1999-01-04,
-2007-12-31]</td>
-<td>[2008 (EUR)]</td>
+<td>[1999-01-04 :
+2016-09-12]</td>
+<td>[1999-01-04 :
+2015-12-31]</td>
+<td>1999 (ATS
+to EUR)</td>
+</tr>
+<tr class="row-even"><td>Belgium</td>
+<td>EUR</td>
+<td>BE</td>
+<td>BEL</td>
+<td>[1960,
+2015]</td>
+<td>[1999-01-04 :
+2016-09-12]</td>
+<td>[1999-01-04 :
+2015-12-31]</td>
+<td>1999 (BEF
+to EUR)</td>
 </tr>
 <tr class="row-odd"><td>...</td>
 <td>...</td>
@@ -360,12 +351,12 @@ lia</td>
 </tr>
 </tbody>
 </table>
-<p>As can be seen above, the date ranges for which Inflation
-(InflationRange) and Exchange Rate (CurrencyRange) data is available (as
-well as when these two overlap) are provided. Additionally, the dates of known
-transitions from one currency to another are also provided.</p>
-<p>One can also gain access to <em>currency</em> and <em>inflation</em> information
-separately.</p>
+<p>Above, the <em>InflationRange</em> and <em>ExchangeRange</em> columns provide the range of dates for
+which inflation and exchange rate information is available, respectively. The <em>Overlap</em> column
+shows the range of dates shared by these two columns.
+Additionally, the dates of known transitions from one currency to another are also provided.</p>
+<p>To gain access to a summary of the exchange data alone, &#8216;exchange&#8217; can be passed to <em>info</em>.
+Similarly, &#8216;inflation&#8217; can be passed to inspect inflation information separately.</p>
 <div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="c1"># Currency Information Alone</span>
 <span class="n">ep</span><span class="o">.</span><span class="n">options</span><span class="p">(</span><span class="n">info</span> <span class="o">=</span> <span class="s1">&#39;exchange&#39;</span><span class="p">,</span> <span class="n">pretty_print</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span>
 
@@ -373,8 +364,8 @@ separately.</p>
 <span class="n">ep</span><span class="o">.</span><span class="n">options</span><span class="p">(</span><span class="n">info</span> <span class="o">=</span> <span class="s1">&#39;inflation&#39;</span><span class="p">,</span> <span class="n">pretty_print</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span>
 </pre></div>
 </div>
-<p>Additionally, instead of printing a given data table, it can be returned
-as Pandas DataFrame.</p>
+<p>Changing <code class="docutils literal"><span class="pre">pretty_print</span></code> to False will return the information in <code class="docutils literal"><span class="pre">options()</span></code> as
+a <code class="docutils literal"><span class="pre">Pandas</span> <span class="pre">DataFrame</span></code>.</p>
 <div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">inflation_df</span> <span class="o">=</span> <span class="n">ep</span><span class="o">.</span><span class="n">options</span><span class="p">(</span><span class="n">info</span> <span class="o">=</span> <span class="s1">&#39;inflation&#39;</span><span class="p">,</span> <span class="n">pretty_print</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span>
 </pre></div>
 </div>
@@ -387,15 +378,13 @@ inflation information is available.</p>
 <div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">currency_list</span> <span class="o">=</span> <span class="n">ep</span><span class="o">.</span><span class="n">options</span><span class="p">(</span><span class="n">info</span> <span class="o">=</span> <span class="s1">&#39;exchange&#39;</span><span class="p">,</span> <span class="n">rformat</span> <span class="o">=</span> <span class="s1">&#39;list&#39;</span><span class="p">,</span> <span class="n">pretty_print</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span>
 </pre></div>
 </div>
-<p><em>Note</em>: Errors may emerge when converting across currency transitions,
-e.g., CY (2005) → CY (2010).</p>
 </div>
 <div class="section" id="databases">
 <h3>Databases<a class="headerlink" href="#databases" title="Permalink to this headline">¶</a></h3>
 <p>It&#8217;s also straightforward to gain access to the databases used by
 <code class="docutils literal"><span class="pre">EasyPeasy()</span></code>.</p>
 <p>To see all of the International Organization for Standardization (ISO)
-Alpha2 codes currently cached:</p>
+Alpha2 and Alpha3 codes (along with a region&#8217;s natural name) currently cached:</p>
 <div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">ep</span><span class="o">.</span><span class="n">ISOAlphaCodesDB</span>
 </pre></div>
 </div>
@@ -422,11 +411,16 @@ instance of the <code class="docutils literal"><span class="pre">EasyPeasy()</sp
 <div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">ep</span> <span class="o">=</span> <span class="n">EasyPeasy</span><span class="p">(</span><span class="s1">&#39;/path/of/your/choosing&#39;</span><span class="p">)</span>
 </pre></div>
 </div>
-<p>If this directory does not contain all of the required DataBases, it
+<p>If this directory does not contain all of the required databases, it
 will be populated with them. Conversely, if the the directory already contains
 some of the required databases, <code class="docutils literal"><span class="pre">EasyPeasy()</span></code> will automagically
 read in the existing databases and generate only those databases that are missing.</p>
 </div>
+</div>
+<hr class="docutils" />
+<div class="section" id="license">
+<h2>License<a class="headerlink" href="#license" title="Permalink to this headline">¶</a></h2>
+<p>This software is provided under a BSD License.</p>
 </div>
 <hr class="docutils" />
 <div class="section" id="resources">

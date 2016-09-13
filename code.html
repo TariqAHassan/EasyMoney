@@ -136,7 +136,7 @@
 <h2>Main API Functionality<a class="headerlink" href="#main-api-functionality" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
 <dt id="easymoney.money.EasyPeasy">
-<em class="property">class </em><code class="descclassname">easymoney.money.</code><code class="descname">EasyPeasy</code><span class="sig-paren">(</span><em>database_path=None</em>, <em>precision=2</em>, <em>fall_back=True</em>, <em>fuzzy_match_threshold=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/easymoney/money.html#EasyPeasy"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#easymoney.money.EasyPeasy" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">easymoney.money.</code><code class="descname">EasyPeasy</code><span class="sig-paren">(</span><em>database_path=None</em>, <em>precision=2</em>, <em>fall_back=True</em>, <em>fuzzy_match_threshold=None</em>, <em>base_currency='EUR'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/easymoney/money.html#EasyPeasy"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#easymoney.money.EasyPeasy" title="Permalink to this definition">¶</a></dt>
 <dd><p>Tools for Monetary Information and Conversions.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -159,6 +159,7 @@ This will only impact attempts to match on natural names, e.g., attempting to ma
 <p class="last">Whenever possible, use terminology <em>exactly</em> as it appears in <code class="docutils literal"><span class="pre">options()</span></code>.</p>
 </div>
 </li>
+<li><strong>base_currency</strong> (<em>str</em>) &#8211; a currency to use as the base currency. Defaults to &#8216;EUR&#8217;.</li>
 </ul>
 </td>
 </tr>
@@ -258,11 +259,12 @@ or the default is not recommended.</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>amount</strong> (<em>float or int</em>) &#8211; a monetary amount, e.g., 5.23.</li>
-<li><strong>region</strong> (<em>str</em>) &#8211; a geographical region, e.g., &#8216;US&#8217;.</li>
+<li><strong>amount</strong> (<em>float or int</em>) &#8211; a monetary amount.</li>
+<li><strong>region</strong> (<em>str</em>) &#8211; a geographical region.</li>
 <li><strong>year_a</strong> (<em>int</em>) &#8211; start year.</li>
 <li><strong>year_b</strong> (<em>int</em>) &#8211; end year.</li>
-<li><strong>pretty_print</strong> (<em>bool</em>) &#8211; if True, pretty prints the result otherwise returns the result as a float. Defaults to False.</li>
+<li><strong>pretty_print</strong> (<em>bool</em>) &#8211; if True, pretty prints the result otherwise returns the result as a float.
+Defaults to False.</li>
 </ul>
 </td>
 </tr>
@@ -303,7 +305,7 @@ or the default is not recommended.</p>
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
 <li><strong>region</strong> (<em>str</em>) &#8211; a region (currency codes may work, provided they are not common currencies, e.g., Euro).</li>
 <li><strong>year_a</strong> (<em>int</em>) &#8211; start year.</li>
-<li><strong>year_b</strong> (<em>int</em>) &#8211; end year. Defaults to None &#8211; can only be left to this default if return_raw_cpi_dict is True.</li>
+<li><strong>year_b</strong> (<em>int</em>) &#8211; end year. Defaults to None &#8211; can only be left to this default if <em>return_raw_cpi_dict</em> is True.</li>
 <li><strong>return_raw_cpi_dict</strong> (<em>bool</em>) &#8211; If True, returns the CPI information in a dict. Defaults to False.</li>
 <li><strong>pretty_print</strong> (<em>bool</em>) &#8211; if True, pretty prints the result otherwise returns the result as a float. Defaults to False.</li>
 </ul>
@@ -358,7 +360,7 @@ See <code class="docutils literal"><span class="pre">options(info</span> <span c
 <div class="admonition warning">
 <p class="first admonition-title">Warning</p>
 <p>If <em>to_year</em> is set to a specific year rather than to its default (&#8216;latest&#8217;) and
-<em>exchange_date</em> is left to its default (<em>None</em>), the <em>average</em> exchange rate for <em>to_year</em>
+<em>exchange_date</em> is left to its default (None), the <em>average</em> exchange rate for <em>to_year</em>
 will be used <sup>1</sup>.</p>
 <p>For this reason, it is suggested that if you wish to pass a specific year via <em>to_year</em>,
 you also supply a specific date to <em>exchange_date</em> for this method to perform the currency
@@ -397,7 +399,7 @@ Defaults to None.</li>
 
 <dl class="method">
 <dt id="easymoney.money.EasyPeasy.options">
-<code class="descname">options</code><span class="sig-paren">(</span><em>info</em>, <em>rformat='table'</em>, <em>pretty_table=True</em>, <em>pretty_print=True</em>, <em>overlap_only=False</em>, <em>min_max_dates=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/easymoney/money.html#EasyPeasy.options"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#easymoney.money.EasyPeasy.options" title="Permalink to this definition">¶</a></dt>
+<code class="descname">options</code><span class="sig-paren">(</span><em>info</em>, <em>rformat='table'</em>, <em>pretty_print=True</em>, <em>overlap_only=False</em>, <em>min_max_dates=True</em>, <em>convert_to_datetimes=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/easymoney/money.html#EasyPeasy.options"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#easymoney.money.EasyPeasy.options" title="Permalink to this definition">¶</a></dt>
 <dd><p>An easy interface to explore all of the terminology EasyMoney understands
 as well the dates for which data is available.</p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -407,13 +409,15 @@ as well the dates for which data is available.</p>
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
 <li><strong>info</strong> (<em>str</em>) &#8211; &#8216;exchange&#8217;, &#8216;inflation&#8217; or &#8216;all&#8217; (&#8216;all&#8217; requires rformat is set to &#8216;table&#8217;).</li>
 <li><strong>rformat</strong> (<em>str</em>) &#8211; &#8216;table&#8217; for a table or &#8216;list&#8217; for just the currency codes, alone. Defaults to &#8216;table&#8217;.</li>
-<li><strong>pretty_table</strong> (<em>bool</em>) &#8211; prettifies the options table. Defaults to True.</li>
 <li><strong>pretty_print</strong> (<em>bool</em>) &#8211; if True, prints the list or table. If False, returns the list or table (as a Pandas DataFrame).
 Defaults to True.</li>
 <li><strong>overlap_only</strong> (<em>bool</em>) &#8211; when info is set to &#8216;all&#8217;, keep only those rows for which exchange rate and inflation data
 overlap.</li>
 <li><strong>min_max_dates</strong> (<em>bool</em>) &#8211; if True, only report the minimum and maximum date for which data is available;
 if False, all dates for which data is available will be reported. Defaults to True.</li>
+<li><strong>convert_to_datetimes</strong> (<em>bool</em>) &#8211; If True, converts all date information to datetimes.
+Note: Years, with no day or month information, will remain as ints.
+Defaults to False.</li>
 </ul>
 </td>
 </tr>
@@ -437,20 +441,20 @@ if False, all dates for which data is available will be reported. Defaults to Tr
 
 <dl class="method">
 <dt id="easymoney.money.EasyPeasy.region_map">
-<code class="descname">region_map</code><span class="sig-paren">(</span><em>region</em>, <em>map_to='alpha2'</em>, <em>return_region_type=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/easymoney/money.html#EasyPeasy.region_map"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#easymoney.money.EasyPeasy.region_map" title="Permalink to this definition">¶</a></dt>
+<code class="descname">region_map</code><span class="sig-paren">(</span><em>region</em>, <em>map_to='alpha2'</em>, <em>return_region_type=False</em>, <em>year='latest'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/easymoney/money.html#EasyPeasy.region_map"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#easymoney.money.EasyPeasy.region_map" title="Permalink to this definition">¶</a></dt>
 <dd><p>Map a &#8216;region&#8217; to any one of: ISO Alpha2, ISO Alpha3 or Currency Code as well as its Natural Name.</p>
 <blockquote>
 <div><dl class="docutils">
 <dt>Examples Converting From Currency:</dt>
 <dd><ul class="first last simple">
-<li><code class="docutils literal"><span class="pre">EasyPeasy().region_map(region</span> <span class="pre">=</span> <span class="pre">'CAD',</span> <span class="pre">map_to</span> <span class="pre">=</span> <span class="pre">'alpha2')</span></code>   <span class="math">\(=\)</span> &#8216;CA&#8217;</li>
-<li><code class="docutils literal"><span class="pre">EasyPeasy().region_map(region</span> <span class="pre">=</span> <span class="pre">'CAD',</span> <span class="pre">map_to</span> <span class="pre">=</span> <span class="pre">'alpha3')</span></code>   <span class="math">\(=\)</span> &#8216;CAN&#8217;</li>
+<li><code class="docutils literal"><span class="pre">EasyPeasy().region_map(region='CAD',</span> <span class="pre">map_to='alpha2')</span></code>   <span class="math">\(=\)</span> &#8216;CA&#8217;</li>
+<li><code class="docutils literal"><span class="pre">EasyPeasy().region_map(region='CAD',</span> <span class="pre">map_to='alpha3')</span></code>   <span class="math">\(=\)</span> &#8216;CAN&#8217;</li>
 </ul>
 </dd>
 <dt>Examples Converting From Alpha2:</dt>
 <dd><ul class="first last simple">
-<li><code class="docutils literal"><span class="pre">EasyPeasy().region_map(region</span> <span class="pre">=</span> <span class="pre">'FR',</span> <span class="pre">map_to</span> <span class="pre">=</span> <span class="pre">'currency')</span></code> <span class="math">\(=\)</span> &#8216;EUR&#8217;</li>
-<li><code class="docutils literal"><span class="pre">EasyPeasy().region_map(region</span> <span class="pre">=</span> <span class="pre">'FR',</span> <span class="pre">map_to</span> <span class="pre">=</span> <span class="pre">'natural')</span></code>  <span class="math">\(=\)</span> &#8216;France&#8217;</li>
+<li><code class="docutils literal"><span class="pre">EasyPeasy().region_map(region='FR',</span> <span class="pre">map_to='currency')</span></code> <span class="math">\(=\)</span> &#8216;EUR&#8217;</li>
+<li><code class="docutils literal"><span class="pre">EasyPeasy().region_map(region='FR',</span> <span class="pre">map_to='natural')</span></code>  <span class="math">\(=\)</span> &#8216;France&#8217;</li>
 </ul>
 </dd>
 </dl>
@@ -463,8 +467,9 @@ if False, all dates for which data is available will be reported. Defaults to Tr
 <li><strong>region</strong> (<em>str</em>) &#8211; a &#8216;region&#8217; in the format of a ISO Alpha2, ISO Alpha3 or currency code, as well as natural name.</li>
 <li><strong>map_to</strong> (<em>str</em>) &#8211; &#8216;alpha2&#8217;, &#8216;alpha3&#8217; &#8216;currency&#8217; or &#8216;natural&#8217; for ISO Alpha2, ISO Alpha2, Currency Code and
 Natural Names, respectively. Defaults to &#8216;alpha2&#8217;.</li>
-<li><strong>return_region_type</strong> (<em>bool</em>) &#8211; if True return the type of input supplied (one of:&#8217;alpha2&#8217;, &#8216;alpha3&#8217; &#8216;currency&#8217; or &#8216;natural&#8217;)
-Defaults to False.</li>
+<li><strong>return_region_type</strong> (<em>bool</em>) &#8211; if True return the type of input supplied (one of:&#8217;alpha2&#8217;, &#8216;alpha3&#8217; &#8216;currency&#8217; or
+&#8216;natural&#8217;). Defaults to False.</li>
+<li><strong>year</strong> (<em>int</em>) &#8211; Defaults to &#8216;latest&#8217; (which will use the current year).</li>
 </ul>
 </td>
 </tr>
@@ -483,8 +488,8 @@ Defaults to False.</li>
 <p class="first admonition-title">Warning</p>
 <p>Attempts to map common currencies to a single nation will fail.</p>
 <p class="last">For instance: <code class="docutils literal"><span class="pre">EasyPeasy().region_map(region</span> <span class="pre">=</span> <span class="pre">'EUR',</span> <span class="pre">map_to</span> <span class="pre">=</span> <span class="pre">'alpha2')</span></code> will fail because the Euro (EUR)
-is used in several nations and thus a request to map it to a single ISO Alpha2 country code creates insurmountable
-ambiguity.</p>
+is used in several nations and thus a request to map it to a single ISO Alpha2 country code creates
+insurmountable ambiguity.</p>
 </div>
 </dd></dl>
 
