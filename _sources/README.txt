@@ -227,15 +227,15 @@ Codes and Currency Codes currently understood by ``EasyPeasy()``:
 
     ep.ConsumerPriceIndexDB
 
-It's also easy to save these databases to disk so they can be used
-offline or modified. To do so, one can simply pass a directory when creating an
+The databases used by ``EasyPeasy()`` can be saved disk so they can be used offline
+or modified. To do so, one can simply pass a directory when creating an
 instance of the ``EasyPeasy()`` class.
 
 .. code:: python
 
     ep = EasyPeasy('/path/of/your/choosing')
 
-If this directory does not contain all of the required databases, it
+If this directory does not contain any of the required databases, it
 will be populated with them. Conversely, if the the directory already contains
 some of the required databases, ``EasyPeasy()`` will automagically
 read in the existing databases and generate only those databases that are missing.

@@ -397,13 +397,13 @@ Codes and Currency Codes currently understood by <code class="docutils literal">
 <div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">ep</span><span class="o">.</span><span class="n">ConsumerPriceIndexDB</span>
 </pre></div>
 </div>
-<p>It&#8217;s also easy to save these databases to disk so they can be used
-offline or modified. To do so, one can simply pass a directory when creating an
+<p>The databases used by <code class="docutils literal"><span class="pre">EasyPeasy()</span></code> can be saved disk so they can be used offline
+or modified. To do so, one can simply pass a directory when creating an
 instance of the <code class="docutils literal"><span class="pre">EasyPeasy()</span></code> class.</p>
 <div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">ep</span> <span class="o">=</span> <span class="n">EasyPeasy</span><span class="p">(</span><span class="s1">&#39;/path/of/your/choosing&#39;</span><span class="p">)</span>
 </pre></div>
 </div>
-<p>If this directory does not contain all of the required databases, it
+<p>If this directory does not contain any of the required databases, it
 will be populated with them. Conversely, if the the directory already contains
 some of the required databases, <code class="docutils literal"><span class="pre">EasyPeasy()</span></code> will automagically
 read in the existing databases and generate only those databases that are missing.</p>
