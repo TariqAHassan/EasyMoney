@@ -132,7 +132,8 @@ common currency, inflation may differ.
 Options
 '''''''
 
-It's easy to explore the terminology ``EasyPeasy`` understands with ``options()``.
+It's easy to explore the terminology understood by `EasyPeasy`, as well as the dates for which
+data is available, with `options()`.
 
 .. code:: python
 
