@@ -3,29 +3,29 @@ import os
 from setuptools import setup, find_packages
 from warnings import warn
 
-try:
-   import pypandoc
-   description = pypandoc.convert('README.md', 'rst')
-except:
-   description = ''
+def read(fname):
+    try:
+        return open(os.path.join(os.path.dirname(__file__), fname)).read()
+    except:
+        return 'Please see: https://github.com/TariqAHassan/EasyMoney.'
 
 setup(
     name = "easymoney",
-    version = "1.0.3",
+    version = "1.0.7",
     author = "Tariq A. Hassan",
     author_email = "laterallattice@gmail.com",
     description = ("Tools for Monetary Information and Conversions."),
-    long_description = description,
+    long_description = read('docs/README.rst'),
     license = "BSD",
     keywords = 'economics, finance, inflation, currency converter, data analysis, data science',
     url = "https://github.com/TariqAHassan/EasyMoney.git",
-    download_url='https://github.com/TariqAHassan/EasyMoney/archive/1.0.1.tar.gz',
+    download_url='https://github.com/TariqAHassan/EasyMoney/archive/1.0.7.tar.gz',
     packages = find_packages(exclude = [  "tests.*"
                                         , "tests"
                                         , "sources/single_use.*"
                                         , "sources/single_use"
                                         ]),
-    package_data = {'': ['*.csv', '*.p'],},
+    package_data = {'sources': ['data/*.csv'],},
     data_files = [('', ["LICENSE.txt"])],
     install_requires = ['numpy', 'pandas', 'wbdata', 'requests'],
     classifiers = [  "Development Status :: 5 - Production/Stable"
