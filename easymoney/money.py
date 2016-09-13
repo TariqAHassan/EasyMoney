@@ -731,7 +731,7 @@ class EasyPeasy(object):
         |
         That is, less formally:
 
-            .. math:: LCU(1 \space EUR, CUR) = \dfrac{x \space \space CUR}{1 \space EUR}
+            .. math:: LCU(\phi_{EUR}, CUR) = \dfrac{x \space \space CUR}{1 \space EUR}
 
         :math:`Thus`:
 
