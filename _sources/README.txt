@@ -11,8 +11,8 @@ This package is primarily intended to be used in the domain of Data Science to s
 the process of analysing data sets which contain money information. Often, the financial information
 within, and often between, data sets is be separated in time (inflation), currency (conversion)
 as well as the ways in which these sources refer to the currency being used (e.g., ISO Alpha2 Codes vs. Currency Codes).
-Conventionally, this has required handcrafting a patchwork of techniques and tools to control for these differences on a
-case-by-case basis. EasyMoney is intended to streamline this process to make comparisons across these dimensions
+Conventionally, this has required handcrafting a solution to control for these differences on a case-by-case basis.
+EasyMoney is intended to streamline this process to make comparisons across these dimensions
 extremely simple and straightforward.
 
 Feature Summary
