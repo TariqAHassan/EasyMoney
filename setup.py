@@ -19,6 +19,7 @@ setup(
     license = "BSD",
     keywords = 'economics, finance, inflation, currency converter, data analysis, data science',
     url = "https://github.com/TariqAHassan/EasyMoney.git",
+    download_url='https://github.com/TariqAHassan/EasyMoney/archive/1.0.0.tar.gz',
     packages = find_packages(exclude = [  "tests.*"
                                         , "tests"
                                         , "sources/single_use.*"
