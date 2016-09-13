@@ -4,14 +4,25 @@ EasyMoney
 Overview
 ~~~~~~~~
 
-EasyMoney is a set of tools for:
+Project Summary
+'''''''''''''''
 
--  computing inflation
--  currency conversions
--  adjusting a given currency for inflation
--  'normalizing' a currency, i.e., adjust for inflation and then convert
-   to a base currency.
--  doing all of the above without having to memorize currency codes!
+This package is primarily intended to be used in the domain of Data Science to simplify
+the process of analysing data sets which contain money information. Often, the financial information
+within, or often between, data sets is be separated in time (inflation), currency (conversion)
+and/or the ways in which these sources refer to the currency being used (e.g., ISO Alpha2 Codes vs. Currency Codes).
+Conventionally, this has required handcrafting a patchwork of techniques and tools to control for these differences on a
+case-by-case basis. EasyMoney is intended to streamline this process to make comparisons across these dimensions
+extremely simple and straightforward.
+
+Feature Summary
+'''''''''''''''
+
+- Computing Inflation
+- Currency Conversion
+- Adjusting a given currency for Inflation
+- 'Normalizing' a currency, i.e., adjust for inflation and then convert to a base currency.
+- Relating ISO Alpha2/3 Codes, Currency Codes and a region's Natural Name.
 
 **NOTICE: THIS TOOL IS FOR INFORMATION PURPOSES ONLY.**
 
@@ -23,12 +34,7 @@ Dependencies
 EasyMoney requires: `numpy <http://www.numpy.org>`__,
 `pandas <http://pandas.pydata.org>`__,
 `requests <http://docs.python-requests.org/en/master/>`__ and
-`wbdata <https://github.com/OliverSherouse/wbdata>`__\ †.
-
-Internet access is required to create an instance of the main
-``EasyPeasy()`` class. However, once EasyMoney has cached the latest
-data from online databases (see below), internet access is no longer
-required.
+`wbdata <https://github.com/OliverSherouse/wbdata>`__\ :sup:`†`.
 
 --------------
 
@@ -133,50 +139,46 @@ The following can be used interchangeably:
 -  Region Names (as they appear in ``options()``)
 -  ISO Alpha2 Codes
 -  ISO Alpha3 Codes
--  Currency Codes\*
-
-\*This may fail when attempting to obtain inflation information about a
-country that uses a common currency.
+-  Currency Codes
 
 .. code:: python
 
     ep.options(info = 'all', pretty_print = True, overlap_only = True)
 
-+--------+--------+------+------+-----------+----------------+----------------+------------+
-| Region | Curren | Alph | Alph | Inflation | CurrencyRange  | Overlap        | CurrencyTr |
-|        | cy     | a2   | a3   | Range     |                |                | ansition   |
-+========+========+======+======+===========+================+================+============+
-| Austra | AUD    | AU   | AUS  | [1960,    | [1999-01-04,   | [1999-01-04,   |            |
-| lia    |        |      |      | 2015]     | 2016-08-29]    | 2015-12-31]    |            |
-+--------+--------+------+------+-----------+----------------+----------------+------------+
-| Canada | CAD    | CA   | CAN  | [1960,    | [1999-01-04,   | [1999-01-04,   |            |
-|        |        |      |      | 2015]     | 2016-08-29]    | 2015-12-31]    |            |
-+--------+--------+------+------+-----------+----------------+----------------+------------+
-| Cyprus | EUR    | CY   | CYP  | [1960,    | [1999-01-04,   | [1999-01-04,   | 2008       |
-|        |        |      |      | 2015]     | 2007-12-31]    | 2007-12-31]    |            |
-+--------+--------+------+------+-----------+----------------+----------------+------------+
-| ...    | ...    | ...  | ...  | ...       | ...            | ...            | ...        |
-+--------+--------+------+------+-----------+----------------+----------------+------------+
++-----------+----------+--------+--------+-----------+-----------------+-----------------+-------------+
+| Region    | Currency | Alpha2 | Alpha3 | Inflation | Exchange        | Overlap         | Transitions |
+|           |          |        |        | Range     | Range           |                 |             |
++===========+==========+========+========+===========+=================+=================+=============+
+| Australia | AUD      | AU     | AUS    | [1960,    | [1999-01-04 :   | [1999-01-04 :   |             |
+|           |          |        |        | 2015]     | 2016-09-12]     | 2015-12-31]     |             |
++-----------+----------+--------+--------+-----------+-----------------+-----------------+-------------+
+| Austria   | EUR      | AT     | AUT    | [1960,    | [1999-01-04 :   | [1999-01-04 :   | 1999 (ATS   |
+|           |          |        |        | 2015]     | 2016-09-12]     | 2015-12-31]     | to EUR)     |
++-----------+----------+--------+--------+-----------+-----------------+-----------------+-------------+
+| Belgium   | EUR      | BE     | BEL    | [1960,    | [1999-01-04 :   | [1999-01-04 :   | 1999 (BEF   |
+|           |          |        |        | 2015]     | 2016-09-12]     | 2015-12-31]     | to EUR)     |
++-----------+----------+--------+--------+-----------+-----------------+-----------------+-------------+
+| ...       | ...      | ...    | ...    | ...       | ...             | ...             | ...         |
++-----------+----------+--------+--------+-----------+-----------------+-----------------+-------------+
 
-As can be seen above, the date ranges for which Inflation
-(InflationRange) and Exchange Rate (CurrencyRange) data is available (as
-well as when these two overlap) are provided. Additionally, the dates of
-(some) transitions from one currency to another (CurrencyTransition) are
-noted.
+Above, the *InflationRange* and *ExchangeRange* columns provide the range of dates for
+which inflation and exchange rate information is available, respectively. The *Overlap* column
+shows the range of dates shared by these two columns.
+Additionally, the dates of known transitions from one currency to another are also provided.
 
-One can also gain access to *currency* and *inflation* information
-separately.
+To gain access to a summary of the exchange data alone, 'exchange' can be passed to *info*.
+Similarly, 'inflation' can be passed to inspect inflation information separately.
 
 .. code:: python
 
     # Currency Information Alone
     ep.options(info = 'exchange', pretty_print = True)
 
-    # Inflation Infomation Alone
+    # Inflation Information Alone
     ep.options(info = 'inflation', pretty_print = True)
 
-Additionally, instead of printing a given data table, it can be returned
-as Pandas DataFrame.
+Changing ``pretty_print`` to False will return the information in ``options()`` as
+a ``Pandas DataFrame``.
 
 .. code:: python
 
@@ -195,8 +197,6 @@ This can also be done for exchange rate information.
 
     currency_list = ep.options(info = 'exchange', rformat = 'list', pretty_print = False)
 
-*Note*: Errors may emerge when converting across currency transitions,
-e.g., CY (2005) → CY (2010).
 
 Databases
 '''''''''
@@ -205,7 +205,7 @@ It's also straightforward to gain access to the databases used by
 ``EasyPeasy()``.
 
 To see all of the International Organization for Standardization (ISO)
-Alpha2 codes currently cached:
+Alpha2 and Alpha3 codes (along with a region's natural name) currently cached:
 
 .. code:: python
 
@@ -237,19 +237,24 @@ Codes and Currency Codes currently understood by ``EasyPeasy()``:
     ep.ConsumerPriceIndexDB
 
 It's also easy to save these databases to disk so they can be used
-offline or modified. One can simply pass a directory when creating an
-instance of the class.
+offline or modified. To do so, one can simply pass a directory when creating an
+instance of the ``EasyPeasy()`` class.
 
 .. code:: python
 
     ep = EasyPeasy('/path/of/your/choosing')
 
-If this directory does not contain all of the required DataBases, it
-will be populated with them.
+If this directory does not contain all of the required databases, it
+will be populated with them. Conversely, if the the directory already contains
+some of the required databases, ``EasyPeasy()`` will automagically
+read in the existing databases and generate only those databases that are missing.
 
-If the directory already contains some of the required databases,
-``EasyPeasy()`` will automagically read in the existing databases and
-generate only those databases that are missing.
+--------------
+
+License
+~~~~~~~~~
+
+This software is provided under a BSD License.
 
 --------------
 
@@ -276,10 +281,10 @@ Indicators used:
          2. Rates are updated by the ECB around 16:00 CET.
          3. The ECB states, clearly, that usage for transaction purposes
             is strongly discouraged. This sentiment is echoed here;
-            ***as stated above, this tool is intended to be for
-            information purposes only***.
+            **as stated above, this tool is intended to be for
+            information purposes only**.
          4. ALL EXCHANGE RESULTS OBTAINED FROM EASYMONEY ARE THE RESULT
             OF CALCULATIONS BASED ON ECB DATA. THAT IS, THESE RESULTS
             ARE NOT A DIRECT REPORTING OF ECB-PROVIDED DATA.
 
-†Sherouse, Oliver (2014). Wbdata. Arlington, VA.
+:sup:`†` Sherouse, Oliver (2014). Wbdata. Arlington, VA.

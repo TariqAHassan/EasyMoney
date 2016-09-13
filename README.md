@@ -11,7 +11,7 @@ Feature Summary:
 - Currency Conversion
 - Adjusting a given currency for Inflation
 - 'Normalizing' a currency, i.e., adjust for inflation and then convert to a base currency.
-- Relating ISO Alpha2/3 Codes to Currency Codes or a Country's Natural Name.
+- Relating ISO Alpha2/3 Codes, Currency Codes and a region's Natural Name.
 
 **NOTICE: THIS TOOL IS FOR INFORMATION PURPOSES ONLY.**
 
@@ -20,10 +20,6 @@ Feature Summary:
 ###Dependencies
 
 EasyMoney requires: [numpy], [pandas], [requests] and [wbdata]<sup>†</sup>.
-
-Internet access is required to create an instance of the main `EasyPeasy()` class.
-However, once EasyMoney has cached the latest data from online databases (see below), internet
-access is no longer required.
 
 ------------------------------------------------------------------------
 
@@ -106,23 +102,22 @@ The following can be used interchangeably:
 - Region Names (as they appear in `options()`)
 - ISO Alpha2 Codes
 - ISO Alpha3 Codes
-- Currency Codes*
-
-*This may fail when attempting to obtain inflation information about a country that uses a common currency. 
+- Currency Codes
 
 ```python
 ep.options(info = 'all', pretty_print = True, overlap_only = True)
 ```
 
-|   Region  | Currency | Alpha2 | Alpha3 | InflationRange |      CurrencyRange       |       Overlap            | Transitions  |
-|:---------:|:--------:|:------:|:------:|:--------------:|:------------------------:|:------------------------:|:------------:|
-| Australia |  AUD     | AU     | AUS    |  [1960, 2015]  | [1999-01-04, 2016-08-29] | [1999-01-04, 2015-12-31] |              |
-| Canada    |  CAD     | CA     | CAN    |  [1960, 2015]  | [1999-01-04, 2016-08-29] | [1999-01-04, 2015-12-31] |              |
-| Cyprus    |  EUR     | CY     | CYP    |  [1960, 2015]  | [1999-01-04, 2007-12-31] | [1999-01-04, 2007-12-31] | [2008 (EUR)] |
-|   ...     |  ...     | ...    | ...    |      ...       |           ...            |           ...            |      ...     |  
+|   Region  | Currency | Alpha2 | Alpha3 | InflationRange |      ExchangeRange        |       Overlap             |    Transitions    |
+|:---------:|:--------:|:------:|:------:|:--------------:|:-------------------------:|:-------------------------:|:-----------------:|
+| Australia |  AUD     | AU     | AUS    |  [1960, 2015]  | [1999-01-04 : 2016-09-12] | [1999-01-04 : 2015-12-31] |                   |
+| Austria   |  EUR     | AT     | AUT    |  [1960, 2015]  | [1999-01-04 : 2016-09-12] | [1999-01-04 : 2015-12-31] | 1999 (ATS to EUR) |
+| Belgium   |  EUR     | BE     | BEL    |  [1960, 2015]  | [1999-01-04 : 2016-09-12] | [1999-01-04 : 2015-12-31] | 1999 (BEF to EUR) |
+|   ...     |  ...     | ...    | ...    |      ...       |           ...             |           ...             |        ...        |  
 
-As can be seen above, the date ranges for which Inflation (InflationRange) and Exchange Rate (CurrencyRange) data is available 
-(as well as when these two overlap) are provided. Additionally, the dates of known transitions from one currency to another are also provided.
+Above, the *InflationRange* and *ExchangeRange* columns provide the range of dates for which inflation and exchange rate information 
+is available, respectively. The *Overlap* column shows the range of dates shared by these two columns.
+Additionally, the dates of known transitions from one currency to another are also provided.
 
 ####Databases
 
@@ -133,7 +128,7 @@ instance of the ``EasyPeasy()`` class.
 ep = EasyPeasy('/path/of/your/choosing')
 ```
 
-If this directory does not contain all of the required DataBases, it
+If this directory does not contain all of the required databases, it
 will be populated with them. Conversely, if the the directory already contains
 some of the required databases, ``EasyPeasy()`` will automagically
 read in the existing databases and generate only those databases that are missing.
