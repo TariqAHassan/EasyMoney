@@ -257,8 +257,14 @@ Indicators used:
 1. `Consumer price index (2010 =
    100) <http://data.worldbank.org/indicator/FP.CPI.TOTL>`__
 
-   -  Source: International Monetary Fund, International Financial
+   -  Source: International Monetary Fund (IMF), International Financial
       Statistics.
+
+      -  Notes:
+
+         1. ALL INFLATION-RELATED RESULTS OBTAINED FROM EASYMONEY
+            (INCLUDING, BUT NOT NECESSARILY LIMITED TO, INFLATION RATE AND NORMALIZATION)
+            ARE THE RESULT OF CALCULATIONS BASED ON IMF DATA. THESE RESULTS ARE NOT A DIRECT REPORTING OF IMF-PROVIDED DATA.
 
 2. `Euro foreign exchange reference rates - European Central
    Bank <https://www.ecb.europa.eu/stats/exchange/eurofxref/html/index.en.html>`__
@@ -274,8 +280,8 @@ Indicators used:
             is strongly discouraged. This sentiment is echoed here;
             **as stated above, this tool is intended to be for
             information purposes only**.
-         4. ALL EXCHANGE RESULTS OBTAINED FROM EASYMONEY ARE THE RESULT
-            OF CALCULATIONS BASED ON ECB DATA. THAT IS, THESE RESULTS
-            ARE NOT A DIRECT REPORTING OF ECB-PROVIDED DATA.
+         4. ALL EXCHANGE RATE-RELATED RESULTS OBTAINED FROM EASYMONEY
+            (INCLUDING, BUT NOT NECESSARILY LIMITED TO, CURRENCY CONVERSION AND NORMALIZATION)
+            ARE THE RESULT OF CALCULATIONS BASED ON ECB DATA. THESE RESULTS ARE NOT A DIRECT REPORTING OF ECB-PROVIDED DATA.
 
 :sup:`†` Sherouse, Oliver (2014). Wbdata. Arlington, VA.
