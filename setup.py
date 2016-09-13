@@ -11,7 +11,7 @@ except:
 
 setup(
     name = "easymoney",
-    version = "0.9.9",
+    version = "1.0.0",
     author = "Tariq A. Hassan",
     author_email = "laterallattice@gmail.com",
     description = ("Tools for Monetary Information and Conversions."),
@@ -27,10 +27,10 @@ setup(
     package_data = {'': ['*.csv', '*.p'],},
     data_files = [('', ["LICENSE.txt"])],
     install_requires = ['numpy', 'pandas', 'wbdata', 'requests'],
-    classifiers = [  "Development Status :: 4 - Beta"
+    classifiers = [  "Development Status :: 5 - Production/Stable"
                    , "Natural Language :: English"
-                   , "Intended Audience :: Financial and Insurance Industry"
                    , "Intended Audience :: Science/Research"
+                   , "Intended Audience :: Financial and Insurance Industry"
                    , "Programming Language :: Python :: 3.4"
                    , "Programming Language :: Python :: 3.5"
                    , "Environment :: MacOS X"
