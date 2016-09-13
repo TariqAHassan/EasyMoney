@@ -1,21 +1,21 @@
+import os
+
 from setuptools import setup, find_packages
 from warnings import warn
 
 try:
-    import pypandoc
-    markdown_reader = lambda md: pypandoc.convert(md, 'rst')
+   import pypandoc
+   description = pypandoc.convert('README.md', 'rst')
 except:
-    warn("Could not convert README.md to README.rst.\n"
-         "If you'd like to refer to a local copy of EasyMoney's README, please install 'pypandocs'.")
-    markdown_reader = lambda md: open(md, 'r').read()
+   description = ''
 
 setup(
     name = "easymoney",
-    version = "1.0.0",
+    version = "1.0.3",
     author = "Tariq A. Hassan",
     author_email = "laterallattice@gmail.com",
     description = ("Tools for Monetary Information and Conversions."),
-    long_description = markdown_reader('README.md'),
+    long_description = description,
     license = "BSD",
     keywords = 'economics, finance, inflation, currency converter, data analysis, data science',
     url = "https://github.com/TariqAHassan/EasyMoney.git",

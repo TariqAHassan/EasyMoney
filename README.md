@@ -25,7 +25,7 @@ EasyMoney requires: [numpy], [pandas], [requests] and [wbdata]<sup>†</sup>.
 
 ###Installation
 
-`$ pip3 install git+git://github.com/TariqAHassan/EasyMoney@master`
+`$ pip3 install easymoney`
 
 *Note*: EasyMoney requires Python 3.4 or later.
 
