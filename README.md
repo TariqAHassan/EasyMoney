@@ -42,7 +42,6 @@ from easymoney.money import EasyPeasy
 ```python
 ep = EasyPeasy()
 ```
-Note: this may take a moment, depending on the speed of your internet connection.
 
 ####Prototypical Conversion Problems
 
@@ -95,20 +94,14 @@ EasyMoney also understands that, while these two nations may share a common curr
 
 ####Options
 
-It's easy to explore the terminology EasyMoney understands.
-
-The following can be used interchangeably:
-
-- Region Names (as they appear in `options()`)
-- ISO Alpha2 Codes
-- ISO Alpha3 Codes
-- Currency Codes
+It's easy to explore the terminology understood by `EasyPeasy`, as well as the dates for which
+data is available, with `options()`.
 
 ```python
 ep.options(info = 'all', pretty_print = True, overlap_only = True)
 ```
 
-|   Region  | Currency | Alpha2 | Alpha3 | InflationRange |      ExchangeRange        |       Overlap             |    Transitions    |
+|   Region  | Currency | Alpha2 | Alpha3 | InflationRange |      ExchangeRange        |         Overlap           |    Transitions    |
 |:---------:|:--------:|:------:|:------:|:--------------:|:-------------------------:|:-------------------------:|:-----------------:|
 | Australia |  AUD     | AU     | AUS    |  [1960, 2015]  | [1999-01-04 : 2016-09-12] | [1999-01-04 : 2015-12-31] |                   |
 | Austria   |  EUR     | AT     | AUT    |  [1960, 2015]  | [1999-01-04 : 2016-09-12] | [1999-01-04 : 2015-12-31] | 1999 (ATS to EUR) |
@@ -121,14 +114,14 @@ Additionally, the dates of known transitions from one currency to another are al
 
 ####Databases
 
-It's easy to save the databases used by ``EasyPeasy()`` to disk so they can be used offline
+The databases used by ``EasyPeasy()`` can be saved disk so they can be used offline
 or modified. To do so, one can simply pass a directory when creating an
 instance of the ``EasyPeasy()`` class.
 ```python
 ep = EasyPeasy('/path/of/your/choosing')
 ```
 
-If this directory does not contain all of the required databases, it
+If this directory does not contain any of the required databases, it
 will be populated with them. Conversely, if the the directory already contains
 some of the required databases, ``EasyPeasy()`` will automagically
 read in the existing databases and generate only those databases that are missing.
@@ -152,7 +145,10 @@ This software is provided under a BSD License.
 Indicators used:
 
 1. [Consumer price index (2010 = 100)]
-       * Source: International Monetary Fund, International Financial Statistics.
+       * Source: International Monetary Fund (IMF), International Financial Statistics.
+       	* Notes:
+       		1. ALL INFLATION-RELATED RESULTS OBTAINED FROM EASYMONEY (INCLUDING, BUT NOT NECESSARILY LIMITED TO, INFLATION RATE AND NORMALIZATION) ARE
+       		   THE RESULT OF CALCULATIONS BASED ON IMF DATA. THESE RESULTS ARE NOT A DIRECT REPORTING OF IMF-PROVIDED DATA.
 2. [Euro foreign exchange reference rates - European Central Bank]
        * Source: European Central Bank (ECB).
        	* Notes:
@@ -160,7 +156,8 @@ Indicators used:
        		2. Rates are updated by the ECB around 16:00 CET.
        		3. The ECB states, clearly, that usage for transaction purposes is strongly discouraged. 
        		   This sentiment is echoed here; ***as stated above, this tool is intended to be for information purposes only***.
-       		4. ALL EXCHANGE RESULTS OBTAINED FROM EASYMONEY ARE THE RESULT OF CALCULATIONS BASED ON ECB DATA. THAT IS, THESE RESULTS ARE NOT A DIRECT REPORTING OF ECB-PROVIDED DATA.
+       		4. ALL EXCHANGE RATE-RELATED RESULTS OBTAINED FROM EASYMONEY (INCLUDING, BUT NOT NECESSARILY LIMITED TO, CURRENCY CONVERSION AND NORMALIZATION) ARE 
+       		   THE RESULT OF CALCULATIONS BASED ON ECB DATA. THESE RESULTS ARE NOT A DIRECT REPORTING OF ECB-PROVIDED DATA.
     
 <sup>†</sup>Sherouse, Oliver (2014). Wbdata. Arlington, VA. 
 

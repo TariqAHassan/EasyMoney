@@ -64,9 +64,6 @@ Create an instance of the EasyPeasy Class
 
     ep = EasyPeasy()
 
-Note: this may take a moment, depending on the speed of your internet
-connection.
-
 Prototypical Conversion Problems
 ''''''''''''''''''''''''''''''''
 
@@ -132,14 +129,8 @@ common currency, inflation may differ.
 Options
 '''''''
 
-It's easy to explore the terminology EasyMoney understands.
-
-The following can be used interchangeably:
-
--  Region Names (as they appear in ``options()``)
--  ISO Alpha2 Codes
--  ISO Alpha3 Codes
--  Currency Codes
+It's easy to explore the terminology understood by `EasyPeasy`, as well as the dates for which
+data is available, with `options()`.
 
 .. code:: python
 
@@ -236,15 +227,15 @@ Codes and Currency Codes currently understood by ``EasyPeasy()``:
 
     ep.ConsumerPriceIndexDB
 
-It's also easy to save these databases to disk so they can be used
-offline or modified. To do so, one can simply pass a directory when creating an
+The databases used by ``EasyPeasy()`` can be saved disk so they can be used offline
+or modified. To do so, one can simply pass a directory when creating an
 instance of the ``EasyPeasy()`` class.
 
 .. code:: python
 
     ep = EasyPeasy('/path/of/your/choosing')
 
-If this directory does not contain all of the required databases, it
+If this directory does not contain any of the required databases, it
 will be populated with them. Conversely, if the the directory already contains
 some of the required databases, ``EasyPeasy()`` will automagically
 read in the existing databases and generate only those databases that are missing.
@@ -266,8 +257,14 @@ Indicators used:
 1. `Consumer price index (2010 =
    100) <http://data.worldbank.org/indicator/FP.CPI.TOTL>`__
 
-   -  Source: International Monetary Fund, International Financial
+   -  Source: International Monetary Fund (IMF), International Financial
       Statistics.
+
+      -  Notes:
+
+         1. ALL INFLATION-RELATED RESULTS OBTAINED FROM EASYMONEY
+            (INCLUDING, BUT NOT NECESSARILY LIMITED TO, INFLATION RATE AND NORMALIZATION)
+            ARE THE RESULT OF CALCULATIONS BASED ON IMF DATA. THESE RESULTS ARE NOT A DIRECT REPORTING OF IMF-PROVIDED DATA.
 
 2. `Euro foreign exchange reference rates - European Central
    Bank <https://www.ecb.europa.eu/stats/exchange/eurofxref/html/index.en.html>`__
@@ -283,8 +280,8 @@ Indicators used:
             is strongly discouraged. This sentiment is echoed here;
             **as stated above, this tool is intended to be for
             information purposes only**.
-         4. ALL EXCHANGE RESULTS OBTAINED FROM EASYMONEY ARE THE RESULT
-            OF CALCULATIONS BASED ON ECB DATA. THAT IS, THESE RESULTS
-            ARE NOT A DIRECT REPORTING OF ECB-PROVIDED DATA.
+         4. ALL EXCHANGE RATE-RELATED RESULTS OBTAINED FROM EASYMONEY
+            (INCLUDING, BUT NOT NECESSARILY LIMITED TO, CURRENCY CONVERSION AND NORMALIZATION)
+            ARE THE RESULT OF CALCULATIONS BASED ON ECB DATA. THESE RESULTS ARE NOT A DIRECT REPORTING OF ECB-PROVIDED DATA.
 
 :sup:`†` Sherouse, Oliver (2014). Wbdata. Arlington, VA.

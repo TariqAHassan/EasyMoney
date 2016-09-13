@@ -432,7 +432,7 @@ class EasyPeasy(object):
             Attempts to map common currencies to a single nation will fail.
 
 
-            For instance: ``EasyPeasy().region_map(region = 'EUR', map_to = 'alpha2')`` will fail because the Euro (EUR)
+            For instance, ``EasyPeasy().region_map(region = 'EUR', map_to = 'alpha2')`` will fail because the Euro (EUR)
             is used in several nations and thus a request to map it to a single ISO Alpha2 country code creates
             insurmountable ambiguity.
         """
