@@ -64,9 +64,6 @@ Create an instance of the EasyPeasy Class
 
     ep = EasyPeasy()
 
-Note: this may take a moment, depending on the speed of your internet
-connection.
-
 Prototypical Conversion Problems
 ''''''''''''''''''''''''''''''''
 
