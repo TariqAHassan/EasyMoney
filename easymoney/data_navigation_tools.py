@@ -12,11 +12,6 @@ import copy
 import numpy as np
 import pandas as pd
 
-try:
-    from fuzzywuzzy import process
-except:
-    pass
-
 from warnings import warn
 from collections import defaultdict
 
@@ -116,7 +111,8 @@ class DataNavigator(object):
         self.alpha2_to_currency = dict_list_unpack(currency_to_alpha2)
 
         # Create Region Name --> Alpha2 Dict
-        self.region_to_alpha2 = remove_from_dict(dict(zip(self.ConsumerPriceIndexDB['Country'], self.ConsumerPriceIndexDB['Alpha2'])))
+        self.region_to_alpha2 = remove_from_dict(dict(zip(self.ConsumerPriceIndexDB['Country']
+                                                        , self.ConsumerPriceIndexDB['Alpha2'])))
 
         # Create Alpha2 --> Region Name Dict
         self.alpha2_to_region = key_value_flip(self.region_to_alpha2)
@@ -132,7 +128,7 @@ class DataNavigator(object):
         :param currency_ops: _currency_options() -> *_currency_duplicate_remover()* ->_currency_transition_integrator()
         :type currency_ops: Pandas DataFrame
         :return: currency_ops with duplicates removed
-        :rtype: Pandas DataFrame
+        :rtype: ``Pandas DataFrame``
         """
         df = copy.deepcopy(currency_ops)
 
@@ -157,6 +153,29 @@ class DataNavigator(object):
 
         # Refresh the index and return
         return df.reset_index(drop=True), multi_alpha2
+
+    def _transitions_col(self, data_frame):
+        """
+
+        :param data_frame:
+        :type data_frame: Pandas DataFrame
+        :return:
+        :rtype: ``Pandas DataFrame``
+        """
+        # Copy the input dataframe
+        df = copy.deepcopy(data_frame)
+
+        # Add Transitions
+        df['Transitions'] = df['Alpha2'].map(
+            lambda x: self.transition_dict[x] if x in self.transition_dict.keys() else np.NaN)
+
+        # Sort Transitions
+        df['Transitions'] = df['Transitions'].map(lambda x: sorted(x, key=lambda y: y[2]) if str(x) != 'nan' else x)
+
+        return df
+
+    def _most_recent_transition(self, transitions):
+        return list(filter(lambda x: str(x[2]) == max(np.array(transitions)[:, 2]), transitions))[0]
 
     def _currency_transition_integrator(self, currency_ops, currency_ops_no_dups, multi_alpha2, min_max_dates):
         """
@@ -200,17 +219,14 @@ class DataNavigator(object):
         df['CurrencyRange'] = df.apply(
             lambda x: x['CurrencyRange'] if x['Alpha2'] not in multi_dates.keys() else multi_dates[x['Alpha2']], axis=1)
 
-        # Add Transitions
-        df['Transitions'] = df['Alpha2'].map(
-            lambda x: self.transition_dict[x] if x in self.transition_dict.keys() else np.NaN)
+        # Add Transition Column
+        df = self._transitions_col(df)
 
-        # For countries with noted transitions, update their Currency to the most recent used.
-        def most_recent_transition(transitions):
-            return list(filter(lambda x: str(x[2]) == max(np.array(transitions)[:,2]), transitions))[0]
+        # Update the currency of countries with noted transitions to the most recent used
 
         # Create a temp. column of currencies to update
         df['CurrenciesToUpdate'] = df['Transitions'].map(
-            lambda x: x if str(x) == 'nan' else most_recent_transition(x))
+            lambda x: x if str(x) == 'nan' else self._most_recent_transition(x))
 
         # Define function to get CurrencyRange following merge
         def date_range_update(current_range, new_currency, min_max_dates):
@@ -228,19 +244,23 @@ class DataNavigator(object):
         df['Currency'] = df.apply(
             lambda x: x['Currency'] if str(x['CurrenciesToUpdate']) == 'nan' else x['CurrenciesToUpdate'][1], axis=1)
 
-        # Drop 'CurrenciesToUpdate'.
-        df.drop('CurrenciesToUpdate', 1, inplace=True)
+        # Drop 'CurrenciesToUpdate' and return
+        return df.drop('CurrenciesToUpdate', 1, inplace=False)
 
-        # Sort Transitions
-        df['Transitions'] = df['Transitions'].map(lambda x: sorted(x, key=lambda y: y[2]) if str(x) != 'nan' else x)
-
-        return df
+    def _currency_ex_dict_lookup(self, x, min_max_dates):
+        if x == 'EUR':
+            return min_max(list_flatten(self.currency_ex_dict.values())) if min_max_dates else list_flatten(
+                self.currency_ex_dict.values())
+        try:
+            return min_max(self.currency_ex_dict[x]) if min_max_dates else sorted(self.currency_ex_dict[x])
+        except:
+            return np.NaN
 
     def _currency_options(self, min_max_dates):
         """
 
         *Private Method*
-        Function to construct a dataframe of currencies for which EasyMoney has data on.
+        Method to construct a dataframe of currencies for which EasyMoney has data on.
 
         :param min_max_dates: if True, only report the minimum and maximum date for which data is available;
                               if False, all dates for which which data is available will be reported.
@@ -266,16 +286,9 @@ class DataNavigator(object):
         # Reorder columns
         currency_ops = currency_ops[['Region', 'Currency', 'Alpha2', 'Alpha3']]
 
-        # Add date information
-        def currency_ex_dict_lookup(x, min_max_dates):
-            try:
-                return min_max(self.currency_ex_dict[x]) if min_max_dates else sorted(self.currency_ex_dict[x])
-            except:
-                return np.NaN
-
         # Create Date Range Column
         currency_ops['CurrencyRange'] = currency_ops['Currency'].map(
-            lambda x: currency_ex_dict_lookup(x, min_max_dates))
+            lambda x: self._currency_ex_dict_lookup(x, min_max_dates))
 
         if min_max_dates:
             all_date_ranges = np.array(currency_ops['CurrencyRange'].tolist())
@@ -332,8 +345,11 @@ class DataNavigator(object):
         # Hacking the living daylights out of the pandas API
         cpi_ops['InflationRange'] = pandas_dictkey_to_key_unpack(cpi_ops['Alpha2'], cpi_dict_years)
 
-        # Sort by Region and Return
-        cpi_ops.sort_values(['InflationRange'], ascending=[1], inplace=True)
+        # Add Transition Column
+        cpi_ops = self._transitions_col(cpi_ops)
+
+        # Sort by Region
+        cpi_ops.sort_values(['Region'], ascending=[1], inplace=True)
 
         # Correct Index
         cpi_ops.index = range(cpi_ops.shape[0])
@@ -384,9 +400,21 @@ class DataNavigator(object):
         # Merge on Inflation options
         df = pd.merge(cpi_ops_df, currency_ops_df[currency_cols], on='Alpha2', how='left')
 
+        # Attempt to add CurrencyRange Information for rows without it following the merge
+        def _post_merge_currency_match(transition, currency_range, min_max_date):
+            if isinstance(currency_range, list):
+                return currency_range
+            elif isinstance(transition, list):
+                return self._currency_ex_dict_lookup(self._most_recent_transition(transition)[1], min_max_dates)
+            else:
+                return np.NaN
+
+        # Update CurrencyRange
+        df['CurrencyRange'] = df.apply(
+            lambda x: _post_merge_currency_match(x['Transitions'], x['CurrencyRange'], min_max_dates), axis=1)
+
         # Determine the Overlap in dates between CPI and Exchange
-        df['Overlap'] = df.apply(lambda row: self._date_overlap_calc(row['InflationRange'], row['CurrencyRange'])
-                                 , axis=1)
+        df['Overlap'] = df.apply(lambda row: self._date_overlap_calc(row['InflationRange'], row['CurrencyRange']), axis=1)
 
         # Sort by mapping
         df['TempSort'] = df['CurrencyRange'].map(lambda x: 'A' if str(x) != 'nan' else 'B')

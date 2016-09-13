@@ -25,12 +25,10 @@ from easymoney.support_money import floater
 from easymoney.support_money import money_printer
 from easymoney.support_money import str_to_datetime
 from easymoney.support_money import year_from_string
+from easymoney.data_navigation_tools import DataNavigator
 
 from sources.databases import _exchange_rates_from_datafile
 from sources.ecb_interface import ecb_currency_to_alpha2_dict
-
-
-from easymoney.data_navigation_tools import DataNavigator
 
 
 
@@ -847,7 +845,7 @@ class EasyPeasy(object):
 
                         .. warning::
                             If *to_year* is set to a specific year rather than to its default ('latest') and
-                            *exchange_date* is left to its default ('None'), the *average* exchange rate for *to_year*
+                            *exchange_date* is left to its default (None), the *average* exchange rate for *to_year*
                             will be used :sup:`1`.
 
                             For this reason, it is suggested that if you wish to pass a specific year via *to_year*,
@@ -865,7 +863,7 @@ class EasyPeasy(object):
         :param pretty_print: Pretty print the result if True; return amount if False. Defaults to False.
         :type pretty_print: bool
         :param exchange_date: date to perform the currency conversion on. Dates must be of the form: ``YYYY-MM-DD``.
-                              Defaults to 'None'.
+                              Defaults to None.
         :type exchange_date: str
         :return: amount adjusted for inflation and converted into the base currency.
         :rtype: ``float``
