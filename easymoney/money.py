@@ -20,7 +20,6 @@ from datetime import datetime
 
 from easymoney.support_tools import mint
 from easymoney.support_tools import min_max_dates
-
 from easymoney.pycountry_wrap import map_region_to_type
 from easymoney.sources.world_bank_interface import world_bank_pull_wrapper
 from easymoney.sources.ecb_interface import ecb_xml_exchange_data
@@ -198,6 +197,11 @@ class EasyPeasy(object):
         return mint(adjusted_amount, currency=self.region_map(region, map_to='currency_alpha_3'), pretty_print=pretty_print)
 
     def _user_currency_input(self, currency_or_region):
+        """
+
+        :param currency_or_region:
+        :return:
+        """
         try:
             return pycountry.currencies.lookup(currency_or_region).alpha_3
         except:

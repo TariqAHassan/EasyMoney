@@ -45,6 +45,7 @@ def _wb_rowwise_extractor(wb_row, dict_keys):
 
     return extracted_data_dict
 
+
 def _world_bank_pull(dict_keys, raw_data):
     """
 

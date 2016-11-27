@@ -24,108 +24,98 @@ from easymoney.money import EasyPeasy
 # Set the Data Path
 currrent_dir = str(os.getcwd())
 
-PATH = ''
-if 'EasyMoney' in currrent_dir:
-    PATH = currrent_dir.split('EasyMoney', 1)[0] + "EasyMoney/"
-elif 'easymoney' in currrent_dir:
-    PATH = currrent_dir.split('easymoney', 1)[0] + "easymoney/"
-
-# Import from sources' data directory.
-ep_default = EasyPeasy(PATH + "sources/data")
-
-# Import from sources' data directory and enable fuzzy search
-ep_fuzzy = EasyPeasy(PATH + "sources/data", fuzzy_match_threshold = 85)
-
-# Import all Data from tests' test_data directory.
-ep_alternative = EasyPeasy(PATH + "tests/test_data")
+# PATH = ''
+# if 'EasyMoney' in currrent_dir:
+#     PATH = currrent_dir.split('EasyMoney', 1)[0] + "EasyMoney/"
+# elif 'easymoney' in currrent_dir:
+#     PATH = currrent_dir.split('easymoney', 1)[0] + "easymoney/"
 
 
-
-class OptionTests(unittest.TestCase):
-    """
-
-    Test Battery for EasyMoney/money's EasyPeasy().options() method.
-
-    """
-
-
-    def test_options_list(self):
-        """
-        General: test the EasyPeasy().options() method.
-        Specific: test rformat = 'list'.
-        """
-        # Request a list of nations for which there is exchange rate information.
-        exchange_options_list = ep_default.options(info = "exchange", rformat = 'list', pretty_print = False)
-
-        # Assert exchange_options_list is, in fact, a list
-        self.assertEqual(isinstance(exchange_options_list, list), True)
-
-        # Assert inflation_options_list is of nontrivial length.
-        self.assertEqual(len(exchange_options_list) > 0, True)
-
-        # Request a list of nations for which there is inflation information.
-        inflation_options_list = ep_default.options(info = "inflation", rformat = 'list', pretty_print = False)
-
-        # Assert inflation_options_list is, in fact, a list
-        self.assertEqual(isinstance(inflation_options_list, list), True)
-
-        # Assert inflation_options_list is of nontrivial length.
-        self.assertEqual(len(inflation_options_list) > 0, True)
-
-    def test_options_df_exchange(self):
-        """
-        General: test the EasyPeasy().options() method.
-        Specific: test rformat = 'table'.
-        """
-        exchange_options_df = ep_default.options(info = "exchange", rformat = 'table', pretty_print = False)
-
-        # Assert exchange_options_df is a Pandas DataFrame
-        self.assertEqual(isinstance(exchange_options_df, pd.DataFrame), True)
-
-        # Assert the number of rows in exchange_options_df is > 0.
-        self.assertEqual(exchange_options_df.shape[0] > 0, True)
-
-    def test_options_df_inflation(self):
-        """
-        General: test the EasyPeasy().options() method.
-        Specific: test rformat = 'table'.
-        """
-        # Request a Pandas DataFrame with all information information.
-        inflation_options_df = ep_default.options(info = "inflation", rformat = 'table', pretty_print = False)
-
-        # Assert inflation_options_list is a Pandas DataFrame
-        self.assertEqual(isinstance(inflation_options_df, pd.DataFrame), True)
-
-        # Assert the number of rows in inflation_options_list is > 0.
-        self.assertEqual(inflation_options_df.shape[0] > 0, True)
-
-    def test_options_df_overlap(self):
-        """
-        General: test the EasyPeasy().options() method.
-        Specific: test rformat = 'table'.
-        """
-        # Request a Pandas DataFrame with all overlap information (between exchange rate and inflation).
-        overlap_options_df = ep_default.options(info = "all", rformat = 'table', overlap_only = True, pretty_print = False)
-
-        # Assert overlap_options_df is a Pandas DataFrame
-        self.assertEqual(isinstance(overlap_options_df, pd.DataFrame), True)
-
-        # Assert the number of rows in overlap_options_df is > 0.
-        self.assertEqual(overlap_options_df.shape[0] > 0, True)
-
-    def test_options_df_all_dates(self):
-        """
-        General: test the EasyPeasy().options() method.
-        Specific: test min_max_dates = False.
-        """
-        # Request a Pandas DataFrame with all data information
-        all_dates_options_df = ep_default.options(info = "all", pretty_print = False, min_max_dates = False)
-
-        # Assert there are more than lists of two (i.e, [min, max] in the InflationRange column
-        self.assertEqual(max([len(l) for l in all_dates_options_df['InflationRange'] if isinstance(l, list)]) > 2, True)
-
-        # Assert there are more than lists of two (i.e, [min, max] in the ExchangeRange column
-        self.assertEqual(max([len(l) for l in all_dates_options_df['ExchangeRange'] if isinstance(l, list)]) > 2, True)
+# class OptionTests(unittest.TestCase):
+#     """
+#
+#     Test Battery for EasyMoney/money's EasyPeasy().options() method.
+#
+#     """
+#
+#
+#     def test_options_list(self):
+#         """
+#         General: test the EasyPeasy().options() method.
+#         Specific: test rformat = 'list'.
+#         """
+#         # Request a list of nations for which there is exchange rate information.
+#         exchange_options_list = ep_default.options(info = "exchange", rformat = 'list', pretty_print = False)
+#
+#         # Assert exchange_options_list is, in fact, a list
+#         self.assertEqual(isinstance(exchange_options_list, list), True)
+#
+#         # Assert inflation_options_list is of nontrivial length.
+#         self.assertEqual(len(exchange_options_list) > 0, True)
+#
+#         # Request a list of nations for which there is inflation information.
+#         inflation_options_list = ep_default.options(info = "inflation", rformat = 'list', pretty_print = False)
+#
+#         # Assert inflation_options_list is, in fact, a list
+#         self.assertEqual(isinstance(inflation_options_list, list), True)
+#
+#         # Assert inflation_options_list is of nontrivial length.
+#         self.assertEqual(len(inflation_options_list) > 0, True)
+#
+#     def test_options_df_exchange(self):
+#         """
+#         General: test the EasyPeasy().options() method.
+#         Specific: test rformat = 'table'.
+#         """
+#         exchange_options_df = ep_default.options(info = "exchange", rformat = 'table', pretty_print = False)
+#
+#         # Assert exchange_options_df is a Pandas DataFrame
+#         self.assertEqual(isinstance(exchange_options_df, pd.DataFrame), True)
+#
+#         # Assert the number of rows in exchange_options_df is > 0.
+#         self.assertEqual(exchange_options_df.shape[0] > 0, True)
+#
+#     def test_options_df_inflation(self):
+#         """
+#         General: test the EasyPeasy().options() method.
+#         Specific: test rformat = 'table'.
+#         """
+#         # Request a Pandas DataFrame with all information information.
+#         inflation_options_df = ep_default.options(info = "inflation", rformat = 'table', pretty_print = False)
+#
+#         # Assert inflation_options_list is a Pandas DataFrame
+#         self.assertEqual(isinstance(inflation_options_df, pd.DataFrame), True)
+#
+#         # Assert the number of rows in inflation_options_list is > 0.
+#         self.assertEqual(inflation_options_df.shape[0] > 0, True)
+#
+#     def test_options_df_overlap(self):
+#         """
+#         General: test the EasyPeasy().options() method.
+#         Specific: test rformat = 'table'.
+#         """
+#         # Request a Pandas DataFrame with all overlap information (between exchange rate and inflation).
+#         overlap_options_df = ep_default.options(info = "all", rformat = 'table', overlap_only = True, pretty_print = False)
+#
+#         # Assert overlap_options_df is a Pandas DataFrame
+#         self.assertEqual(isinstance(overlap_options_df, pd.DataFrame), True)
+#
+#         # Assert the number of rows in overlap_options_df is > 0.
+#         self.assertEqual(overlap_options_df.shape[0] > 0, True)
+#
+#     def test_options_df_all_dates(self):
+#         """
+#         General: test the EasyPeasy().options() method.
+#         Specific: test min_max_dates = False.
+#         """
+#         # Request a Pandas DataFrame with all data information
+#         all_dates_options_df = ep_default.options(info = "all", pretty_print = False, min_max_dates = False)
+#
+#         # Assert there are more than lists of two (i.e, [min, max] in the InflationRange column
+#         self.assertEqual(max([len(l) for l in all_dates_options_df['InflationRange'] if isinstance(l, list)]) > 2, True)
+#
+#         # Assert there are more than lists of two (i.e, [min, max] in the ExchangeRange column
+#         self.assertEqual(max([len(l) for l in all_dates_options_df['ExchangeRange'] if isinstance(l, list)]) > 2, True)
 
 class FunctionalityTests(unittest.TestCase):
     """
