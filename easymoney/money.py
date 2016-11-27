@@ -36,7 +36,7 @@ class EasyPeasy(object):
         self.pycountry_wrap = PycountryWrap(curr_path)
         self.cpi_dict = world_bank_pull_wrapper(return_type='dict')
         self.exchange_dict = ecb_xml_exchange_data('dict')[0]
-        self.exchange_date_range = min_max_dates(list_of_dates=list(exchange_dict.keys()))
+        self.exchange_date_range = min_max_dates(list_of_dates=list(self.exchange_dict.keys()))
 
     def _params_check(self, amount, pretty_print):
         """
@@ -92,8 +92,8 @@ class EasyPeasy(object):
         :return:
         """
         cpi_years_list = list()
-        for year in sorted(list(cpi_dict.keys()), reverse=True):
-            cpi = cpi_dict.get(year, None).get(region, None)
+        for year in sorted(list(self.cpi_dict.keys()), reverse=True):
+            cpi = self.cpi_dict.get(year, None).get(region, None)
             if not isinstance(cpi, type(None)):
                 cpi_years_list.append(year)
 
@@ -126,7 +126,7 @@ class EasyPeasy(object):
             return year
 
     def _cpi_region_year(self, region, year):
-        cpi = cpi_dict.get(str(int(float(year))), {}).get(self.region_map(region, 'alpha_2'), None)
+        cpi = self.cpi_dict.get(str(int(float(year))), {}).get(self.region_map(region, 'alpha_2'), None)
         if cpi is not None:
             return float(cpi)
         else:
@@ -166,7 +166,7 @@ class EasyPeasy(object):
         if (any([pd.isnull(c1), pd.isnull(c2)])) or (c2 == 0.0):
             return np.NaN
         else:
-            rate = round(((c1 - c2) / float(c2)) * 100, round_to)
+            rate = round(((c1 - c2) / float(c2)) * 100, self.round_to)
 
         # Return or Pretty Print.
         return rate if not pretty_print else print(rate, "%")
@@ -181,7 +181,7 @@ class EasyPeasy(object):
 
         # Input checking
         if year_a == year_b:
-            return round(amount, round_to)
+            return round(amount, self.round_to)
 
         # Get the CPI information
         inflation_dict, years = self.inflation(region, year_a, year_b, return_raw_cpi_dict='complete')
@@ -221,9 +221,9 @@ class EasyPeasy(object):
 
         # Set Date for the Exchange -- Improve (this assumes uniformity in dates and currencies).
         if date == 'oldest':
-            exchange_date = exchange_date_range[0]
+            exchange_date = self.exchange_date_range[0]
         elif date == 'latest':
-            exchange_date = exchange_date_range[1]
+            exchange_date = self.exchange_date_range[1]
         elif isinstance(date, str) and date.count("/") == 2: # improve
             exchange_date = date
         else:
@@ -256,7 +256,7 @@ class EasyPeasy(object):
         converted_amount = conversion_to_invert ** -1 * self._base_cur_to_lcu(to_currency_fn, date) * float(amount)
 
         # Return results (or pretty print)
-        return mint(round(converted_amount, round_to), currency=to_currency_fn, pretty_print=pretty_print)
+        return mint(round(converted_amount, self.round_to), currency=to_currency_fn, pretty_print=pretty_print)
 
     def normalize(self
                   , amount
@@ -279,8 +279,7 @@ class EasyPeasy(object):
         normalize_amount = self.currency_converter(real_amount, region, base_currency, date=exchange_date)
 
         # Return results (or pretty print)
-        return mint(round(normalize_amount, round_to), self._user_currency_input(base_currency), pretty_print)
-
+        return mint(round(normalize_amount, self.round_to), self._user_currency_input(base_currency), pretty_print)
 
 
 
