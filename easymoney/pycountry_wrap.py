@@ -85,10 +85,10 @@ def _currency_extract(currency_name, extract_type='currency_alpha_3'):
         raise ValueError("invalid extract_type supplied")
 
 
-def map_to_type(region, extract_type='alpha_2'):
+def map_region_to_type(region, extract_type='alpha_2'):
     """
 
-    Maps the input to:
+    Maps the input region to:
         region: alpha_2, alpha_3, name, official_name
         currency: currency_alpha_3, currency_numeric, currency_name
 

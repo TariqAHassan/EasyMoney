@@ -11,9 +11,10 @@
 import re
 import requests
 import pandas as pd
-from easymoney.support_money import floater
 
-def _ecb_xml_exchange_data(return_as = 'dict', ecb_extension = "/stats/eurofxref/eurofxref-hist.xml"):
+from easymoney.support_tools import date_reformat
+
+def ecb_xml_exchange_data(return_as = 'dict', ecb_extension = "/stats/eurofxref/eurofxref-hist.xml"):
     """
 
     *Private Method*
@@ -51,7 +52,7 @@ def _ecb_xml_exchange_data(return_as = 'dict', ecb_extension = "/stats/eurofxref
         date = re.findall(r'time="(.*?)"', j)[0]
         ccodes = re.findall(r'currency="(.*?)" rate=', j)
         rates = re.findall(r'rate="(.*?)"', j)
-        exchange_rate_db[date] = dict(zip(ccodes, [floater(x) for x in rates]))
+        exchange_rate_db[date_reformat(date, from_format="%Y-%m-%d")] = dict(zip(ccodes, [float(x) for x in rates]))
         all_currency_codes += [c for c in ccodes if c not in all_currency_codes]
 
     # return as dict
@@ -59,7 +60,7 @@ def _ecb_xml_exchange_data(return_as = 'dict', ecb_extension = "/stats/eurofxref
         return exchange_rate_db, all_currency_codes
 
     # return as pandas df
-    elif return_as == 'df' or return_as == 'both':
+    elif return_as == 'data_frame' or return_as == 'both':
         # Convert to pandas dataframe
         df = pd.DataFrame.from_dict(exchange_rate_db, orient = 'index')
 
@@ -74,16 +75,19 @@ def _ecb_xml_exchange_data(return_as = 'dict', ecb_extension = "/stats/eurofxref
         # Drop NaNs
         df = df[pd.notnull(df['Rate'])]
 
-        # Convert date column --> datetime
-        df['Date'] = pd.to_datetime(df['Date'], infer_datetime_format = True)
+        # Add Temp. Date Column
+        df['DateTemp'] = pd.to_datetime(df['Date'], format='%d/%m/%Y')
 
         # Sort by currency code
-        df.sort_values(['Date', 'Currency'], ascending = [1, 1], inplace = True)
+        df.sort_values(['DateTemp', 'Currency'], ascending = [1, 1], inplace = True)
+
+        # Drop DateTemp
+        del df['DateTemp']
 
         # Refresh index
-        df.index = range(df.shape[0])
+        df = df.reset_index(drop=True)
 
-        if return_as == 'df':
+        if return_as == 'data_frame':
             return df, all_currency_codes
         elif return_as == 'both':
             return exchange_rate_db, df, all_currency_codes
