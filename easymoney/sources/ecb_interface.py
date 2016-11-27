@@ -7,14 +7,11 @@
 
 """
 
-# Modules #
+# Modules
 import re
 import requests
 import pandas as pd
-
-
 from easymoney.support_money import floater
-
 
 def _ecb_xml_exchange_data(return_as = 'dict', ecb_extension = "/stats/eurofxref/eurofxref-hist.xml"):
     """

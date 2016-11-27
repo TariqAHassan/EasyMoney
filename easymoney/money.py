@@ -7,8 +7,9 @@
 
 """
 # Modules #
-import sys
 import datetime
+import sys
+
 import numpy as np
 import pandas as pd
 
@@ -17,7 +18,6 @@ try:
 except:
     pass
 
-import warnings
 from warnings import warn
 
 from easymoney.support_money import datetime_to_str
@@ -27,8 +27,8 @@ from easymoney.support_money import str_to_datetime
 from easymoney.support_money import year_from_string
 from easymoney.data_navigation_tools import DataNavigator
 
-from sources.databases import _exchange_rates_from_datafile
-from sources.ecb_interface import ecb_currency_to_alpha2_dict
+from easymoney.sources.databases import _exchange_rates_from_datafile
+from easymoney.sources.ecb_interface import ecb_currency_to_alpha2_dict
 
 
 
