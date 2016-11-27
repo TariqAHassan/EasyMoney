@@ -24,12 +24,7 @@ from easymoney.money import EasyPeasy
 # Set the Data Path
 currrent_dir = str(os.getcwd())
 
-# PATH = ''
-# if 'EasyMoney' in currrent_dir:
-#     PATH = currrent_dir.split('EasyMoney', 1)[0] + "EasyMoney/"
-# elif 'easymoney' in currrent_dir:
-#     PATH = currrent_dir.split('easymoney', 1)[0] + "easymoney/"
-
+ep = EasyPeasy(currrent_dir + "/")
 
 # class OptionTests(unittest.TestCase):
 #     """

@@ -12,13 +12,13 @@ from easymoney.support_tools import cln
 from easymoney.easy_pandas import twoD_nested_dict
 from easymoney.sources.world_bank_interface import world_bank_pull_wrapper
 
-def currency_mapping_to_dict():
+def currency_mapping_to_dict(curr_path=''):
     """
 
     :return:
     """
     # Read in the data
-    currency_mappings = pd.read_csv("easymoney/sources/data/CurrencyRelationshipsDB.csv",
+    currency_mappings = pd.read_csv(curr_path + "easymoney/sources/data/CurrencyRelationshipsDB.csv",
                                     usecols=['Alpha3', 'CurrencyCode'])
 
     # Initialize a default dict

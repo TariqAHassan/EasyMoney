@@ -20,7 +20,7 @@ from datetime import datetime
 
 from easymoney.support_tools import mint
 from easymoney.support_tools import min_max_dates
-from easymoney.pycountry_wrap import map_region_to_type
+from easymoney.pycountry_wrap import PycountryWrap
 from easymoney.sources.world_bank_interface import world_bank_pull_wrapper
 from easymoney.sources.ecb_interface import ecb_xml_exchange_data
 
@@ -30,9 +30,10 @@ class EasyPeasy(object):
 
     """
 
-    def __init__(self, round_to=2, fall_back=True):
+    def __init__(self, round_to=2, fall_back=True, curr_path=''):
         self.round_to = round_to
         # self.fall_back = fall_back
+        self.pycountry_wrap = PycountryWrap(curr_path)
         self.cpi_dict = world_bank_pull_wrapper(return_type='dict')
         self.exchange_dict = ecb_xml_exchange_data('dict')[0]
         self.exchange_date_range = min_max_dates(list_of_dates=list(exchange_dict.keys()))
@@ -80,7 +81,7 @@ class EasyPeasy(object):
             is used in several nations and thus a request to map it to a single ISO Alpha2 country code creates
             insurmountable ambiguity.
         """
-        return map_region_to_type(region=region, extract_type=map_to)
+        return self.pycountry_wrap.map_region_to_type(region=region, extract_type=map_to)
 
     def _cpi_years(self, region):
         """
