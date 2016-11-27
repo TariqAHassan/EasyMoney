@@ -27,7 +27,7 @@ setup(
                                         ]),
     package_data = {'sources': ['data/*.csv'],},
     data_files = [('', ["LICENSE.txt"])],
-    install_requires = ['numpy', 'pandas', 'wbdata', 'requests'],
+    install_requires = ['numpy', 'pandas', 'wbdata', 'requests', 'pycountry'],
     classifiers = [  "Development Status :: 5 - Production/Stable"
                    , "Natural Language :: English"
                    , "Intended Audience :: Science/Research"
