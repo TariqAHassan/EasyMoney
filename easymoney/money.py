@@ -101,6 +101,7 @@ class EasyPeasy(object):
         self._table_col_order = ['RegionFull', 'Region', 'Alpha2', 'Alpha3', 'Currencies',
                                  'InflationDates', 'ExchangeDates', 'Overlap']
 
+
     def _params_check(self, amount="void", pretty_print="void"):
         """
 
@@ -119,6 +120,7 @@ class EasyPeasy(object):
         if pretty_print != "void" and not isinstance(pretty_print, bool):
             raise ValueError("pretty_print must be either True or False.")
 
+
     def region_map(self, region, map_to='alpha_2'):
         """
 
@@ -136,6 +138,7 @@ class EasyPeasy(object):
         :rtype: ``str`` or ``tuple``
         """
         return self._pycountry_wrap.map_region_to_type(region=region, extract_type=map_to)
+
 
     def _cpi_years(self, region, warn=True):
         """
@@ -687,9 +690,6 @@ class EasyPeasy(object):
             raise ValueError("`rformat` must be one of:\n"
                              " - 'list', for a list of the requested information.\n"
                              " - 'table', for a table (dataframe) of the requested information.")
-
-
-
 
 
 
