@@ -15,7 +15,7 @@ import numpy as np
 import pandas as pd
 
 
-def strlist_to_list(to_parse, convert_to_str_first = False):
+def strlist_to_list(to_parse, convert_to_str_first=False):
     """
 
     Eval() work around for str(list) --> list.
@@ -30,27 +30,6 @@ def strlist_to_list(to_parse, convert_to_str_first = False):
     """
     str_list = str(to_parse) if convert_to_str_first else to_parse
     return [i.strip().replace("'", "") for i in [j.split(",") for j in [str_list.replace("[", "").replace("]", "")]][0]]
-
-def pandas_print_full(pd_df, full_rows = True, full_cols = True):
-    """
-
-    Print *all* of a Pandas DataFrame.
-
-    :param pd_df: DataFrame to printed in its entirety.
-    :type pd_df: Pandas DataFrame
-    :param full_rows: print all rows if True. Defaults to True.
-    :type full_rows: bool
-    :param full_cols: print all columns side-by-side if True. Defaults to True.
-    :type full_cols: bool
-    """
-    if full_rows: pd.set_option('display.max_rows', len(pd_df))
-    if full_cols: pd.set_option('expand_frame_repr', False)
-
-    # Print the data frame
-    print(pd_df)
-
-    if full_rows: pd.reset_option('display.max_rows')
-    if full_cols: pd.set_option('expand_frame_repr', True)
 
 def pandas_dictkey_to_key_unpack(pandas_series, unpack_dict, convert_values_to_str = False):
     """
@@ -292,6 +271,124 @@ def prettify_all_pandas_list_cols(data_frame, join_on = ", ", allow_nan = True, 
         return data_frame
     else:
         return pandas_list_column_to_str(data_frame, cols_to_prettify, join_on, bracket_wrap)
+
+
+def items_null(element):
+    """
+
+    :param element:
+    :return:
+    """
+    if isinstance(element, (list, tuple, type(np.array))):
+        return True if all(pd.isnull(i) for i in element) else False
+    else:
+        return True if pd.isnull(element) else False
+
+
+def pandas_null_drop(data_frame, subset=None):
+    """
+
+    :param data_frame:
+    :return:
+    """
+
+    # Fill Empty cells with nans
+    data_frame = data_frame.fillna(np.NaN)
+
+    if subset is None:
+        data_frame = data_frame.dropna()
+    else:
+        for c in subset:
+            data_frame = data_frame[~data_frame[c].map(items_null)]
+
+    return data_frame.reset_index(drop=True)
+
+
+# ----------------------------------------------------------------------------------------------------------
+# Printing Suit
+# ----------------------------------------------------------------------------------------------------------
+
+def _padding(s, amount, justify):
+    pad = ' ' * amount
+    if justify == 'left':
+        return "%s%s" % (str(s), pad)
+    elif justify == 'center':
+        return "%s%s%s" % (pad[:int(amount/2)], str(s), pad[int(amount/2):])
+
+def _pandas_series_alignment(pandas_series, justify):
+    if justify == 'right':
+        return pandas_series
+    longest_string = max([len(str(s)) for s in pandas_series])
+    return [_padding(s, longest_string - len(s), justify) for s in pandas_series]
+
+def align_pandas(data_frame, to_align='right'):
+    """
+
+    Align the columns of a Pandas DataFrame
+
+    :param data_frame: a Pandas DataFrame
+    :param to_align: 'left', 'right', 'center' or a dictionary of the form {'COLUMN' : 'ALIGNMENT'}.
+    :return: aligned DataFrame
+    """
+    if isinstance(to_align, dict):
+        alignment_dict = to_align
+    elif to_align.lower() in ['left', 'right', 'center']:
+        alignment_dict = dict.fromkeys(data_frame.columns, to_align.lower())
+    else:
+        raise ValueError("to_align must be either 'left', 'right', 'center', or a dict.")
+
+    for col, justification in alignment_dict.items():
+        data_frame[col] = _pandas_series_alignment(data_frame[col], justification)
+
+    return data_frame
+
+def pandas_print_full(pd_df, full_rows = True, full_cols = True):
+    """
+
+    Print *all* of a Pandas DataFrame.
+
+    :param pd_df: DataFrame to printed in its entirety.
+    :type pd_df: Pandas DataFrame
+    :param full_rows: print all rows if True. Defaults to True.
+    :type full_rows: bool
+    :param full_cols: print all columns side-by-side if True. Defaults to True.
+    :type full_cols: bool
+    """
+    if full_rows: pd.set_option('display.max_rows', len(pd_df))
+    if full_cols: pd.set_option('expand_frame_repr', False)
+
+    # Print the data frame
+    print(pd_df)
+
+    if full_rows: pd.reset_option('display.max_rows')
+    if full_cols: pd.set_option('expand_frame_repr', True)
+
+def pandas_pretty_print(data_frame, col_align='right', header_align='center', full_rows=True, full_cols=True):
+    """
+
+    Pretty Print a Pandas DataFrame
+
+    :param data_frame: a Pandas DataFrame
+    :param col_align: 'left', 'right', 'center'' or a dictionary of the form {'COLUMN' : 'ALIGNMENT'}.
+    :param header_align: 'left', 'right', 'center''
+    :param full_rows: print all rows
+    :param full_cols: print all columns
+    """
+    aligned_df = align_pandas(data_frame, col_align)
+    pd.set_option('colheader_justify', header_align)
+    pandas_print_full(aligned_df.fillna(""), full_rows, full_cols)
+    pd.set_option('colheader_justify', 'right')
+
+
+
+
+
+
+
+
+
+
+
 
 
 
