@@ -38,6 +38,7 @@ def options_ranking(inflation, exchange):
     else:
         return 0
 
+
 def year_date_overlap(years, full_dates, date_format="%d/%m/%Y"):
     """
 
