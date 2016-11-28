@@ -538,6 +538,7 @@ class EasyPeasy(object):
         # Return results (or pretty print)
         return mint(normalize_amount, self.precision, self._user_currency_input(base_currency), pretty_print)
 
+
     def _options_info_error(self, rformat):
         """
 
