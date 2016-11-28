@@ -7,6 +7,7 @@
 
 """
 # Imports
+import numpy as np
 from datetime import datetime
 
 from easymoney.easy_pandas import items_null
@@ -52,11 +53,25 @@ def year_date_overlap(years, full_dates, date_format="%d/%m/%Y"):
     :return: overlap
     :rtype: tuple
     """
+    # Check inputs
+    if any(items_null(i) for i in [years, full_dates]):
+        return np.NaN
+
+    # Convert input to datetimes
     year_datetimes = [datetime.strptime(dm + str(y), date_format) for y, dm in zip(sorted(years), ["01/01/", "31/12/"])]
     dates_datetimes = [datetime.strptime(d, date_format) for d in date_sort(full_dates, from_format=date_format)]
+
+    # Get date floor
     date_floor = max([year_datetimes[0], dates_datetimes[0]])
+
+    # Get date ceiling
     date_ceiling = min([year_datetimes[1], dates_datetimes[1]])
+
+    # Return
     return date_floor.strftime(date_format), date_ceiling.strftime(date_format)
+
+
+
 
 
 
