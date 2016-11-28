@@ -2,17 +2,13 @@
 
 """
 
-    Wrapper for `pycountry`
-    ~~~~~~~~~~~~~~~~~~~~~~
+    EasyMoney Wrapper for Pycountry
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 """
 # Import
 import pycountry
-import pandas as pd
-
 from warnings import warn
-from collections import defaultdict
-from easymoney.support_tools import cln
 from easymoney.sources.databases import currency_mapping_to_dict
 
 
@@ -46,7 +42,8 @@ class PycountryWrap(object):
             except:
                 raise ImportError("To use `fuzzy_threshold` please install `fuzzywuzzy`.\n"
                                   " - python 2: $ pip install fuzzywuzzy\n"
-                                  " - python 3: $ pip3 install fuzzywuzzy")
+                                  " - python 3: $ pip3 install fuzzywuzzy\n"
+                                  "You may need to create a new Python instance for these changes to take effect.")
 
     def _country_extract(self, country, extract_type='alpha_2'):
         """
