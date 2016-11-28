@@ -6,26 +6,18 @@
     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 """
-
-
-# Modules #
-import os
+# Imports
 import re
-import copy
 import wbdata
 import numpy as np
 import pandas as pd
-import pkg_resources
-
 
 from easymoney.easy_pandas import twoD_nested_dict
-from easymoney.easy_pandas import pandas_str_column_to_list
 
 
 def _wb_rowwise_extractor(wb_row, dict_keys):
     """
 
-    *Private Method*
     Extracts desired (see return) row information from the raw World Bank download.
 
     :param wb_row: a row of the raw World Bank Data (as a dataframe).
@@ -49,7 +41,6 @@ def _wb_rowwise_extractor(wb_row, dict_keys):
 def _world_bank_pull(dict_keys, raw_data):
     """
 
-    *Private Method*
     Parse the information pulled from the world bank's API.
 
     :param dict_keys:
@@ -72,7 +63,6 @@ def _world_bank_pull(dict_keys, raw_data):
 def world_bank_pull_wrapper(value_true_name="CPI", indicator="FP.CPI.TOTL", return_as='data_frame'):
     """
 
-    *Private Method*
     Wrapper for the ``WorldBankParse().world_bank_pull()`` method.
     Extracts world bank information based on a specific indicator and returns a Pandas DataFrame.
 
@@ -101,28 +91,7 @@ def world_bank_pull_wrapper(value_true_name="CPI", indicator="FP.CPI.TOTL", retu
     elif return_as == 'both':
         return df, twoD_nested_dict(df, 'Year', 'Alpha2', 'CPI')
     else:
-        raise ValueError("Invalid option passed to return_as.")
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+        raise ValueError("Invalid option passed to `return_as`.")
 
 
 
