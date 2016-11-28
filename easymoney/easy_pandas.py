@@ -420,7 +420,7 @@ def pandas_pretty_print(data_frame, col_align='right', header_align='center', fu
     :param data_frame: a dataframe
     :type data_frame: ``Pandas DataFrame``
     :param col_align: 'left', 'right', 'center'' or a dictionary of the form: ``{'Column': 'Alignment'}``.
-    :type col_align: ``str`
+    :type col_align: ``str``
     :param header_align: alignment of headers. Must be one of: 'left', 'right', 'center'.
     :type header_align: ``str``
     :param full_rows: print all rows.
