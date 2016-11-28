@@ -69,7 +69,7 @@ def world_bank_pull_wrapper(value_true_name=None, indicator="FP.CPI.TOTL", retur
                 country, ISO alpha 2 code, an indicator, value name (to be replaced by value_true_name) and year.
     | Please do not write procedures that slam their servers.
 
-    :param value_true_name: reable name for the indicator. If None, name will be extract from ``indicator``.
+    :param value_true_name: reable name for the indicator. If None, this information will be extract from ``indicator``.
                             Defaults to None.
     :type value_true_name: ``str``
     :param indicator: World Bank Indicator. Defaults to "FP.CPI.TOTL".
