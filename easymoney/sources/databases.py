@@ -2,20 +2,25 @@
 
 """
 
-    Tools for Locating Required Databases
-    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    Tools for Processing Included Databases
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 """
+# Imports
 import pandas as pd
 from collections import defaultdict
 from easymoney.support_tools import cln
-from easymoney.easy_pandas import twoD_nested_dict
-from easymoney.sources.world_bank_interface import world_bank_pull_wrapper
+
 
 def currency_mapping_to_dict(data_path=''):
     """
 
-    :return:
+    Constructs a mapping between country ISO Alpha 2 codes and currency ISO Alpha 3 codes.
+
+    :param data_path: path to the 'CurrencyRelationshipsDB.csv' database
+    :type data_path: ``str``
+    :return: a dictionary mapping alpha2 codes to currency codes
+    :rtype: ``dict``
     """
     # Read in the data
     currency_mappings = pd.read_csv(data_path + "easymoney/sources/data/CurrencyRelationshipsDB.csv",
