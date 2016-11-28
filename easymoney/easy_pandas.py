@@ -18,38 +18,39 @@ import pandas as pd
 def strlist_to_list(to_parse, convert_to_str_first=False):
     """
 
-    Eval() work around for str(list) --> list.
-    For example: "[1992, '221-21', 2102, 'apples']" --> ['1992', '221-21', '2102', 'apples'].
+    Work around for using ``eval()`` for the following conversion: ``str(list)`` --> ``list``.
+
+    For example: ``"[1992, '221-21', 2102, 'apples']"`` → ``['1992', '221-21', '2102', 'apples']``.
 
     :param to_parse: a string of a list.
-    :type to_parse: str
+    :type to_parse: ``str``
     :param convert_to_str_first: convert to a string first (as a precaution). Defaults to False.
-    :type convert_to_str_first: bool
+    :type convert_to_str_first: ``bool``
     :return: string of a list to an actual list.
-    :return: list
+    :return: ``list``
     """
     str_list = str(to_parse) if convert_to_str_first else to_parse
     return [i.strip().replace("'", "") for i in [j.split(",") for j in [str_list.replace("[", "").replace("]", "")]][0]]
 
 
-def pandas_dictkey_to_key_unpack(pandas_series, unpack_dict, convert_values_to_str = False):
+def _pandas_dictkey_to_key_unpack(pandas_series, unpack_dict, convert_values_to_str = False):
     """
 
     Used to unpack ISO Alpha2 --> Alpha2 ISO code Pandas Series.
 
     :param pandas_series: a Series to replace the alpha2 codes with another set.
-    :type pandas_series: Pandas Series
+    :type pandas_series: ``Pandas Series``
     :param convert_values_to_str: convert the values to string (precaution).
-    :type convert_values_to_str: bool
+    :type convert_values_to_str: ``bool``
     :param unpack_dict: a dict with the values coerced into strings.
-    :type unpack_dict: dict
-    :return: a pandas series with the alpha2 values replaced with unpack_dict.values(). NaNs are used if a match cannot be found.
-    :rtype: Pandas Series
+    :type unpack_dict: ``dict``
+    :return: a pandas series with the alpha2 values replaced with unpack_dict.values().
+             ``NaN`` is used if a match cannot be found.
+    :rtype: ``Pandas Series``
     """
     if convert_values_to_str:
         unpack_dict = {k: str(v) for k, v in unpack_dict.items()}
 
-    # Hacking the living daylights out of the pandas API
     return pandas_series.replace(unpack_dict).map(lambda x: np.NaN if 'nan' in str(x) else strlist_to_list(str(x)))
 
 
@@ -60,16 +61,16 @@ def _standard_pd_nester(data_frame, nest_col_a, nest_col_b, nest_col_c, keys_to_
     Reliable technique (although slow with large DataFrames).
 
     :param data_frame: see ``twoD_nested_dict()``.
-    :type data_frame: Pandas DataFrame
+    :type data_frame: ``Pandas DataFrame``
     :param nest_col_a: see ``twoD_nested_dict()``.
-    :type nest_col_a: str
+    :type nest_col_a: ``str``
     :param nest_col_b: see ``twoD_nested_dict()``.
-    :type nest_col_b: str
+    :type nest_col_b: ``str``
     :param nest_col_c: see ``twoD_nested_dict()``.
-    :type nest_col_c: str
+    :type nest_col_c: ``str``
     :param keys_to_str: see ``twoD_nested_dict()``.
-    :type keys_to_str: bool
-    :return: nested dict of the form {nest_col_a: {nest_col_b: nest_col_c}.
+    :type keys_to_str: ``bool``
+    :return: nested dict of the form: ``{nest_col_a: {nest_col_b: nest_col_c}``.
     :rtype: dict
     """
     # Initialize
@@ -112,7 +113,7 @@ def _fast_pd_nester(data_frame, nest_col_a, nest_col_b, nest_col_c, keys_to_str 
     :param nest_col_c: see ``twoD_nested_dict()``.
     :type nest_col_c: str
     :param keys_to_str: see ``twoD_nested_dict()``.
-    :type keys_to_str: bool
+    :type keys_to_str: ``bool``
     :return: nested dict of the form {nest_col_a: {nest_col_b: nest_col_c}.
     :rtype: dict
     """
@@ -150,28 +151,28 @@ def twoD_nested_dict(data_frame
     Defaults to using the first 3 columns.
 
     :param data_frame: a pandas dataframe.
-    :type data_frame: DateFrame
+    :type data_frame: ``Pandas DateFrame``
     :param nest_col_a: reference to column in the dataframe; to become the master key in dict.
                        Defaults to None (i.e., col 1).
-    :type nest_col_a: str
+    :type nest_col_a: ``str``
     :param nest_col_b: reference to column in the dataframe; to become the sub-key.
                        Defaults to None (i.e., col 2).
-    :type nest_col_b: str
+    :type nest_col_b: ``str``
     :param nest_col_c: reference to column in the dataframe; to become the value to corresponding to the sub-key.
                        Defaults to None (i.e., col 3).
-    :type nest_col_c: str
+    :type nest_col_c: ``str``
     :param to_float: a list items to float. Defaults to None.
-    :type to_float: str
+    :type to_float: ``str``
     :param to_int: a list of the lists to convert to ints. Defaults to None.
-    :type to_int: str
+    :type to_int: ``str``
     :param keys_to_str: Convert the columns that will become keys to strings. Default to True.
                         WARNING: will OVERRIDE *to_float* and *to_int* if they reference nest_col_a or nest_col_b.
-    :param engine: 'standard' for a slower (but better tested) method of generating a nested dict;
-                   'fast' to employ a very speedy (but *not well tested*) method for generating a nested dict.
-                    Default to 'standard'.
-    :type engine: str
-    :return: nested dict of the form {nest_col_a: {nest_col_b: nest_col_c}.
-    :rtype: dict
+    :type keys_to_str: ``bool``
+    :param engine: 'standard' for a slower (but well-tested) method of generating a nested dict; 'fast' to employ a
+                    speedy (but *not well tested*) method for generating a nested dict. Default to 'standard'.
+    :type engine: ``str``
+    :return: nested dict of the form: ``{nest_col_a: {nest_col_b: nest_col_c}``.
+    :rtype: ``dict``
     """
     if all(v is None for v in [nest_col_a, nest_col_b, nest_col_c]):
         nest_col_a = data_frame.columns[0]
@@ -200,14 +201,14 @@ def pandas_list_column_to_str(data_frame, columns, join_on = ", ", bracket_wrap 
     Tool for converting the columns in a Pandas DataFrame
     from pd.Series of lists into comma-seperated strings.
 
-    :param data_frame: any DataFrame
-    :type data_frame: Pandas DataFrame
+    :param data_frame: a dataframe.
+    :type data_frame: ``Pandas DataFrame``
     :param columns: a list of columns in the DataFrame
-    :type columns: list
+    :type columns: ``list``
     :param join_on: a string to join on. Defaults to ", ".
-    :type join_on: str
-    :return: a DataFrame with the columns altered in the manner described above.
-    :rtype: Pandas DataFrame
+    :type join_on: ``str``
+    :return: a dataframe with the columns altered in the manner described above.
+    :rtype: ``Pandas DataFrame``
     """
     df = copy.deepcopy(data_frame)
     for col in columns:
@@ -224,17 +225,16 @@ def pandas_str_column_to_list(data_frame, columns):
     Tool for converting the columns in a Pandas DataFrame
     from comma-seperated strings into a pd.Series of lists.
 
-    :param data_frame: any DataFrame
-    :type data_frame: Pandas DataFrame
-    :param columns: a list of columns in the DataFrame
-    :type columns: list
-    :return: a DataFrame with the columns altered in the manner described above.
-    :rtype: Pandas DataFrame
+    :param data_frame: a dataframe.
+    :type data_frame: ``Pandas DataFrame``
+    :param columns: a list of columns in the dataframe.
+    :type columns: ``list``
+    :return: a dataframe with the columns altered in the manner described above.
+    :rtype: ``Pandas DataFrame``
     """
     data_frame = copy.deepcopy(data_frame)
     for col in columns:
         data_frame[col] = data_frame[col].astype(str).map(lambda x: [i.strip() for i in x.split(",")])
-
     return data_frame
 
 
@@ -262,7 +262,7 @@ def prettify_all_pandas_list_cols(data_frame, join_on = ", ", allow_nan = True, 
     :type nan: ``bool``
     :param join_on: a string to join on. Defaults to ", ".
     :type join_on: ``str``
-    :param exclude: columns to exclude Defaults to an empty-list, [].
+    :param exclude: columns to exclude Defaults to an empty list (``[]``).
     :type exclude: ``list``
     :param bracket_wrap: wrap in brackets.
     :type bracket_wrap: ``bool``
@@ -300,13 +300,13 @@ def items_null(element):
 def pandas_null_drop(data_frame, subset=None):
     """
 
-    Drop Rows with NaNs of all, or a subset of, the dataframe's columns.
+    Drop rows with NaNs of all, or a subset of, the dataframe's columns.
     (Can handle iterables which only contain NaNs).
 
     :param data_frame: a dataframe.
-    :rtype data_frame: ``Pandas DataFrame``
+    :type data_frame: ``Pandas DataFrame``
     :param subset: a subset of columns. Defaults to None, which will apply to all columns.
-    :rtype subset: ``iterable``
+    :type subset: ``iterable``
     :return: dataframe with NaN dropped.
     :rtype: ``Pandas DataFrame``
     """
@@ -372,9 +372,9 @@ def align_pandas(data_frame, to_align='right'):
 
     :param data_frame: a dataframe.
     :type data_frame: ``Pandas DataFrame``
-    :param to_align: 'left', 'right', 'center' or a dictionary of the form {'COLUMN' : 'ALIGNMENT'}.
+    :param to_align: 'left', 'right', 'center' or a dictionary of the form: ``{'Column': 'Alignment'}``.
     :type to_align: ``str``
-    :return: aligned DataFrame
+    :return: aligned dataframe
     :rtype: ``Pandas DataFrame``
     """
     if isinstance(to_align, dict):
@@ -396,11 +396,11 @@ def pandas_print_full(pd_df, full_rows = True, full_cols = True):
     Print *all* of a Pandas DataFrame.
 
     :param pd_df: DataFrame to printed in its entirety.
-    :type pd_df: Pandas DataFrame
+    :type pd_df: ``Pandas DataFrame``
     :param full_rows: print all rows if True. Defaults to True.
-    :type full_rows: bool
+    :type full_rows: ``bool``
     :param full_cols: print all columns side-by-side if True. Defaults to True.
-    :type full_cols: bool
+    :type full_cols: ``bool``
     """
     if full_rows: pd.set_option('display.max_rows', len(pd_df))
     if full_cols: pd.set_option('expand_frame_repr', False)
@@ -417,11 +417,16 @@ def pandas_pretty_print(data_frame, col_align='right', header_align='center', fu
 
     Pretty Print a Pandas DataFrame.
 
-    :param data_frame: a Pandas DataFrame
-    :param col_align: 'left', 'right', 'center'' or a dictionary of the form {'COLUMN' : 'ALIGNMENT'}.
-    :param header_align: 'left', 'right', 'center''
-    :param full_rows: print all rows
-    :param full_cols: print all columns
+    :param data_frame: a dataframe
+    :type data_frame: ``Pandas DataFrame``
+    :param col_align: 'left', 'right', 'center'' or a dictionary of the form: ``{'Column': 'Alignment'}``.
+    :type col_align: ``str`
+    :param header_align: alignment of headers. Must be one of: 'left', 'right', 'center'.
+    :type header_align: ``str``
+    :param full_rows: print all rows.
+    :type full_rows: ``bool``
+    :param full_cols: print all columns.
+    :type full_cols: ``bool``
     """
     aligned_df = align_pandas(data_frame, col_align)
     pd.set_option('colheader_justify', header_align)

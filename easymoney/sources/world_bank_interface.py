@@ -2,8 +2,8 @@
 
 """
 
-    Tools for Obtaining Data from the World Bank Group
-    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    World Bank Group Data
+    ~~~~~~~~~~~~~~~~~~~~~
 
 """
 # Imports
@@ -38,10 +38,10 @@ def _wb_rowwise_extractor(wb_row, dict_keys):
     return extracted_data_dict
 
 
-def _world_bank_pull(dict_keys, raw_data):
+def _wb_pull(dict_keys, raw_data):
     """
 
-    Parse the information pulled from the world bank's API.
+    Parse the information pulled from the World Bank's API.
 
     :param dict_keys:
     :return: DataFrame with the requested indicator information.
@@ -60,36 +60,41 @@ def _world_bank_pull(dict_keys, raw_data):
     return data_frame.sort_values(['Alpha2', 'Year'], ascending = [1, 0]).reset_index(drop=True)
 
 
-def world_bank_pull_wrapper(value_true_name="CPI", indicator="FP.CPI.TOTL", return_as='data_frame'):
+def world_bank_pull_wrapper(value_true_name=None, indicator="FP.CPI.TOTL", return_as='data_frame'):
     """
 
-    Wrapper for the ``WorldBankParse().world_bank_pull()`` method.
-    Extracts world bank information based on a specific indicator and returns a Pandas DataFrame.
+    | Tool to harvest data for specific indicator from the World Bank Group via their generously provided API.
+    | Extracts world bank information based on a specific indicator and returns a Pandas DataFrame.
+    | Currently expects the follwing in the XML data:
+                country, ISO alpha 2 code, an indicator, value name (to be replaced by value_true_name) and year.
+    | Please do not write procedures that slam their servers.
 
-    :param value_true_name:
-    :type value_true_name: str
-    :param indicator:
-    :type indicator: str
+    :param value_true_name: reable name for the indicator. If None, name will be extract from ``indicator``.
+                            Defaults to None.
+    :type value_true_name: ``str``
+    :param indicator: World Bank Indicator. Defaults to "FP.CPI.TOTL".
+    :type indicator: ``str``
     :param return_as: 'data_frame' or 'dict'
-    :type return_as: str
+    :type return_as: ``str``
     :return: DataFrame with the requested indicator information or a dictionary
-    :rtype: Pandas DateFrame or dict
+    :rtype: ``dict`` or ``Pandas DateFrame``
     """
     raw_data = wbdata.get_data(indicator)
-    dict_keys = ['Country', 'Alpha2', 'Indicator', value_true_name, 'Year']
+    readable_name = value_true_name.split(".")[1] if value_true_name is None else value_true_name
+    dict_keys = ['Country', 'Alpha2', 'Indicator', readable_name, 'Year']
 
     # Convert to DataFrame
-    df = _world_bank_pull(dict_keys, raw_data)
+    df = _wb_pull(dict_keys, raw_data)
 
     # Fill Empty Values with NaNs
-    df = df.fillna(value=np.NaN).dropna(subset=['Year', 'Alpha2', 'CPI']).reset_index(drop=True)
+    df = df.fillna(value=np.NaN).dropna(subset=['Year', 'Alpha2', readable_name]).reset_index(drop=True)
 
     if return_as == 'data_frame':
         return df
     elif return_as == 'dict':
-        return twoD_nested_dict(df, 'Year', 'Alpha2', 'CPI')
+        return twoD_nested_dict(df, 'Year', 'Alpha2', readable_name)
     elif return_as == 'both':
-        return df, twoD_nested_dict(df, 'Year', 'Alpha2', 'CPI')
+        return df, twoD_nested_dict(df, 'Year', 'Alpha2', readable_name)
     else:
         raise ValueError("Invalid option passed to `return_as`.")
 

@@ -2,8 +2,8 @@
 
 """
 
-    Tools for Obtaining Data from the European Central Bank
-    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    European Central Bank Data
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 """
 # Modules
@@ -21,10 +21,10 @@ def _ecb_data_frame(exchange_rate_dict):
 
     Convert `exchange_rate_dict` into a Pandas DataFrame
 
-    :param exchange_rate_dict:
+    :param exchange_rate_dict: data harvest by `ecb_xml_exchange_data()`.
     :type exchange_rate_dict: ``dict``
     :return: dataframe of ECB exchange data.
-    :rytpe: Pandas DataFrame
+    :rytpe: ``Pandas DataFrame``
     """
     # Convert to pandas dataframe
     df = pd.DataFrame.from_dict(exchange_rate_dict, orient='index')
@@ -56,19 +56,18 @@ def _ecb_data_frame(exchange_rate_dict):
 def ecb_xml_exchange_data(return_as='dict', ecb_extension="stats/eurofxref/eurofxref-hist.xml"):
     """
 
-    | This tool goes out to the European Central Bank via their generously provided API
-    | and coerces XML data into a dictionary.
-    | Expects 'time', 'currency', 'rate' in the XML data.
-    | Returns a nested dictionary of the form: ``{time: {currency: rate}}``.
-    | DO NOT WRITE PROCEDURES THAT SLAM THEIR SERVERS.
+    | This tool harvests XML data European Central Bank via their generously provided API.
+    | Expects the follwing in the XML data: 'time', 'currency' and 'rate'.
+    | Returns either a Pandas DataFrame or nested dictionary of the form: ``{time: {currency: rate}}``.
+    | Please do not write procedures that slam their servers.
 
     :param return_as: 'dict' for dictionary (nested); 'df' for Pandas DataFrame OR 'both' for both a dict and DataFrame.
-    :type return_as: str
-    :param ecb_extension: URL to the exchange rate XML data on "http://www.ecb.europa.eu".
-                          Defaults to '/stats/eurofxref/eurofxref-hist.xml'.
-    :type ecb_extension: str
+    :type return_as: ``str``
+    :param ecb_extension: URL to the exchange rate XML data on ``"http://www.ecb.europa.eu"``.
+                          Defaults to ``'/stats/eurofxref/eurofxref-hist.xml'``.
+    :type ecb_extension: ``str``
     :return: exchange rate with EUR as the base-currency.
-    :rtype: dict or Pandas DataFrame
+    :rtype: ``dict`` or ``Pandas DataFrame``
     """
     # Currency Codes
     all_currency_codes = list()
