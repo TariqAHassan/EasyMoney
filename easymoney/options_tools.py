@@ -47,11 +47,11 @@ def year_date_overlap(years, full_dates, date_format="%d/%m/%Y"):
     Get the overlap for a iterable of years and an iterable of full dates (as strings).
 
     :param range_a: years of the form (year_a, year_b). Length must be equal to 2.
-    :type range_a: iterable
+    :type range_a: ``iterable``
     :param range_b: dates of the form (string_date_a, string_date_b). Length must be equal to 2.
-    :type range_b: iterable
-    :return: overlap
-    :rtype: list
+    :type range_b: ``iterable``
+    :return: date overlap.
+    :rtype: ``list``
     """
     # Check inputs
     if any(items_null(i) for i in [years, full_dates]):
