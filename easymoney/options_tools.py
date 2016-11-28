@@ -13,6 +13,7 @@ from datetime import datetime
 from easymoney.easy_pandas import items_null
 from easymoney.support_tools import date_sort
 
+
 def options_ranking(inflation, exchange):
     """
 
@@ -44,7 +45,6 @@ def year_date_overlap(years, full_dates, date_format="%d/%m/%Y"):
     """
 
     Get the overlap for a iterable of years and an iterable of full dates (as strings).
-
 
     :param range_a: years of the form (year_a, year_b). Length must be equal to 2.
     :type range_a: iterable
