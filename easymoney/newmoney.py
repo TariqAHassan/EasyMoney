@@ -43,9 +43,12 @@ curr_path = ''
 pycountry_wrap = PycountryWrap(curr_path)
 pycountries_alpha_2 = set([c.alpha_2 for c in list(pycountry.countries)])
 cpi_dict = world_bank_pull_wrapper(return_as='dict')
-exchange_dict = ecb_xml_exchange_data(return_as='dict')[0]
+
+exchange_dict, all_currency_codes, currency_date_record = ecb_xml_exchange_data(return_as='dict')
 exchange_date_range = min_max_dates(list_of_dates=list(exchange_dict.keys()))
 
+# Drop TempRanking, Order Columns and Return
+table_col_order = ['RegionFull', 'Region', 'Alpha2', 'Alpha3', 'Currencies', 'InflationDates', 'ExchangeDates']
 
 
 
@@ -217,20 +220,31 @@ def inflation_calculator(amount, region, year_a, year_b, pretty_print=False):
     # Print or Return
     return mint(adjusted_amount, currency=region_map(region, map_to='currency_alpha_3'), pretty_print=pretty_print)
 
-def _exchange_dates(currency):
+def _exchange_dates(currencies, min_max_rslt=False, date_format='%d/%m/%Y'):
     """
 
-    Get all dates for which there is data for a given currency
+    Get all dates for which there is data for a given list of currencies
 
-    :param currency:
+    :param currencies:
     :return:
     """
-    if currency.upper() == 'EUR':
-        dates = list(exchange_dict.keys())
-    else:
-        dates = [k for k, v in  exchange_dict.items() if currency.upper() in v]
+    dates = list()
+    for c in currencies:
+        if c == 'EUR':
+            dates.append(sorted(list(exchange_dict.keys()), key=lambda x: datetime.strptime(x, date_format)))
+        else:
+            dates.append(currency_date_record.get(c.upper(), None))
 
-    return sorted(dates, key=lambda x: datetime.strptime(x, '%d/%m/%Y'))
+    # Remove None
+    dates = list(filter(None, dates))
+
+    if not len(dates):
+        return None
+
+    if min_max_rslt:
+        dates = [list(min_max_dates(d)) for d in dates if isinstance(d, (list, tuple, type(np.array)))]
+
+    return dates[0] if len(dates) == 1 else dates
 
 def _user_currency_input(currency_or_region):
     """
@@ -336,12 +350,11 @@ def _options_info_error(rformat):
     raise ValueError(options_error_msg + append)
 
 
-def _options_table(info, overlap_only=False, range_dates=True):
+def _options_table(info, table_overlap_only=False, range_table_dates=True):
     """
     Note: does not currently handle currency transitions
 
     """
-
     # Use CurrencyRelationshipsDB as Base
     d = [i for i in list(pycountry_wrap.alpha2_currency_dict.items()) if i[0] in pycountries_alpha_2]
     options_df = pd.DataFrame(d).rename(columns={0 : "Alpha2", 1 : "Currencies"})
@@ -355,12 +368,12 @@ def _options_table(info, overlap_only=False, range_dates=True):
 
     # Map available Inflation Data onto this Base
     options_df['InflationDates'] = options_df['Alpha2'].map(
-          lambda x: sort_range_reverse(_cpi_years(x, warn=False), ('reverse' if not range_dates else 'range')), 'ignore'
+          lambda x: sort_range_reverse(_cpi_years(x, warn=False), ('reverse' if not range_table_dates else 'range')), 'ignore'
     )
 
     # Map available Exchange Rate Data onto this Base
     options_df['ExchangeDates'] = options_df['Currencies'].map(
-        lambda x: multi_currency_dates(x, _exchange_dates, range_dates), na_action='ignore'
+        lambda x: _exchange_dates(x, min_max_rslt=range_table_dates), na_action='ignore'
     )
 
     # Fill NaNs
@@ -370,17 +383,15 @@ def _options_table(info, overlap_only=False, range_dates=True):
     options_df['TempRanking'] = options_df.apply(lambda x: options_ranking(x['InflationDates'], x['ExchangeDates']), axis=1)
     options_df = options_df.sort_values(['TempRanking', 'Alpha2'], ascending=[False, True])
 
-    if overlap_only and info == 'all':
+    if table_overlap_only and info == 'all':
         options_df = pandas_null_drop(options_df, subset=['InflationDates', 'ExchangeDates'])
 
-    # Drop TempRanking, Order Columns and Return
-    col_order = ['RegionFull', 'Region', 'Alpha2', 'Alpha3', 'Currencies', 'InflationDates', 'ExchangeDates']
-
     # Subset
+    col_order = table_col_order
     if info == 'exchange':
-        col_order = [c for c in col_order if c != 'InflationDates']
+        col_order = [c for c in table_col_order if c != 'InflationDates'] # self.
     elif info == 'inflation':
-        col_order = [c for c in col_order if c != 'ExchangeDates']
+        col_order = [c for c in table_col_order if c != 'ExchangeDates']  # self.
     elif info != 'all':
         _options_info_error('table')
 
@@ -401,27 +412,29 @@ def _options_lists(info):
     full = [list(v.keys()) for k, v in d.items()]
     return sorted(set([i for s in full for i in s]))
 
+
 def options(info='all', rformat='table', pretty_print=True, table_overlap_only=False, range_table_dates=True):
     """
     """
+    pretty_df = None
     if rformat == 'list':
         request = _options_lists(info)
         return request if not pretty_print else pprint(request, width=65, compact=True)
     elif rformat == 'table':
         request = _options_table(info, table_overlap_only, range_table_dates)
         if pretty_print:
-            pandas_pretty_print(data_frame=request.drop('RegionFull', axis=1), col_align={'Region' : 'left'})
+            pretty_df = request.drop('RegionFull', axis=1)
+            pretty_df['Currencies'] = pretty_df['Currencies'].str.join("; ")
+            pandas_pretty_print(pretty_df, col_align={'Region' : 'left'})
         else:
             return request
     else:
-        raise ValueError("rformat must be one of:\n"
+        raise ValueError("`rformat` must be one of:\n"
                          " - 'list', for a list of the requested information.\n"
                          " - 'table', for a table (dataframe) of the requested information.")
 
 
-
-
-options(info='all')
+options()
 
 
 
