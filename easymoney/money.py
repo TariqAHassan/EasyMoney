@@ -49,9 +49,9 @@ class EasyPeasy(object):
     Tools for Monetary Information and Conversions.
 
     :param precision: number of places to round to when returning results. Defaults to 2.
-    :type precision: int
+    :type precision: ``int``
     :param fall_back: if True, fall back to closest possible date for which data is available. Defaults to True.
-    :type fall_back: bool
+    :type fall_back: ``bool``
     :param fuzzy_match_threshold: a threshold for fuzzy matching confidence (requires the ``fuzzywuzzy`` package).
                                   The value must be an number between 0 and 100. The *suggested* minimum values is 85.
                                   This will only impact attempts to match on natural names, e.g., attempting to match
@@ -63,10 +63,10 @@ class EasyPeasy(object):
 
                                         Whenever possible, use terminology *exactly* as it appears in ``options()``.
 
-    :type fuzzy_threshold: `int` or `float`
+    :type fuzzy_threshold: ``int`` or ``float``
     :param data_path: an alternative path to the database file(s). Defaults to ''.
                       Unless you know what you're doing, do not alter this parameter.
-    :type data_path: str
+    :type data_path: ``str``
     """
 
     def __init__(self, precision=2, fall_back=True, fuzzy_threshold=False, data_path = ''):
@@ -77,6 +77,11 @@ class EasyPeasy(object):
         """
         self.precision = precision
         self.fall_back = fall_back
+
+        # Check fuzzy_threshold
+        if fuzzy_threshold != False and not isinstance(fuzzy_threshold, (float, int)):
+            raise ValueError("`fuzzy_threshold` must be either `False`, a `float` or an `int`.")
+
         self.pycountry_wrap = PycountryWrap(fuzzy_threshold, data_path)
         self.pycountries_alpha_2 = set([c.alpha_2 for c in list(pycountry.countries)])
 
@@ -117,9 +122,9 @@ class EasyPeasy(object):
                 - ``EasyPeasy().region_map(region='Canada', map_to='alpha_3')``   :math:`=` 'CAN'
 
         :param region: a 'region' in the format of a ISO Alpha2, ISO Alpha3 or currency code, as well as natural name.
-        :type region: str
+        :type region: ``str``
         :param map_to: 'alpha_2', 'alpha_3' 'name' or 'offical_name'. Defaults to 'alpha_2'.
-        :type map_to: str
+        :type map_to: ``str``
         :return: the desired mapping from region to ISO Alpha2.
         :rtype: ``str`` or ``tuple``
         """
@@ -131,9 +136,9 @@ class EasyPeasy(object):
         Get Years for which CPI information is available for a given region.
 
         :param region: region of the form allowed by `EasyPeasy().region_map()`
-        :type region: `str`
+        :type region: ``str``
         :param warn: warn if data could not be obtained
-        :type warn: `bool`
+        :type warn: ``bool``
         :return: list of years for which CPI information is available.
         :rtype: ``list``
         """
@@ -156,10 +161,10 @@ class EasyPeasy(object):
         Match region to the best possible year.
 
         :param region: region of the form allowed by `EasyPeasy().region_map()`
-        :type region: `str`
+        :type region: ``str``
         :param year: a year for which CPI information is desired.
                      Can also be one of: 'oldest' or 'latest'.
-        :type year: `int` or `str`
+        :type year: ``int`` or ``str``
         :return: best matching of CPI information for the given region w.r.t. the year supplied.
         :rtype: ``float``, ``int`` or ``str``
         """
@@ -195,12 +200,12 @@ class EasyPeasy(object):
         Get the Consumer Price Index (CPI) in a given region for a given year.
 
         :param region: region of the form allowed by `EasyPeasy().region_map()`
-        :type region: `str`
+        :type region: ``str``
         :param year: a year for which CPI information is desired.
                      Can also be one of: 'oldest' or 'latest'.
-        :type year: `int` or `str`
+        :type year: ``int`` or ``str``
         :return: CPI for a given year.
-        :rtype: `float`
+        :rtype: ``float``
         """
         cpi = self.cpi_dict.get(str(int(float(year))), {}).get(self.region_map(region, 'alpha_2'), None)
         if cpi is not None:
@@ -223,15 +228,15 @@ class EasyPeasy(object):
         |   :math:`c_{2}` = CPI of the region in *year_a*.
 
         :param region: a region (currency codes may work, provided they are not common currencies, e.g., Euro).
-        :type region: str
+        :type region: ``str``
         :param year_a: start year.
-        :type year_a: int
+        :type year_a: ``int``
         :param year_b: end year. Defaults to None -- can only be left to this default if *return_raw_cpi_dict* is True.
-        :type year_b: int
+        :type year_b: ``int``
         :param return_raw_cpi_dict: If True, returns the CPI information in a dict. Defaults to False.
-        :type return_raw_cpi_dict: bool
+        :type return_raw_cpi_dict: ``bool``
         :param pretty_print: if True, pretty prints the result otherwise returns the result as a float. Defaults to False.
-        :type pretty_print: bool
+        :type pretty_print: ``bool``
         :return: (a) the rate of inflation between year_a and year_h.
 
                  (b) a dictionary of CPI information with the years as keys, CPI as values.
@@ -282,14 +287,14 @@ class EasyPeasy(object):
         :param amount: a monetary amount.
         :type amount: ``float`` or ``int``
         :param region: a geographical region.
-        :type region: str
+        :type region: ``str``
         :param year_a: start year.
-        :type year_a: int
+        :type year_a: ``int``
         :param year_b: end year.
-        :type year_b: int
+        :type year_b: ``int``
         :param pretty_print: if True, pretty prints the result otherwise returns the result as a float.
                              Defaults to False.
-        :type pretty_print: bool
+        :type pretty_print: ``bool``
         :return: :math:`amount \cdot inflation \space rate`.
         :rtype: ``float`` or ``NaN``
         """
@@ -324,9 +329,9 @@ class EasyPeasy(object):
         :type currencies: ``list``
         :param min_max_rslt: compute the earliest and latest date for which exchange rate information is available.
                              Defaults to False.
-        :type min_max_rslt: bool
+        :type min_max_rslt: ``bool``
         :param date_format: a data format. Defaults to '%d/%m/%Y'.
-        :type date_format: str
+        :type date_format: ``str``
         :return:
         :rtype: 1D ``list`` or 2D ``list``
         """
@@ -354,7 +359,7 @@ class EasyPeasy(object):
         Converts User supplied reference to a currency into an actual ISO Alpha 3 Currency Code.
 
         :param currency_or_region: reference to a currency
-        :type currency_or_region: str
+        :type currency_or_region: ``str``
         :return: ISO Alpha 3 Currency Code
         :rtype: ``pycountry object``
         """
@@ -370,9 +375,9 @@ class EasyPeasy(object):
         Convert from a base currency (Euros) to a local currency unit, e.g., CAD.
 
         :param currency: a currency code or region
-        :type currency: str
+        :type currency: ``str``
         :param date: date of allowed form (currently limited to DD/MM/YYYY).
-        :type date: str
+        :type date: ``str``
         :return: exchange_rate w.r.t. the Euro as a base currency.
         """
         error_msg = "\nCould not obtain the exchange rate for '%s' on %s from the\n" \
@@ -438,23 +443,15 @@ class EasyPeasy(object):
                 .. math:: amount_{CUR_{2}} = \dfrac{1}{LCU(\phi_{EUR}, CUR_{1})} \cdot LCU(\phi_{EUR}, CUR_{2}) \cdot amount_{CUR_{1}}
 
         :param amount: an amount of money to be converted.
-        :type amount: float or int
+        :type amount: ``float`` or ``int``
         :param from_currency: the currency of the amount.
-        :type from_currency: str
+        :type from_currency: ``str``
         :param to_currency: the currency the amount is to be converted into.
-        :type to_currency: str
-        :param date: date of data to perform the conversion with. Dates must be of the form: ``YYYY-MM-DD`` or ``YYYY``.
-                     Defaults to "latest" (which will use the most recent data available).
-
-                     .. warning::
-                         If a date of the form *YYYY*  is passed, the average exchange rate will be returned for that entire year.
-
-                         For this reason, using a value other than a date of the form *YYYY-MM-DD*
-                         or the default is not recommended.
-
-        :type date: str
+        :type to_currency: ``str``
+        :param date: date of data to perform the conversion with. Dates must be of the form: ``DD/MM/YYYY``
+        :type date: ``str``
         :param pretty_print: if True, pretty prints the table otherwise returns the table as a pandas DataFrame. Defaults to False.
-        :type pretty_print: bool
+        :type pretty_print: ``bool``
         :return: converted currency.
         :rtype: ``float``
         """
@@ -498,20 +495,20 @@ class EasyPeasy(object):
         |       2. Convert the adjusted amount into the *base_currency*.
 
         :param amount: a numeric amount of money.
-        :type amount: float or int
+        :type amount: ``float`` or ``int``
         :param currency: a region or currency.
                          Legal options: Region Name, ISO Alpha2, Alpha3 or Currency Code (see ``options()``).
-        :type currency: str
+        :type currency: ``str``
         :param from_year: a year. For valid values see ``options()``.
-        :type from_year: int
+        :type from_year: ``int``
         :param to_year: a year. For valid values see ``options()``.
                         Defaults to 'latest' (which will use the most recent data available).
-        :type to_year: str or int
+        :type to_year: ``str`` or ``int``
         :param base_currency:  a region or currency. Legal: Region Name, ISO Alpha2, Alpha3 or Currency Code
                                (see ``options()``). Defaults to 'EUR'.
-        :type base_currency: str
+        :type base_currency: ``str``
         :param pretty_print: Pretty print the result if True; return amount if False. Defaults to False.
-        :type pretty_print: bool
+        :type pretty_print: ``bool``
         :return: amount adjusted for inflation and converted into the base currency.
         :rtype: ``float``
         """
@@ -658,7 +655,7 @@ class EasyPeasy(object):
         :param range_table_dates: if True, only report the minimum and maximum date for which data is available;
                               if False, all dates for which data is available will be reported. Defaults to True.
         :type range_table_dates: ``bool``
-        :return: DataFrame of Currency Information EasyMoney Understands.
+        :return: DataFrame of Currency Information `EasyPeasy()` Understands.
         :rtype: ``Pandas DataFrame``
         """
         pretty_df = None
