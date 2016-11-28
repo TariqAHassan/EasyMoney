@@ -30,10 +30,8 @@ from easymoney.pycountry_wrap import PycountryWrap
 
 # options_tools
 from easymoney.options_tools import options_ranking
-from easymoney.options_tools import multi_currency_dates
 
 # Easy Pandas
-from easymoney.easy_pandas import items_null
 from easymoney.easy_pandas import pandas_null_drop
 from easymoney.easy_pandas import pandas_pretty_print
 
@@ -64,7 +62,7 @@ class EasyPeasy(object):
                                         Whenever possible, use terminology *exactly* as it appears in ``options()``.
 
     :type fuzzy_threshold: ``int`` or ``float``
-    :param data_path: an alternative path to the database file(s). Defaults to ''.
+    :param data_path: path to the database file(s). Defaults to ''.
                       Unless you know what you're doing, do not alter this parameter.
     :type data_path: ``str``
     """
@@ -81,6 +79,12 @@ class EasyPeasy(object):
         # Check fuzzy_threshold
         if fuzzy_threshold != False and not isinstance(fuzzy_threshold, (float, int)):
             raise ValueError("`fuzzy_threshold` must be either `False`, a `float` or an `int`.")
+        elif isinstance(fuzzy_threshold, (float, int)) and fuzzy_threshold <= 0:
+            raise ValueError("`fuzzy_threshold` be between greater than 0.")
+        elif isinstance(fuzzy_threshold, (float, int)) and fuzzy_threshold > 100:
+            raise ValueError("`fuzzy_threshold` be less than 100.")
+        elif isinstance(fuzzy_threshold, (float, int)) and fuzzy_threshold < 85:
+            warn("Low `fuzzy_threshold` values, such as %s, may yield innaccurate results." % (str(fuzzy_threshold)))
 
         self.pycountry_wrap = PycountryWrap(fuzzy_threshold, data_path)
         self.pycountries_alpha_2 = set([c.alpha_2 for c in list(pycountry.countries)])
@@ -303,7 +307,7 @@ class EasyPeasy(object):
 
         # Input checking
         if year_a == year_b:
-            return round(amount, self.precision)
+            return mint(amount, self.precision, self.region_map(region, map_to='currency_alpha_3'), pretty_print)
 
         # Get the CPI information
         inflation_dict, years = self.inflation(region, year_a, year_b, return_raw_cpi_dict='complete')
@@ -317,7 +321,7 @@ class EasyPeasy(object):
         adjusted_amount = inflation_dict[years['year_b']] / float(inflation_dict[years['year_a']]) * amount
 
         # Print or Return
-        return mint(adjusted_amount, currency=self.region_map(region, map_to='currency_alpha_3'), pretty_print=pretty_print)
+        return mint(adjusted_amount, self.precision, self.region_map(region, map_to='currency_alpha_3'), pretty_print)
 
 
     def _exchange_dates(self, currencies, min_max_rslt=False, date_format='%d/%m/%Y'):
@@ -463,7 +467,7 @@ class EasyPeasy(object):
 
         # Return amount unaltered if self-conversion was requested.
         if from_currency_fn == to_currency_fn:
-            return mint(amount, currency=to_currency_fn, pretty_print=pretty_print)
+            return mint(amount, self.precision, to_currency_fn, pretty_print)
 
         # from_currency --> Base Currency --> to_currency
         conversion_to_invert = self._base_cur_to_lcu(from_currency_fn, date)
@@ -472,7 +476,7 @@ class EasyPeasy(object):
         converted_amount = (conversion_to_invert ** -1) * self._base_cur_to_lcu(to_currency_fn, date) * float(amount)
 
         # Return results (or pretty print)
-        return mint(round(converted_amount, self.precision), currency=to_currency_fn, pretty_print=pretty_print)
+        return mint(converted_amount, self.precision, to_currency_fn, pretty_print)
 
 
     def normalize(self
@@ -531,7 +535,7 @@ class EasyPeasy(object):
         normalize_amount = self.currency_converter(real_amount, region, base_currency, date=exchange_date)
 
         # Return results (or pretty print)
-        return mint(round(normalize_amount, self.precision), self._user_currency_input(base_currency), pretty_print)
+        return mint(normalize_amount, self.precision, self._user_currency_input(base_currency), pretty_print)
 
     def _options_info_error(self, rformat):
         """
