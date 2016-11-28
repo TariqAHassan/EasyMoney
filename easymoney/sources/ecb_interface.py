@@ -6,7 +6,6 @@
     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 """
-
 # Modules
 import re
 import requests
@@ -16,10 +15,47 @@ from collections import defaultdict
 from easymoney.support_tools import date_sort
 from easymoney.support_tools import date_reformat
 
-def ecb_xml_exchange_data(return_as = 'dict', ecb_extension = "/stats/eurofxref/eurofxref-hist.xml"):
+
+def _ecb_data_frame(exchange_rate_dict):
     """
 
-    *Private Method*
+    Convert `exchange_rate_dict` into a Pandas DataFrame
+
+    :param exchange_rate_dict:
+    :type exchange_rate_dict: ``dict``
+    :return: dataframe of ECB exchange data.
+    :rytpe: Pandas DataFrame
+    """
+    # Convert to pandas dataframe
+    df = pd.DataFrame.from_dict(exchange_rate_dict, orient='index')
+
+    # convert date index --> column
+    df['Date'] = df.index
+    df.index = range(df.shape[0])
+
+    # Melt the dataframe
+    df = pd.melt(df, id_vars=['Date'], value_vars=[d for d in df.columns if d != 'Date'])
+    df.rename(columns={"variable": "Currency", "value": "Rate"}, inplace=True)
+
+    # Drop NaNs
+    df = df[pd.notnull(df['Rate'])]
+
+    # Add Temp. Date Column
+    df['DateTemp'] = pd.to_datetime(df['Date'], format='%d/%m/%Y')
+
+    # Sort by currency code
+    df.sort_values(['DateTemp', 'Currency'], ascending=[1, 1], inplace=True)
+
+    # Drop DateTemp
+    del df['DateTemp']
+
+    # Refresh index and Return
+    return df.reset_index(drop=True)
+
+
+def ecb_xml_exchange_data(return_as='dict', ecb_extension="stats/eurofxref/eurofxref-hist.xml"):
+    """
+
     | This tool goes out to the European Central Bank via their generously provided API
     | and coerces XML data into a dictionary.
     | Expects 'time', 'currency', 'rate' in the XML data.
@@ -34,11 +70,11 @@ def ecb_xml_exchange_data(return_as = 'dict', ecb_extension = "/stats/eurofxref/
     :return: exchange rate with EUR as the base-currency.
     :rtype: dict or Pandas DataFrame
     """
-    # Initialize
+    # Currency Codes
     all_currency_codes = list()
 
     # Constuct the URL to the XML data on the ECB's website.
-    xmlpath = "http://www.ecb.europa.eu" + ecb_extension
+    xmlpath = "http://www.ecb.europa.eu/" + ecb_extension
 
     # Request the data from the sever.
     url_request = requests.get(xmlpath)
@@ -47,7 +83,7 @@ def ecb_xml_exchange_data(return_as = 'dict', ecb_extension = "/stats/eurofxref/
     parsed_xml = str(url_request.content).split("Cube><Cube")[1:]
 
     # Initialize the exchange rate dict
-    exchange_rate_db = dict()
+    exchange_rate_dict = dict()
 
     # Initialize dict to track dates by currency
     currency_date_record = defaultdict(set)
@@ -62,7 +98,7 @@ def ecb_xml_exchange_data(return_as = 'dict', ecb_extension = "/stats/eurofxref/
         reformatted_date = date_reformat(date, from_format="%Y-%m-%d")
 
         # Build Exchange Rate Dict
-        exchange_rate_db[reformatted_date] = dict(zip(ccodes, [float(x) for x in rates]))
+        exchange_rate_dict[reformatted_date] = dict(zip(ccodes, [float(x) for x in rates]))
 
         # Track Currency Codes
         all_currency_codes += [c for c in ccodes if c not in all_currency_codes]
@@ -76,40 +112,13 @@ def ecb_xml_exchange_data(return_as = 'dict', ecb_extension = "/stats/eurofxref/
 
     # return as dict
     if return_as == 'dict':
-        return exchange_rate_db, all_currency_codes, currency_date_record_sorted
-
-    # return as pandas df
-    elif return_as in ['data_frame', 'both']:
-        # Convert to pandas dataframe
-        df = pd.DataFrame.from_dict(exchange_rate_db, orient = 'index')
-
-        # convert date index --> column
-        df['Date'] = df.index
-        df.index = range(df.shape[0])
-
-        # Melt the dataframe
-        df = pd.melt(df, id_vars = ['Date'], value_vars = [d for d in df.columns if d != 'Date'])
-        df.rename(columns = {"variable" : "Currency", "value" : "Rate"}, inplace = True)
-
-        # Drop NaNs
-        df = df[pd.notnull(df['Rate'])]
-
-        # Add Temp. Date Column
-        df['DateTemp'] = pd.to_datetime(df['Date'], format='%d/%m/%Y')
-
-        # Sort by currency code
-        df.sort_values(['DateTemp', 'Currency'], ascending = [1, 1], inplace = True)
-
-        # Drop DateTemp
-        del df['DateTemp']
-
-        # Refresh index
-        df = df.reset_index(drop=True)
-
-        if return_as == 'data_frame':
-            return df, all_currency_codes
-        elif return_as == 'both':
-            return exchange_rate_db, df, all_currency_codes, currency_date_record_sorted
+        return exchange_rate_dict, all_currency_codes, currency_date_record_sorted
+    elif return_as == 'data_frame':
+        return _ecb_data_frame(exchange_rate_dict), all_currency_codes
+    elif return_as == 'both':
+        return exchange_rate_dict, _ecb_data_frame(exchange_rate_dict), all_currency_codes, currency_date_record_sorted
+    else:
+        raise ValueError("`return_as` must be one of: 'dict', 'data_frame' or `both`.")
 
 ecb_currency_to_alpha2_dict = {   "CYP": "CY"
                                 , "EEK": "EE"
@@ -121,4 +130,11 @@ ecb_currency_to_alpha2_dict = {   "CYP": "CY"
                                 , "SKK": "SK"
                                 , "TRL": "TR"
 }
+
+
+
+
+
+
+
 
