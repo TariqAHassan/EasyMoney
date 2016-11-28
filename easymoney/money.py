@@ -30,6 +30,7 @@ from easymoney.pycountry_wrap import PycountryWrap
 
 # options_tools
 from easymoney.options_tools import options_ranking
+from easymoney.options_tools import year_date_overlap
 
 # Easy Pandas
 from easymoney.easy_pandas import pandas_null_drop
@@ -97,7 +98,8 @@ class EasyPeasy(object):
         self._exchange_dict, all_currency_codes, self._currency_date_record = ecb_xml_exchange_data(return_as='dict')
 
         # Column Order for options
-        self._table_col_order = ['RegionFull', 'Region', 'Alpha2', 'Alpha3', 'Currencies', 'InflationDates', 'ExchangeDates']
+        self._table_col_order = ['RegionFull', 'Region', 'Alpha2', 'Alpha3', 'Currencies',
+                                 'InflationDates', 'ExchangeDates', 'Overlap']
 
     def _params_check(self, amount="void", pretty_print="void"):
         """
@@ -600,6 +602,11 @@ class EasyPeasy(object):
             lambda x: self._exchange_dates(x, min_max_rslt=range_table_dates), na_action='ignore'
         )
 
+        # Add Overlap
+        options_df['Overlap'] = options_df.apply(
+            lambda x: year_date_overlap(x['InflationDates'], x['ExchangeDates'], date_format="%d/%m/%Y"), axis=1
+        )
+
         # Fill NaNs
         options_df = options_df.fillna(np.NaN)
 
@@ -680,16 +687,6 @@ class EasyPeasy(object):
             raise ValueError("`rformat` must be one of:\n"
                              " - 'list', for a list of the requested information.\n"
                              " - 'table', for a table (dataframe) of the requested information.")
-
-
-
-
-
-
-
-
-
-
 
 
 
