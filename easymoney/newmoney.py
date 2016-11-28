@@ -6,10 +6,6 @@
     ~~~~~~~~~~~~~~~~~~~~~~
 
 """
-
-# Functionality to add:
-#   - options
-
 # Imports
 import pycountry
 import numpy as np
@@ -21,10 +17,14 @@ from pprint import pprint
 
 from easymoney.support_tools import mint
 from easymoney.support_tools import min_max
+from easymoney.support_tools import closest_date
 from easymoney.support_tools import min_max_dates
+from easymoney.support_tools import closest_value
+from easymoney.support_tools import date_format_check
 from easymoney.support_tools import sort_range_reverse
 
 from easymoney.pycountry_wrap import PycountryWrap
+
 from easymoney.options_tools import options_ranking
 from easymoney.options_tools import multi_currency_dates
 
@@ -40,7 +40,7 @@ from easymoney.sources.world_bank_interface import world_bank_pull_wrapper
 round_to = 2
 fall_back = True
 curr_path = ''
-pycountry_wrap = PycountryWrap(curr_path)
+pycountry_wrap = PycountryWrap(curr_path) # fuzzy_threshold
 pycountries_alpha_2 = set([c.alpha_2 for c in list(pycountry.countries)])
 cpi_dict = world_bank_pull_wrapper(return_as='dict')
 
@@ -49,7 +49,6 @@ exchange_date_range = min_max_dates(list_of_dates=list(exchange_dict.keys()))
 
 # Drop TempRanking, Order Columns and Return
 table_col_order = ['RegionFull', 'Region', 'Alpha2', 'Alpha3', 'Currencies', 'InflationDates', 'ExchangeDates']
-
 
 
 
@@ -67,6 +66,7 @@ def _params_check(amount="void", pretty_print="void"):
     # Check pretty_print is a bool
     if pretty_print != "void" and not isinstance(pretty_print, bool):
         raise ValueError("pretty_print must be either True or False.")
+
 
 def region_map(region, map_to='alpha_2'):
     """
@@ -98,6 +98,7 @@ def region_map(region, map_to='alpha_2'):
     """
     return pycountry_wrap.map_region_to_type(region=region, extract_type=map_to)
 
+
 def _cpi_years(region, warn=True):
     """
 
@@ -116,7 +117,9 @@ def _cpi_years(region, warn=True):
     if len(cpi_years_list):
         return cpi_years_list
     elif warn:
-        raise KeyError("Could not obtain inflation (CPI) information for '%s'." % (region))
+        raise KeyError("Could not obtain inflation (CPI) information for '%s' from the\n" \
+                       "International Monetary Fund database currently cached." % (region))
+
 
 def _cpi_match(region, year):
     """
@@ -125,22 +128,31 @@ def _cpi_match(region, year):
     :param year:
     :return:
     """
+    # Init
+    fall_back_year = None
+    natural_region_name = None
+
     # replace year_b if it is 'oldest' or 'latest'
-    year_bounds = [int(float(func(_cpi_years(region)))) for func in (min, max)]
-    error_msg = "Inflation (CPI) data for %s in '%s' could not be obtained. Falling back to %s."
+    available_years = list(map(int, _cpi_years(region)))
+    error_msg = "\nInflation (CPI) data for %s in '%s' could not be obtained from the\n" \
+                "International Monetary Fund database currently cached."
+    warn_msg = error_msg + "\nFalling back to %s."
 
     if year == 'oldest':
-        return year_bounds[0]
+        return min(available_years)
     elif year == 'latest':
-        return year_bounds[1]
-    elif float(year) < year_bounds[0]:
-        warn(error_msg % (year, region, int(year_bounds[0])))
-        return year_bounds[0]
-    elif float(year) > year_bounds[1]:
-        warn(error_msg % (year, region, int(year_bounds[1])))
-        return year_bounds[1]
+        return max(available_years)
+    elif int(float(year)) not in available_years:
+        if fall_back:
+            natural_region_name = pycountry_wrap.map_region_to_type(region, 'name')
+            fall_back_year = closest_value(float(year), available_years)
+            warn(warn_msg % (year, natural_region_name, str(fall_back_year)))
+            return fall_back_year
+        else:
+            raise AttributeError(error_msg % (year, natural_region_name))
     else:
         return year
+
 
 def _cpi_region_year(region, year):
     """
@@ -155,13 +167,14 @@ def _cpi_region_year(region, year):
     else:
         raise KeyError("Could not obtain inflation information for '%s' in '%s'." % (str(region), str(year)))
 
+
 def inflation(region, year_a, year_b=None, return_raw_cpi_dict=False, pretty_print=False):
     """
     """
     # Check Params
     _params_check(pretty_print=pretty_print)
 
-    # Map Region
+    # Map Region to its alpha 2 code
     mapped_region = region_map(region, 'alpha_2')
 
     # Set to_year
@@ -194,6 +207,7 @@ def inflation(region, year_a, year_b=None, return_raw_cpi_dict=False, pretty_pri
     # Return or Pretty Print.
     return rate if not pretty_print else print(rate, "%")
 
+
 def inflation_calculator(amount, region, year_a, year_b, pretty_print=False):
     """
 
@@ -220,6 +234,7 @@ def inflation_calculator(amount, region, year_a, year_b, pretty_print=False):
     # Print or Return
     return mint(adjusted_amount, currency=region_map(region, map_to='currency_alpha_3'), pretty_print=pretty_print)
 
+
 def _exchange_dates(currencies, min_max_rslt=False, date_format='%d/%m/%Y'):
     """
 
@@ -237,7 +252,6 @@ def _exchange_dates(currencies, min_max_rslt=False, date_format='%d/%m/%Y'):
 
     # Remove None
     dates = list(filter(None, dates))
-
     if not len(dates):
         return None
 
@@ -245,6 +259,7 @@ def _exchange_dates(currencies, min_max_rslt=False, date_format='%d/%m/%Y'):
         dates = [list(min_max_dates(d)) for d in dates if isinstance(d, (list, tuple, type(np.array)))]
 
     return dates[0] if len(dates) == 1 else dates
+
 
 def _user_currency_input(currency_or_region):
     """
@@ -257,6 +272,7 @@ def _user_currency_input(currency_or_region):
     except:
         return region_map(currency_or_region, "currency_alpha_3")
 
+
 def _base_cur_to_lcu(currency, date):
     """
 
@@ -264,26 +280,40 @@ def _base_cur_to_lcu(currency, date):
     :param date:
     :return:
     """
+    error_msg = "\nCould not obtain the exchange rate for '%s' on %s from the\n" \
+                "European Central Bank database currently cached."
+    warn_msg = error_msg + "\nFalling back to %s."
+
     # Handle Base Currency
     if currency.upper() == 'EUR':
         return 1.0
 
-    # Set Date for the Exchange -- Improve (this assumes uniformity in dates and currencies).
+    available_data = currency_date_record.get(currency, None)
+    if available_data == None:
+        raise AttributeError("Data could not obtained for '%s' from the\n" \
+                             "European Central Bank database currently cached." % (currency))
+
     if date == 'oldest':
-        exchange_date = exchange_date_range[0]
+        exchange_date = min_max_dates(available_data)[0]
     elif date == 'latest':
-        exchange_date = exchange_date_range[1]
-    elif isinstance(date, str) and date.count("/") == 2: # improve
+        exchange_date = min_max_dates(available_data)[1]
+    elif isinstance(date, str) and date not in available_data:
+        if fall_back:
+            exchange_date = closest_date(date, available_data)
+            warn(warn_msg % (currency, date, exchange_date))
+        else:
+            raise AttributeError(msg % (currency, exchange_date))
+    elif isinstance(date, str) and date_format_check(date, from_format="%d/%m/%Y"):
         exchange_date = date
     else:
-        raise ValueError("Invalid Date Passed. Dates must be of the form DD/MM/YYYY.")
+        raise ValueError("Invalid Date Supplied. Dates must be of the form DD/MM/YYYY.")
 
-    exchange_rate = exchange_dict.get(exchange_date, None).get(currency, None)
+    exchange_rate = exchange_dict.get(exchange_date, {}).get(currency, None)
     if not isinstance(exchange_rate, type(None)):
         return exchange_rate
     else:
-        msg = "Could not obtain the exchange rate for '%s' on %s from the European Central Bank."
         raise AttributeError(msg % (currency, exchange_date))
+
 
 def currency_converter(amount, from_currency, to_currency, date="latest", pretty_print=False):
     """
@@ -307,6 +337,8 @@ def currency_converter(amount, from_currency, to_currency, date="latest", pretty
     # Return results (or pretty print)
     return mint(round(converted_amount, round_to), currency=to_currency_fn, pretty_print=pretty_print)
 
+
+
 def normalize(amount
               , region
               , from_year
@@ -320,6 +352,15 @@ def normalize(amount
     # Check Params
     _params_check(amount, pretty_print)
 
+    exchange_year = year_extract(exchange_date)
+    if not exchange_year.isdigit():
+        warn("\n`exchange_date` is likely formatted improperly.")
+
+    # Check delta between `to_year` and `exchange_date`.
+    if abs(float(to_year) - float(exchange_year)) > 1:
+        warn("\nThe year for which the input amount is being adjusted\n"
+             "for inflation is %s, whereas the exchange rate year is %s." % (str(to_year), str(exchange_year)))
+
     # Adjust input for inflation
     real_amount = inflation_calculator(amount, region, year_a=from_year, year_b=to_year)
 
@@ -328,7 +369,6 @@ def normalize(amount
 
     # Return results (or pretty print)
     return mint(round(normalize_amount, round_to), _user_currency_input(base_currency), pretty_print)
-
 
 def _options_info_error(rformat):
     """
@@ -385,6 +425,8 @@ def _options_table(info, table_overlap_only=False, range_table_dates=True):
 
     if table_overlap_only and info == 'all':
         options_df = pandas_null_drop(options_df, subset=['InflationDates', 'ExchangeDates'])
+    elif table_overlap_only and info != 'all':
+        warn("`table_overlap_only` can only take effect if `info` is equal to 'all'.")
 
     # Subset
     col_order = table_col_order
@@ -396,6 +438,7 @@ def _options_table(info, table_overlap_only=False, range_table_dates=True):
         _options_info_error('table')
 
     return options_df.drop('TempRanking', axis=1)[col_order].reset_index(drop=True)
+
 
 def _options_lists(info):
     """
@@ -434,7 +477,17 @@ def options(info='all', rformat='table', pretty_print=True, table_overlap_only=F
                          " - 'table', for a table (dataframe) of the requested information.")
 
 
-options()
+
+
+
+
+
+
+
+
+
+
+
 
 
 
