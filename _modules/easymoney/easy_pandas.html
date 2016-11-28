@@ -1,0 +1,645 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>easymoney.easy_pandas &mdash; EasyMoney 1.0.0 documentation</title>
+  
+
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+    <link rel="top" title="EasyMoney 1.0.0 documentation" href="../../index.html"/>
+        <link rel="up" title="Module code" href="../index.html"/> 
+
+  
+  <script src="../../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../../index.html" class="icon icon-home"> EasyMoney
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                1.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+                <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../README.html">EasyMoney</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../code.html">Developer Documentation</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="../../index.html">EasyMoney</a>
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../../index.html">Docs</a> &raquo;</li>
+      
+          <li><a href="../index.html">Module code</a> &raquo;</li>
+      
+    <li>easymoney.easy_pandas</li>
+      <li class="wy-breadcrumbs-aside">
+        
+          
+        
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for easymoney.easy_pandas</h1><div class="highlight"><pre>
+<span></span><span class="ch">#!/usr/bin/env python3</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="sd">    Supporting Pandas Tools</span>
+<span class="sd">    ~~~~~~~~~~~~~~~~~~~~~~~</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="c1"># Modules #</span>
+<span class="kn">import</span> <span class="nn">copy</span>
+<span class="kn">import</span> <span class="nn">warnings</span>
+<span class="kn">import</span> <span class="nn">datetime</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+
+
+<div class="viewcode-block" id="strlist_to_list"><a class="viewcode-back" href="../../code.html#easymoney.easy_pandas.strlist_to_list">[docs]</a><span class="k">def</span> <span class="nf">strlist_to_list</span><span class="p">(</span><span class="n">to_parse</span><span class="p">,</span> <span class="n">convert_to_str_first</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+
+<span class="sd">    Work around for using ``eval()`` for the following conversion: ``str(list)`` --&gt; ``list``.</span>
+
+<span class="sd">    For example: ``&quot;[1992, &#39;221-21&#39;, 2102, &#39;apples&#39;]&quot;`` → ``[&#39;1992&#39;, &#39;221-21&#39;, &#39;2102&#39;, &#39;apples&#39;]``.</span>
+
+<span class="sd">    :param to_parse: a string of a list.</span>
+<span class="sd">    :type to_parse: ``str``</span>
+<span class="sd">    :param convert_to_str_first: convert to a string first (as a precaution). Defaults to False.</span>
+<span class="sd">    :type convert_to_str_first: ``bool``</span>
+<span class="sd">    :return: string of a list to an actual list.</span>
+<span class="sd">    :return: ``list``</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">str_list</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">to_parse</span><span class="p">)</span> <span class="k">if</span> <span class="n">convert_to_str_first</span> <span class="k">else</span> <span class="n">to_parse</span>
+    <span class="k">return</span> <span class="p">[</span><span class="n">i</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;&#39;&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="p">[</span><span class="n">j</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;,&quot;</span><span class="p">)</span> <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="p">[</span><span class="n">str_list</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;[&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;]&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)]][</span><span class="mi">0</span><span class="p">]]</span></div>
+
+
+<span class="k">def</span> <span class="nf">_pandas_dictkey_to_key_unpack</span><span class="p">(</span><span class="n">pandas_series</span><span class="p">,</span> <span class="n">unpack_dict</span><span class="p">,</span> <span class="n">convert_values_to_str</span> <span class="o">=</span> <span class="kc">False</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+
+<span class="sd">    Used to unpack ISO Alpha2 --&gt; Alpha2 ISO code Pandas Series.</span>
+
+<span class="sd">    :param pandas_series: a Series to replace the alpha2 codes with another set.</span>
+<span class="sd">    :type pandas_series: ``Pandas Series``</span>
+<span class="sd">    :param convert_values_to_str: convert the values to string (precaution).</span>
+<span class="sd">    :type convert_values_to_str: ``bool``</span>
+<span class="sd">    :param unpack_dict: a dict with the values coerced into strings.</span>
+<span class="sd">    :type unpack_dict: ``dict``</span>
+<span class="sd">    :return: a pandas series with the alpha2 values replaced with unpack_dict.values().</span>
+<span class="sd">             ``NaN`` is used if a match cannot be found.</span>
+<span class="sd">    :rtype: ``Pandas Series``</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">convert_values_to_str</span><span class="p">:</span>
+        <span class="n">unpack_dict</span> <span class="o">=</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">v</span><span class="p">)</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">unpack_dict</span><span class="o">.</span><span class="n">items</span><span class="p">()}</span>
+
+    <span class="k">return</span> <span class="n">pandas_series</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">unpack_dict</span><span class="p">)</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">NaN</span> <span class="k">if</span> <span class="s1">&#39;nan&#39;</span> <span class="ow">in</span> <span class="nb">str</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="k">else</span> <span class="n">strlist_to_list</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">x</span><span class="p">)))</span>
+
+
+<span class="k">def</span> <span class="nf">_standard_pd_nester</span><span class="p">(</span><span class="n">data_frame</span><span class="p">,</span> <span class="n">nest_col_a</span><span class="p">,</span> <span class="n">nest_col_b</span><span class="p">,</span> <span class="n">nest_col_c</span><span class="p">,</span> <span class="n">keys_to_str</span> <span class="o">=</span> <span class="kc">True</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+
+<span class="sd">    Method to produce a nested dict from a large pandas dataframe.</span>
+<span class="sd">    Reliable technique (although slow with large DataFrames).</span>
+
+<span class="sd">    :param data_frame: see ``twoD_nested_dict()``.</span>
+<span class="sd">    :type data_frame: ``Pandas DataFrame``</span>
+<span class="sd">    :param nest_col_a: see ``twoD_nested_dict()``.</span>
+<span class="sd">    :type nest_col_a: ``str``</span>
+<span class="sd">    :param nest_col_b: see ``twoD_nested_dict()``.</span>
+<span class="sd">    :type nest_col_b: ``str``</span>
+<span class="sd">    :param nest_col_c: see ``twoD_nested_dict()``.</span>
+<span class="sd">    :type nest_col_c: ``str``</span>
+<span class="sd">    :param keys_to_str: see ``twoD_nested_dict()``.</span>
+<span class="sd">    :type keys_to_str: ``bool``</span>
+<span class="sd">    :return: nested dict of the form: ``{nest_col_a: {nest_col_b: nest_col_c}``.</span>
+<span class="sd">    :rtype: dict</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># Initialize</span>
+    <span class="n">df_slice</span> <span class="o">=</span> <span class="kc">None</span>
+
+    <span class="c1"># Make columns that are to become keys strings.</span>
+    <span class="k">if</span> <span class="n">keys_to_str</span><span class="p">:</span>
+        <span class="n">data_frame</span><span class="p">[</span><span class="n">nest_col_a</span><span class="p">]</span> <span class="o">=</span> <span class="n">data_frame</span><span class="p">[</span><span class="n">nest_col_a</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">str</span><span class="p">)</span><span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span>
+        <span class="n">data_frame</span><span class="p">[</span><span class="n">nest_col_b</span><span class="p">]</span> <span class="o">=</span> <span class="n">data_frame</span><span class="p">[</span><span class="n">nest_col_b</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">str</span><span class="p">)</span>
+
+    <span class="c1"># Create a dict from keys()</span>
+    <span class="n">nested_dict</span> <span class="o">=</span> <span class="nb">dict</span><span class="o">.</span><span class="n">fromkeys</span><span class="p">(</span><span class="n">data_frame</span><span class="p">[</span><span class="n">nest_col_a</span><span class="p">]</span><span class="o">.</span><span class="n">unique</span><span class="p">())</span>
+    <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">nested_dict</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+        <span class="n">df_slice</span> <span class="o">=</span> <span class="n">data_frame</span><span class="p">[</span><span class="n">data_frame</span><span class="p">[</span><span class="n">nest_col_a</span><span class="p">]</span> <span class="o">==</span> <span class="n">k</span><span class="p">]</span>
+        <span class="n">nested_dict</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">df_slice</span><span class="p">[</span><span class="n">nest_col_b</span><span class="p">],</span> <span class="n">df_slice</span><span class="p">[</span><span class="n">nest_col_c</span><span class="p">]))</span>
+
+    <span class="k">return</span> <span class="n">nested_dict</span>
+
+
+<span class="k">def</span> <span class="nf">_fast_pd_nester</span><span class="p">(</span><span class="n">data_frame</span><span class="p">,</span> <span class="n">nest_col_a</span><span class="p">,</span> <span class="n">nest_col_b</span><span class="p">,</span> <span class="n">nest_col_c</span><span class="p">,</span> <span class="n">keys_to_str</span> <span class="o">=</span> <span class="kc">True</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+
+<span class="sd">    | This is a fast way to produce a nested dict from a large Pandas DataFrames.</span>
+<span class="sd">    | Can handle DataFrames with several nest_col_a entries that are the same,</span>
+<span class="sd">    | e.g.,</span>
+<span class="sd">    |         nest_col_a    nest_col_b  nest_col_c</span>
+<span class="sd">    | 0       1999-01-04      AUD          0</span>
+<span class="sd">    | 1       1999-01-04      CAD          1</span>
+<span class="sd">    | 2       1999-01-05      CHF          2</span>
+<span class="sd">    | 3       1999-01-05      CYP          3</span>
+<span class="sd">    |</span>
+<span class="sd">    | WARNING: Not well-tested. This procedure may produce inaccuracies.</span>
+
+<span class="sd">    :param data_frame: see ``twoD_nested_dict()``.</span>
+<span class="sd">    :type data_frame: Pandas DataFrame</span>
+<span class="sd">    :param nest_col_a: see ``twoD_nested_dict()``.</span>
+<span class="sd">    :type nest_col_a: str</span>
+<span class="sd">    :param nest_col_b: see ``twoD_nested_dict()``.</span>
+<span class="sd">    :type nest_col_b: str</span>
+<span class="sd">    :param nest_col_c: see ``twoD_nested_dict()``.</span>
+<span class="sd">    :type nest_col_c: str</span>
+<span class="sd">    :param keys_to_str: see ``twoD_nested_dict()``.</span>
+<span class="sd">    :type keys_to_str: ``bool``</span>
+<span class="sd">    :return: nested dict of the form {nest_col_a: {nest_col_b: nest_col_c}.</span>
+<span class="sd">    :rtype: dict</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># Group nest_col_b and nest_col_c by nest_col_a</span>
+    <span class="n">col_b_groupby</span> <span class="o">=</span> <span class="n">data_frame</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="n">nest_col_a</span><span class="p">)[</span><span class="n">nest_col_b</span><span class="p">]</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="o">.</span><span class="n">tolist</span><span class="p">())</span><span class="o">.</span><span class="n">reset_index</span><span class="p">()</span>
+    <span class="n">col_c_groupby</span> <span class="o">=</span> <span class="n">data_frame</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="n">nest_col_a</span><span class="p">)[</span><span class="n">nest_col_c</span><span class="p">]</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="o">.</span><span class="n">tolist</span><span class="p">())</span><span class="o">.</span><span class="n">reset_index</span><span class="p">()</span>
+
+    <span class="c1"># Merge on nest_col_a</span>
+    <span class="n">grouped_data_frame</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">merge</span><span class="p">(</span><span class="n">col_b_groupby</span><span class="p">,</span> <span class="n">col_c_groupby</span><span class="p">,</span> <span class="n">on</span> <span class="o">=</span> <span class="n">nest_col_a</span><span class="p">,</span> <span class="n">how</span> <span class="o">=</span> <span class="s1">&#39;outer&#39;</span><span class="p">)</span>
+
+    <span class="c1"># Convert columns that will become keys to a string</span>
+    <span class="k">if</span> <span class="n">keys_to_str</span><span class="p">:</span>
+        <span class="n">grouped_data_frame</span><span class="p">[</span><span class="n">nest_col_a</span><span class="p">]</span> <span class="o">=</span> <span class="n">grouped_data_frame</span><span class="p">[</span><span class="n">nest_col_a</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">str</span><span class="p">)</span>
+        <span class="n">grouped_data_frame</span><span class="p">[</span><span class="n">nest_col_b</span><span class="p">]</span> <span class="o">=</span> <span class="n">grouped_data_frame</span><span class="p">[</span><span class="n">nest_col_b</span><span class="p">]</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="p">[</span><span class="nb">str</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">x</span><span class="p">])</span>
+
+    <span class="c1"># Generate a dictionary by zipping the nest_col_b and nest_col_c columns</span>
+    <span class="n">grouped_data_frame</span><span class="p">[</span><span class="s1">&#39;dict_zipped&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">grouped_data_frame</span><span class="p">[[</span><span class="n">nest_col_b</span><span class="p">,</span> <span class="n">nest_col_c</span><span class="p">]]</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span>
+                                                                    <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="nb">dict</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">])),</span> <span class="n">axis</span> <span class="o">=</span> <span class="mi">1</span><span class="p">)</span>
+
+    <span class="c1"># Return as a nested dict</span>
+    <span class="k">return</span> <span class="nb">dict</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">grouped_data_frame</span><span class="p">[</span><span class="n">nest_col_a</span><span class="p">],</span> <span class="n">grouped_data_frame</span><span class="p">[</span><span class="s1">&#39;dict_zipped&#39;</span><span class="p">]))</span>
+
+
+<div class="viewcode-block" id="twoD_nested_dict"><a class="viewcode-back" href="../../code.html#easymoney.easy_pandas.twoD_nested_dict">[docs]</a><span class="k">def</span> <span class="nf">twoD_nested_dict</span><span class="p">(</span><span class="n">data_frame</span>
+                     <span class="p">,</span> <span class="n">nest_col_a</span> <span class="o">=</span> <span class="kc">None</span>
+                     <span class="p">,</span> <span class="n">nest_col_b</span> <span class="o">=</span> <span class="kc">None</span>
+                     <span class="p">,</span> <span class="n">nest_col_c</span> <span class="o">=</span> <span class="kc">None</span>
+                     <span class="p">,</span> <span class="n">to_float</span> <span class="o">=</span> <span class="kc">None</span>
+                     <span class="p">,</span> <span class="n">to_int</span> <span class="o">=</span> <span class="kc">None</span>
+                     <span class="p">,</span> <span class="n">keys_to_str</span> <span class="o">=</span> <span class="kc">True</span>
+                     <span class="p">,</span> <span class="n">engine</span> <span class="o">=</span> <span class="s1">&#39;standard&#39;</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+
+<span class="sd">    Generate a nested dictionary from the columns of a pandas dataframe.</span>
+<span class="sd">    Defaults to using the first 3 columns.</span>
+
+<span class="sd">    :param data_frame: a pandas dataframe.</span>
+<span class="sd">    :type data_frame: ``Pandas DateFrame``</span>
+<span class="sd">    :param nest_col_a: reference to column in the dataframe; to become the master key in dict.</span>
+<span class="sd">                       Defaults to None (i.e., col 1).</span>
+<span class="sd">    :type nest_col_a: ``str``</span>
+<span class="sd">    :param nest_col_b: reference to column in the dataframe; to become the sub-key.</span>
+<span class="sd">                       Defaults to None (i.e., col 2).</span>
+<span class="sd">    :type nest_col_b: ``str``</span>
+<span class="sd">    :param nest_col_c: reference to column in the dataframe; to become the value to corresponding to the sub-key.</span>
+<span class="sd">                       Defaults to None (i.e., col 3).</span>
+<span class="sd">    :type nest_col_c: ``str``</span>
+<span class="sd">    :param to_float: a list items to float. Defaults to None.</span>
+<span class="sd">    :type to_float: ``str``</span>
+<span class="sd">    :param to_int: a list of the lists to convert to ints. Defaults to None.</span>
+<span class="sd">    :type to_int: ``str``</span>
+<span class="sd">    :param keys_to_str: Convert the columns that will become keys to strings. Default to True.</span>
+<span class="sd">                        WARNING: will OVERRIDE *to_float* and *to_int* if they reference nest_col_a or nest_col_b.</span>
+<span class="sd">    :type keys_to_str: ``bool``</span>
+<span class="sd">    :param engine: &#39;standard&#39; for a slower (but well-tested) method of generating a nested dict; &#39;fast&#39; to employ a</span>
+<span class="sd">                    speedy (but *not well tested*) method for generating a nested dict. Default to &#39;standard&#39;.</span>
+<span class="sd">    :type engine: ``str``</span>
+<span class="sd">    :return: nested dict of the form: ``{nest_col_a: {nest_col_b: nest_col_c}``.</span>
+<span class="sd">    :rtype: ``dict``</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="nb">all</span><span class="p">(</span><span class="n">v</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="p">[</span><span class="n">nest_col_a</span><span class="p">,</span> <span class="n">nest_col_b</span><span class="p">,</span> <span class="n">nest_col_c</span><span class="p">]):</span>
+        <span class="n">nest_col_a</span> <span class="o">=</span> <span class="n">data_frame</span><span class="o">.</span><span class="n">columns</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">nest_col_b</span> <span class="o">=</span> <span class="n">data_frame</span><span class="o">.</span><span class="n">columns</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+        <span class="n">nest_col_c</span> <span class="o">=</span> <span class="n">data_frame</span><span class="o">.</span><span class="n">columns</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
+
+    <span class="c1"># Convert selected columns to float</span>
+    <span class="k">if</span> <span class="n">to_float</span> <span class="o">!=</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">to_float</span><span class="p">:</span> <span class="n">data_frame</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">data_frame</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">float</span><span class="p">)</span>
+
+    <span class="c1"># Convert selected columns to int</span>
+    <span class="k">if</span> <span class="n">to_int</span> <span class="o">!=</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="n">to_int</span><span class="p">:</span> <span class="n">data_frame</span><span class="p">[</span><span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="n">data_frame</span><span class="p">[</span><span class="n">j</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span>
+
+    <span class="c1"># Use one of two engines to generate the nested dict</span>
+    <span class="k">if</span> <span class="n">engine</span> <span class="o">==</span> <span class="s1">&#39;standard&#39;</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">_standard_pd_nester</span><span class="p">(</span><span class="n">data_frame</span><span class="p">,</span> <span class="n">nest_col_a</span><span class="p">,</span> <span class="n">nest_col_b</span><span class="p">,</span> <span class="n">nest_col_c</span><span class="p">,</span> <span class="n">keys_to_str</span><span class="p">)</span>
+
+    <span class="k">elif</span> <span class="n">engine</span> <span class="o">==</span> <span class="s1">&#39;fast&#39;</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">_fast_pd_nester</span><span class="p">(</span><span class="n">data_frame</span><span class="p">,</span> <span class="n">nest_col_a</span><span class="p">,</span> <span class="n">nest_col_b</span><span class="p">,</span> <span class="n">nest_col_c</span><span class="p">,</span> <span class="n">keys_to_str</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="pandas_list_column_to_str"><a class="viewcode-back" href="../../code.html#easymoney.easy_pandas.pandas_list_column_to_str">[docs]</a><span class="k">def</span> <span class="nf">pandas_list_column_to_str</span><span class="p">(</span><span class="n">data_frame</span><span class="p">,</span> <span class="n">columns</span><span class="p">,</span> <span class="n">join_on</span> <span class="o">=</span> <span class="s2">&quot;, &quot;</span><span class="p">,</span> <span class="n">bracket_wrap</span> <span class="o">=</span> <span class="kc">False</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+
+<span class="sd">    Tool for converting the columns in a Pandas DataFrame</span>
+<span class="sd">    from pd.Series of lists into comma-seperated strings.</span>
+
+<span class="sd">    :param data_frame: a dataframe.</span>
+<span class="sd">    :type data_frame: ``Pandas DataFrame``</span>
+<span class="sd">    :param columns: a list of columns in the DataFrame</span>
+<span class="sd">    :type columns: ``list``</span>
+<span class="sd">    :param join_on: a string to join on. Defaults to &quot;, &quot;.</span>
+<span class="sd">    :type join_on: ``str``</span>
+<span class="sd">    :return: a dataframe with the columns altered in the manner described above.</span>
+<span class="sd">    :rtype: ``Pandas DataFrame``</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">df</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">data_frame</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="n">columns</span><span class="p">:</span>
+        <span class="n">df</span><span class="p">[</span><span class="n">col</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="n">col</span><span class="p">]</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">join_on</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="k">if</span> <span class="nb">str</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="o">!=</span> <span class="s1">&#39;nan&#39;</span> <span class="k">else</span> <span class="n">x</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">bracket_wrap</span><span class="p">:</span>
+            <span class="n">df</span><span class="p">[</span><span class="n">col</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="n">col</span><span class="p">]</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="s2">&quot;[&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;]&quot;</span> <span class="k">if</span> <span class="nb">str</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="o">!=</span> <span class="s1">&#39;nan&#39;</span> <span class="k">else</span> <span class="n">x</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">df</span></div>
+
+
+<div class="viewcode-block" id="pandas_str_column_to_list"><a class="viewcode-back" href="../../code.html#easymoney.easy_pandas.pandas_str_column_to_list">[docs]</a><span class="k">def</span> <span class="nf">pandas_str_column_to_list</span><span class="p">(</span><span class="n">data_frame</span><span class="p">,</span> <span class="n">columns</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+
+<span class="sd">    Tool for converting the columns in a Pandas DataFrame</span>
+<span class="sd">    from comma-seperated strings into a pd.Series of lists.</span>
+
+<span class="sd">    :param data_frame: a dataframe.</span>
+<span class="sd">    :type data_frame: ``Pandas DataFrame``</span>
+<span class="sd">    :param columns: a list of columns in the dataframe.</span>
+<span class="sd">    :type columns: ``list``</span>
+<span class="sd">    :return: a dataframe with the columns altered in the manner described above.</span>
+<span class="sd">    :rtype: ``Pandas DataFrame``</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">data_frame</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">data_frame</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="n">columns</span><span class="p">:</span>
+        <span class="n">data_frame</span><span class="p">[</span><span class="n">col</span><span class="p">]</span> <span class="o">=</span> <span class="n">data_frame</span><span class="p">[</span><span class="n">col</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">str</span><span class="p">)</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="p">[</span><span class="n">i</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">x</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;,&quot;</span><span class="p">)])</span>
+    <span class="k">return</span> <span class="n">data_frame</span></div>
+
+
+<div class="viewcode-block" id="type_in_series"><a class="viewcode-back" href="../../code.html#easymoney.easy_pandas.type_in_series">[docs]</a><span class="k">def</span> <span class="nf">type_in_series</span><span class="p">(</span><span class="n">series</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+
+<span class="sd">    Return the types of objects in a Pandas Series.</span>
+
+<span class="sd">    :param series: a series.</span>
+<span class="sd">    :type series: ``Pandas Series``</span>
+<span class="sd">    :return: list of the types in a series.</span>
+<span class="sd">    :rtype: ``list``</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="nb">set</span><span class="p">([</span><span class="nb">type</span><span class="p">(</span><span class="n">i</span><span class="p">)</span><span class="o">.</span><span class="n">__name__</span> <span class="k">if</span> <span class="nb">str</span><span class="p">(</span><span class="n">i</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;nan&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">]</span> <span class="k">else</span> <span class="s1">&#39;nan&#39;</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">series</span><span class="p">]))</span></div>
+
+
+<div class="viewcode-block" id="prettify_all_pandas_list_cols"><a class="viewcode-back" href="../../code.html#easymoney.easy_pandas.prettify_all_pandas_list_cols">[docs]</a><span class="k">def</span> <span class="nf">prettify_all_pandas_list_cols</span><span class="p">(</span><span class="n">data_frame</span><span class="p">,</span> <span class="n">join_on</span> <span class="o">=</span> <span class="s2">&quot;, &quot;</span><span class="p">,</span> <span class="n">allow_nan</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">exclude</span> <span class="o">=</span> <span class="p">[],</span> <span class="n">bracket_wrap</span> <span class="o">=</span> <span class="kc">False</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+
+<span class="sd">    Converts all columns with only lists to list-seperated-strings.</span>
+
+<span class="sd">    :param data_frame: a dataframe.</span>
+<span class="sd">    :type data_frame: ``Pandas DataFrame``</span>
+<span class="sd">    :param nan: allow nans</span>
+<span class="sd">    :type nan: ``bool``</span>
+<span class="sd">    :param join_on: a string to join on. Defaults to &quot;, &quot;.</span>
+<span class="sd">    :type join_on: ``str``</span>
+<span class="sd">    :param exclude: columns to exclude Defaults to an empty list (``[]``).</span>
+<span class="sd">    :type exclude: ``list``</span>
+<span class="sd">    :param bracket_wrap: wrap in brackets.</span>
+<span class="sd">    :type bracket_wrap: ``bool``</span>
+<span class="sd">    :return: dataframe with columns lists converted to strings.</span>
+<span class="sd">    :rtype: ``Pandas DataFrame``</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">allowed</span> <span class="o">=</span> <span class="p">[[</span><span class="s1">&#39;list&#39;</span><span class="p">],</span> <span class="p">[</span><span class="s1">&#39;list&#39;</span><span class="p">,</span> <span class="s1">&#39;nan&#39;</span><span class="p">]]</span> <span class="k">if</span> <span class="n">allow_nan</span> <span class="k">else</span> <span class="p">[[</span><span class="s1">&#39;list&#39;</span><span class="p">]]</span>
+
+    <span class="c1"># Find allowed columns</span>
+    <span class="n">cols_to_prettify</span> <span class="o">=</span> \
+        <span class="p">[</span><span class="n">c</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">data_frame</span><span class="o">.</span><span class="n">columns</span> <span class="k">if</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">type_in_series</span><span class="p">(</span><span class="n">data_frame</span><span class="p">[</span><span class="n">c</span><span class="p">]))</span> <span class="ow">in</span> <span class="n">allowed</span> <span class="ow">and</span> <span class="n">c</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">exclude</span><span class="p">]</span>
+
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">cols_to_prettify</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">data_frame</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">pandas_list_column_to_str</span><span class="p">(</span><span class="n">data_frame</span><span class="p">,</span> <span class="n">cols_to_prettify</span><span class="p">,</span> <span class="n">join_on</span><span class="p">,</span> <span class="n">bracket_wrap</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="items_null"><a class="viewcode-back" href="../../code.html#easymoney.easy_pandas.items_null">[docs]</a><span class="k">def</span> <span class="nf">items_null</span><span class="p">(</span><span class="n">element</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+
+<span class="sd">    Check if an object is a NaN, including all the elements in an iterable.</span>
+
+<span class="sd">    :param element: a python object.</span>
+<span class="sd">    :type element: ``any``</span>
+<span class="sd">    :return: assessment of whether or not `element` is a NaN.</span>
+<span class="sd">    :rtype: ``bool``</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">element</span><span class="p">,</span> <span class="p">(</span><span class="nb">list</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">,</span> <span class="nb">type</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">))):</span>
+        <span class="k">return</span> <span class="kc">True</span> <span class="k">if</span> <span class="nb">all</span><span class="p">(</span><span class="n">pd</span><span class="o">.</span><span class="n">isnull</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">element</span><span class="p">)</span> <span class="k">else</span> <span class="kc">False</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">pd</span><span class="o">.</span><span class="n">isnull</span><span class="p">(</span><span class="n">element</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="pandas_null_drop"><a class="viewcode-back" href="../../code.html#easymoney.easy_pandas.pandas_null_drop">[docs]</a><span class="k">def</span> <span class="nf">pandas_null_drop</span><span class="p">(</span><span class="n">data_frame</span><span class="p">,</span> <span class="n">subset</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+
+<span class="sd">    Drop rows with NaNs of all, or a subset of, the dataframe&#39;s columns.</span>
+<span class="sd">    (Can handle iterables which only contain NaNs).</span>
+
+<span class="sd">    :param data_frame: a dataframe.</span>
+<span class="sd">    :type data_frame: ``Pandas DataFrame``</span>
+<span class="sd">    :param subset: a subset of columns. Defaults to None, which will apply to all columns.</span>
+<span class="sd">    :type subset: ``iterable``</span>
+<span class="sd">    :return: dataframe with NaN dropped.</span>
+<span class="sd">    :rtype: ``Pandas DataFrame``</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># Fill Empty cells with nans</span>
+    <span class="n">data_frame</span> <span class="o">=</span> <span class="n">data_frame</span><span class="o">.</span><span class="n">fillna</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">NaN</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">subset</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">data_frame</span> <span class="o">=</span> <span class="n">data_frame</span><span class="o">.</span><span class="n">dropna</span><span class="p">()</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">subset</span><span class="p">:</span>
+            <span class="n">data_frame</span> <span class="o">=</span> <span class="n">data_frame</span><span class="p">[</span><span class="o">~</span><span class="n">data_frame</span><span class="p">[</span><span class="n">c</span><span class="p">]</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="n">items_null</span><span class="p">)]</span>
+
+    <span class="k">return</span> <span class="n">data_frame</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">drop</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span></div>
+
+<span class="c1"># ----------------------------------------------------------------------------------------------------------</span>
+<span class="c1"># Printing Suit</span>
+<span class="c1"># ----------------------------------------------------------------------------------------------------------</span>
+
+<span class="k">def</span> <span class="nf">_padding</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="n">amount</span><span class="p">,</span> <span class="n">justify</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+
+<span class="sd">    Add padding to a string.</span>
+
+<span class="sd">    :param s: a string.</span>
+<span class="sd">    :type s: ``str``</span>
+<span class="sd">    :param amount: the amount of white space to add.</span>
+<span class="sd">    :type amount: ``float`` or ``int``</span>
+<span class="sd">    :param justify: the justification of the resultant text. Must be one of: &#39;left&#39; or &#39;center&#39;.</span>
+<span class="sd">    :type justify: ``str``</span>
+<span class="sd">    :return: `s` justified, or as passed if `justify` is not one of: &#39;left&#39; or &#39;center&#39;.</span>
+<span class="sd">    :rtype: ``str``</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">pad</span> <span class="o">=</span> <span class="s1">&#39; &#39;</span> <span class="o">*</span> <span class="n">amount</span>
+    <span class="k">if</span> <span class="n">justify</span> <span class="o">==</span> <span class="s1">&#39;left&#39;</span><span class="p">:</span>
+        <span class="k">return</span> <span class="s2">&quot;</span><span class="si">%s%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">s</span><span class="p">),</span> <span class="n">pad</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">justify</span> <span class="o">==</span> <span class="s1">&#39;center&#39;</span><span class="p">:</span>
+        <span class="k">return</span> <span class="s2">&quot;</span><span class="si">%s%s%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">pad</span><span class="p">[:</span><span class="nb">int</span><span class="p">(</span><span class="n">amount</span><span class="o">/</span><span class="mi">2</span><span class="p">)],</span> <span class="nb">str</span><span class="p">(</span><span class="n">s</span><span class="p">),</span> <span class="n">pad</span><span class="p">[</span><span class="nb">int</span><span class="p">(</span><span class="n">amount</span><span class="o">/</span><span class="mi">2</span><span class="p">):])</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">s</span>
+
+<span class="k">def</span> <span class="nf">_pandas_series_alignment</span><span class="p">(</span><span class="n">pandas_series</span><span class="p">,</span> <span class="n">justify</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+
+<span class="sd">    Align all items in a pandas series.</span>
+
+<span class="sd">    :param pandas_series: a pandas series.</span>
+<span class="sd">    :type pandas_series: ``Pandas Series``</span>
+<span class="sd">    :param justify: the justification of the resultant text. Must be one of: &#39;left&#39;, &#39;right&#39; or &#39;center&#39;.</span>
+<span class="sd">    :type justify: ``str``</span>
+<span class="sd">    :return: aligned series</span>
+<span class="sd">    :rtype: ``str``</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">justify</span> <span class="o">==</span> <span class="s1">&#39;right&#39;</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">pandas_series</span>
+    <span class="n">longest_string</span> <span class="o">=</span> <span class="nb">max</span><span class="p">([</span><span class="nb">len</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">s</span><span class="p">))</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">pandas_series</span><span class="p">])</span>
+    <span class="k">return</span> <span class="p">[</span><span class="n">_padding</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="n">longest_string</span> <span class="o">-</span> <span class="nb">len</span><span class="p">(</span><span class="n">s</span><span class="p">),</span> <span class="n">justify</span><span class="p">)</span> <span class="k">if</span> <span class="ow">not</span> <span class="n">items_null</span><span class="p">(</span><span class="n">s</span><span class="p">)</span> <span class="k">else</span> <span class="n">s</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">pandas_series</span><span class="p">]</span>
+
+
+<div class="viewcode-block" id="align_pandas"><a class="viewcode-back" href="../../code.html#easymoney.easy_pandas.align_pandas">[docs]</a><span class="k">def</span> <span class="nf">align_pandas</span><span class="p">(</span><span class="n">data_frame</span><span class="p">,</span> <span class="n">to_align</span><span class="o">=</span><span class="s1">&#39;right&#39;</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+
+<span class="sd">    Align the columns of a Pandas DataFrame by adding whitespace.</span>
+
+<span class="sd">    :param data_frame: a dataframe.</span>
+<span class="sd">    :type data_frame: ``Pandas DataFrame``</span>
+<span class="sd">    :param to_align: &#39;left&#39;, &#39;right&#39;, &#39;center&#39; or a dictionary of the form: ``{&#39;Column&#39;: &#39;Alignment&#39;}``.</span>
+<span class="sd">    :type to_align: ``str``</span>
+<span class="sd">    :return: aligned dataframe</span>
+<span class="sd">    :rtype: ``Pandas DataFrame``</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">to_align</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+        <span class="n">alignment_dict</span> <span class="o">=</span> <span class="n">to_align</span>
+    <span class="k">elif</span> <span class="n">to_align</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;left&#39;</span><span class="p">,</span> <span class="s1">&#39;right&#39;</span><span class="p">,</span> <span class="s1">&#39;center&#39;</span><span class="p">]:</span>
+        <span class="n">alignment_dict</span> <span class="o">=</span> <span class="nb">dict</span><span class="o">.</span><span class="n">fromkeys</span><span class="p">(</span><span class="n">data_frame</span><span class="o">.</span><span class="n">columns</span><span class="p">,</span> <span class="n">to_align</span><span class="o">.</span><span class="n">lower</span><span class="p">())</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;to_align must be either &#39;left&#39;, &#39;right&#39;, &#39;center&#39;, or a dict.&quot;</span><span class="p">)</span>
+
+    <span class="k">for</span> <span class="n">col</span><span class="p">,</span> <span class="n">justification</span> <span class="ow">in</span> <span class="n">alignment_dict</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="n">data_frame</span><span class="p">[</span><span class="n">col</span><span class="p">]</span> <span class="o">=</span> <span class="n">_pandas_series_alignment</span><span class="p">(</span><span class="n">data_frame</span><span class="p">[</span><span class="n">col</span><span class="p">],</span> <span class="n">justification</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">data_frame</span></div>
+
+
+<div class="viewcode-block" id="pandas_print_full"><a class="viewcode-back" href="../../code.html#easymoney.easy_pandas.pandas_print_full">[docs]</a><span class="k">def</span> <span class="nf">pandas_print_full</span><span class="p">(</span><span class="n">pd_df</span><span class="p">,</span> <span class="n">full_rows</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">full_cols</span> <span class="o">=</span> <span class="kc">True</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+
+<span class="sd">    Print *all* of a Pandas DataFrame.</span>
+
+<span class="sd">    :param pd_df: DataFrame to printed in its entirety.</span>
+<span class="sd">    :type pd_df: ``Pandas DataFrame``</span>
+<span class="sd">    :param full_rows: print all rows if True. Defaults to True.</span>
+<span class="sd">    :type full_rows: ``bool``</span>
+<span class="sd">    :param full_cols: print all columns side-by-side if True. Defaults to True.</span>
+<span class="sd">    :type full_cols: ``bool``</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">full_rows</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">set_option</span><span class="p">(</span><span class="s1">&#39;display.max_rows&#39;</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">pd_df</span><span class="p">))</span>
+    <span class="k">if</span> <span class="n">full_cols</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">set_option</span><span class="p">(</span><span class="s1">&#39;expand_frame_repr&#39;</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
+
+    <span class="c1"># Print the data frame</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">pd_df</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">full_rows</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">reset_option</span><span class="p">(</span><span class="s1">&#39;display.max_rows&#39;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">full_cols</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">set_option</span><span class="p">(</span><span class="s1">&#39;expand_frame_repr&#39;</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="pandas_pretty_print"><a class="viewcode-back" href="../../code.html#easymoney.easy_pandas.pandas_pretty_print">[docs]</a><span class="k">def</span> <span class="nf">pandas_pretty_print</span><span class="p">(</span><span class="n">data_frame</span><span class="p">,</span> <span class="n">col_align</span><span class="o">=</span><span class="s1">&#39;right&#39;</span><span class="p">,</span> <span class="n">header_align</span><span class="o">=</span><span class="s1">&#39;center&#39;</span><span class="p">,</span> <span class="n">full_rows</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">full_cols</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+
+<span class="sd">    Pretty Print a Pandas DataFrame.</span>
+
+<span class="sd">    :param data_frame: a dataframe</span>
+<span class="sd">    :type data_frame: ``Pandas DataFrame``</span>
+<span class="sd">    :param col_align: &#39;left&#39;, &#39;right&#39;, &#39;center&#39;&#39; or a dictionary of the form: ``{&#39;Column&#39;: &#39;Alignment&#39;}``.</span>
+<span class="sd">    :type col_align: ``str`</span>
+<span class="sd">    :param header_align: alignment of headers. Must be one of: &#39;left&#39;, &#39;right&#39;, &#39;center&#39;.</span>
+<span class="sd">    :type header_align: ``str``</span>
+<span class="sd">    :param full_rows: print all rows.</span>
+<span class="sd">    :type full_rows: ``bool``</span>
+<span class="sd">    :param full_cols: print all columns.</span>
+<span class="sd">    :type full_cols: ``bool``</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">aligned_df</span> <span class="o">=</span> <span class="n">align_pandas</span><span class="p">(</span><span class="n">data_frame</span><span class="p">,</span> <span class="n">col_align</span><span class="p">)</span>
+    <span class="n">pd</span><span class="o">.</span><span class="n">set_option</span><span class="p">(</span><span class="s1">&#39;colheader_justify&#39;</span><span class="p">,</span> <span class="n">header_align</span><span class="p">)</span>
+    <span class="n">pandas_print_full</span><span class="p">(</span><span class="n">aligned_df</span><span class="o">.</span><span class="n">fillna</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">),</span> <span class="n">full_rows</span><span class="p">,</span> <span class="n">full_cols</span><span class="p">)</span>
+    <span class="n">pd</span><span class="o">.</span><span class="n">set_option</span><span class="p">(</span><span class="s1">&#39;colheader_justify&#39;</span><span class="p">,</span> <span class="s1">&#39;right&#39;</span><span class="p">)</span></div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2016, Tariq A. Hassan.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../../',
+            VERSION:'1.0.0',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true
+        };
+    </script>
+      <script type="text/javascript" src="../../_static/jquery.js"></script>
+      <script type="text/javascript" src="../../_static/underscore.js"></script>
+      <script type="text/javascript" src="../../_static/doctools.js"></script>
+      <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>

@@ -84,6 +84,9 @@
 <li class="toctree-l1"><a class="reference internal" href="README.html">EasyMoney</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Developer Documentation</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#main-api-functionality">Main API Functionality</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#supporting-pandas-tools">Supporting Pandas Tools</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#european-central-bank-data">European Central Bank Data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#world-bank-group-data">World Bank Group Data</a></li>
 </ul>
 </li>
 </ul>
@@ -393,6 +396,341 @@ if False, all dates for which data is available will be reported. Defaults to Tr
 </table>
 </dd></dl>
 
+</dd></dl>
+
+</div>
+<span class="target" id="module-easymoney.easy_pandas"></span><div class="section" id="supporting-pandas-tools">
+<h2>Supporting Pandas Tools<a class="headerlink" href="#supporting-pandas-tools" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt id="easymoney.easy_pandas.align_pandas">
+<code class="descclassname">easymoney.easy_pandas.</code><code class="descname">align_pandas</code><span class="sig-paren">(</span><em>data_frame</em>, <em>to_align='right'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/easymoney/easy_pandas.html#align_pandas"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#easymoney.easy_pandas.align_pandas" title="Permalink to this definition">¶</a></dt>
+<dd><p>Align the columns of a Pandas DataFrame by adding whitespace.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>data_frame</strong> (<code class="docutils literal"><span class="pre">Pandas</span> <span class="pre">DataFrame</span></code>) &#8211; a dataframe.</li>
+<li><strong>to_align</strong> (<code class="docutils literal"><span class="pre">str</span></code>) &#8211; &#8216;left&#8217;, &#8216;right&#8217;, &#8216;center&#8217; or a dictionary of the form: <code class="docutils literal"><span class="pre">{'Column':</span> <span class="pre">'Alignment'}</span></code>.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">aligned dataframe</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><code class="docutils literal"><span class="pre">Pandas</span> <span class="pre">DataFrame</span></code></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="easymoney.easy_pandas.items_null">
+<code class="descclassname">easymoney.easy_pandas.</code><code class="descname">items_null</code><span class="sig-paren">(</span><em>element</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/easymoney/easy_pandas.html#items_null"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#easymoney.easy_pandas.items_null" title="Permalink to this definition">¶</a></dt>
+<dd><p>Check if an object is a NaN, including all the elements in an iterable.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>element</strong> (<code class="docutils literal"><span class="pre">any</span></code>) &#8211; a python object.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">assessment of whether or not <cite>element</cite> is a NaN.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="docutils literal"><span class="pre">bool</span></code></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="easymoney.easy_pandas.pandas_list_column_to_str">
+<code class="descclassname">easymoney.easy_pandas.</code><code class="descname">pandas_list_column_to_str</code><span class="sig-paren">(</span><em>data_frame</em>, <em>columns</em>, <em>join_on='</em>, <em>'</em>, <em>bracket_wrap=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/easymoney/easy_pandas.html#pandas_list_column_to_str"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#easymoney.easy_pandas.pandas_list_column_to_str" title="Permalink to this definition">¶</a></dt>
+<dd><p>Tool for converting the columns in a Pandas DataFrame
+from pd.Series of lists into comma-seperated strings.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>data_frame</strong> (<code class="docutils literal"><span class="pre">Pandas</span> <span class="pre">DataFrame</span></code>) &#8211; a dataframe.</li>
+<li><strong>columns</strong> (<code class="docutils literal"><span class="pre">list</span></code>) &#8211; a list of columns in the DataFrame</li>
+<li><strong>join_on</strong> (<code class="docutils literal"><span class="pre">str</span></code>) &#8211; a string to join on. Defaults to &#8221;, &#8221;.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">a dataframe with the columns altered in the manner described above.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><code class="docutils literal"><span class="pre">Pandas</span> <span class="pre">DataFrame</span></code></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="easymoney.easy_pandas.pandas_null_drop">
+<code class="descclassname">easymoney.easy_pandas.</code><code class="descname">pandas_null_drop</code><span class="sig-paren">(</span><em>data_frame</em>, <em>subset=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/easymoney/easy_pandas.html#pandas_null_drop"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#easymoney.easy_pandas.pandas_null_drop" title="Permalink to this definition">¶</a></dt>
+<dd><p>Drop rows with NaNs of all, or a subset of, the dataframe&#8217;s columns.
+(Can handle iterables which only contain NaNs).</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>data_frame</strong> (<code class="docutils literal"><span class="pre">Pandas</span> <span class="pre">DataFrame</span></code>) &#8211; a dataframe.</li>
+<li><strong>subset</strong> (<code class="docutils literal"><span class="pre">iterable</span></code>) &#8211; a subset of columns. Defaults to None, which will apply to all columns.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">dataframe with NaN dropped.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><code class="docutils literal"><span class="pre">Pandas</span> <span class="pre">DataFrame</span></code></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="easymoney.easy_pandas.pandas_pretty_print">
+<code class="descclassname">easymoney.easy_pandas.</code><code class="descname">pandas_pretty_print</code><span class="sig-paren">(</span><em>data_frame</em>, <em>col_align='right'</em>, <em>header_align='center'</em>, <em>full_rows=True</em>, <em>full_cols=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/easymoney/easy_pandas.html#pandas_pretty_print"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#easymoney.easy_pandas.pandas_pretty_print" title="Permalink to this definition">¶</a></dt>
+<dd><p>Pretty Print a Pandas DataFrame.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>data_frame</strong> (<code class="docutils literal"><span class="pre">Pandas</span> <span class="pre">DataFrame</span></code>) &#8211; a dataframe</li>
+<li><strong>col_align</strong> (<a href="#id1"><span class="problematic" id="id2">``</span></a>str`) &#8211; &#8216;left&#8217;, &#8216;right&#8217;, &#8216;center&#8217;&#8217; or a dictionary of the form: <code class="docutils literal"><span class="pre">{'Column':</span> <span class="pre">'Alignment'}</span></code>.</li>
+<li><strong>header_align</strong> (<code class="docutils literal"><span class="pre">str</span></code>) &#8211; alignment of headers. Must be one of: &#8216;left&#8217;, &#8216;right&#8217;, &#8216;center&#8217;.</li>
+<li><strong>full_rows</strong> (<code class="docutils literal"><span class="pre">bool</span></code>) &#8211; print all rows.</li>
+<li><strong>full_cols</strong> (<code class="docutils literal"><span class="pre">bool</span></code>) &#8211; print all columns.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="easymoney.easy_pandas.pandas_print_full">
+<code class="descclassname">easymoney.easy_pandas.</code><code class="descname">pandas_print_full</code><span class="sig-paren">(</span><em>pd_df</em>, <em>full_rows=True</em>, <em>full_cols=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/easymoney/easy_pandas.html#pandas_print_full"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#easymoney.easy_pandas.pandas_print_full" title="Permalink to this definition">¶</a></dt>
+<dd><p>Print <em>all</em> of a Pandas DataFrame.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>pd_df</strong> (<code class="docutils literal"><span class="pre">Pandas</span> <span class="pre">DataFrame</span></code>) &#8211; DataFrame to printed in its entirety.</li>
+<li><strong>full_rows</strong> (<code class="docutils literal"><span class="pre">bool</span></code>) &#8211; print all rows if True. Defaults to True.</li>
+<li><strong>full_cols</strong> (<code class="docutils literal"><span class="pre">bool</span></code>) &#8211; print all columns side-by-side if True. Defaults to True.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="easymoney.easy_pandas.pandas_str_column_to_list">
+<code class="descclassname">easymoney.easy_pandas.</code><code class="descname">pandas_str_column_to_list</code><span class="sig-paren">(</span><em>data_frame</em>, <em>columns</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/easymoney/easy_pandas.html#pandas_str_column_to_list"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#easymoney.easy_pandas.pandas_str_column_to_list" title="Permalink to this definition">¶</a></dt>
+<dd><p>Tool for converting the columns in a Pandas DataFrame
+from comma-seperated strings into a pd.Series of lists.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>data_frame</strong> (<code class="docutils literal"><span class="pre">Pandas</span> <span class="pre">DataFrame</span></code>) &#8211; a dataframe.</li>
+<li><strong>columns</strong> (<code class="docutils literal"><span class="pre">list</span></code>) &#8211; a list of columns in the dataframe.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">a dataframe with the columns altered in the manner described above.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><code class="docutils literal"><span class="pre">Pandas</span> <span class="pre">DataFrame</span></code></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="easymoney.easy_pandas.prettify_all_pandas_list_cols">
+<code class="descclassname">easymoney.easy_pandas.</code><code class="descname">prettify_all_pandas_list_cols</code><span class="sig-paren">(</span><em>data_frame</em>, <em>join_on='</em>, <em>'</em>, <em>allow_nan=True</em>, <em>exclude=[]</em>, <em>bracket_wrap=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/easymoney/easy_pandas.html#prettify_all_pandas_list_cols"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#easymoney.easy_pandas.prettify_all_pandas_list_cols" title="Permalink to this definition">¶</a></dt>
+<dd><p>Converts all columns with only lists to list-seperated-strings.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>data_frame</strong> (<code class="docutils literal"><span class="pre">Pandas</span> <span class="pre">DataFrame</span></code>) &#8211; a dataframe.</li>
+<li><strong>nan</strong> (<code class="docutils literal"><span class="pre">bool</span></code>) &#8211; allow nans</li>
+<li><strong>join_on</strong> (<code class="docutils literal"><span class="pre">str</span></code>) &#8211; a string to join on. Defaults to &#8221;, &#8221;.</li>
+<li><strong>exclude</strong> (<code class="docutils literal"><span class="pre">list</span></code>) &#8211; columns to exclude Defaults to an empty list (<code class="docutils literal"><span class="pre">[]</span></code>).</li>
+<li><strong>bracket_wrap</strong> (<code class="docutils literal"><span class="pre">bool</span></code>) &#8211; wrap in brackets.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">dataframe with columns lists converted to strings.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><code class="docutils literal"><span class="pre">Pandas</span> <span class="pre">DataFrame</span></code></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="easymoney.easy_pandas.strlist_to_list">
+<code class="descclassname">easymoney.easy_pandas.</code><code class="descname">strlist_to_list</code><span class="sig-paren">(</span><em>to_parse</em>, <em>convert_to_str_first=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/easymoney/easy_pandas.html#strlist_to_list"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#easymoney.easy_pandas.strlist_to_list" title="Permalink to this definition">¶</a></dt>
+<dd><p>Work around for using <code class="docutils literal"><span class="pre">eval()</span></code> for the following conversion: <code class="docutils literal"><span class="pre">str(list)</span></code> &#8211;&gt; <code class="docutils literal"><span class="pre">list</span></code>.</p>
+<p>For example: <code class="docutils literal"><span class="pre">&quot;[1992,</span> <span class="pre">'221-21',</span> <span class="pre">2102,</span> <span class="pre">'apples']&quot;</span></code> → <code class="docutils literal"><span class="pre">['1992',</span> <span class="pre">'221-21',</span> <span class="pre">'2102',</span> <span class="pre">'apples']</span></code>.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>to_parse</strong> (<code class="docutils literal"><span class="pre">str</span></code>) &#8211; a string of a list.</li>
+<li><strong>convert_to_str_first</strong> (<code class="docutils literal"><span class="pre">bool</span></code>) &#8211; convert to a string first (as a precaution). Defaults to False.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">string of a list to an actual list.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"><code class="docutils literal"><span class="pre">list</span></code></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="easymoney.easy_pandas.twoD_nested_dict">
+<code class="descclassname">easymoney.easy_pandas.</code><code class="descname">twoD_nested_dict</code><span class="sig-paren">(</span><em>data_frame</em>, <em>nest_col_a=None</em>, <em>nest_col_b=None</em>, <em>nest_col_c=None</em>, <em>to_float=None</em>, <em>to_int=None</em>, <em>keys_to_str=True</em>, <em>engine='standard'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/easymoney/easy_pandas.html#twoD_nested_dict"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#easymoney.easy_pandas.twoD_nested_dict" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generate a nested dictionary from the columns of a pandas dataframe.
+Defaults to using the first 3 columns.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>data_frame</strong> (<code class="docutils literal"><span class="pre">Pandas</span> <span class="pre">DateFrame</span></code>) &#8211; a pandas dataframe.</li>
+<li><strong>nest_col_a</strong> (<code class="docutils literal"><span class="pre">str</span></code>) &#8211; reference to column in the dataframe; to become the master key in dict.
+Defaults to None (i.e., col 1).</li>
+<li><strong>nest_col_b</strong> (<code class="docutils literal"><span class="pre">str</span></code>) &#8211; reference to column in the dataframe; to become the sub-key.
+Defaults to None (i.e., col 2).</li>
+<li><strong>nest_col_c</strong> (<code class="docutils literal"><span class="pre">str</span></code>) &#8211; reference to column in the dataframe; to become the value to corresponding to the sub-key.
+Defaults to None (i.e., col 3).</li>
+<li><strong>to_float</strong> (<code class="docutils literal"><span class="pre">str</span></code>) &#8211; a list items to float. Defaults to None.</li>
+<li><strong>to_int</strong> (<code class="docutils literal"><span class="pre">str</span></code>) &#8211; a list of the lists to convert to ints. Defaults to None.</li>
+<li><strong>keys_to_str</strong> (<code class="docutils literal"><span class="pre">bool</span></code>) &#8211; Convert the columns that will become keys to strings. Default to True.
+WARNING: will OVERRIDE <em>to_float</em> and <em>to_int</em> if they reference nest_col_a or nest_col_b.</li>
+<li><strong>engine</strong> (<code class="docutils literal"><span class="pre">str</span></code>) &#8211; &#8216;standard&#8217; for a slower (but well-tested) method of generating a nested dict; &#8216;fast&#8217; to employ a
+speedy (but <em>not well tested</em>) method for generating a nested dict. Default to &#8216;standard&#8217;.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">nested dict of the form: <code class="docutils literal"><span class="pre">{nest_col_a:</span> <span class="pre">{nest_col_b:</span> <span class="pre">nest_col_c}</span></code>.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><code class="docutils literal"><span class="pre">dict</span></code></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="easymoney.easy_pandas.type_in_series">
+<code class="descclassname">easymoney.easy_pandas.</code><code class="descname">type_in_series</code><span class="sig-paren">(</span><em>series</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/easymoney/easy_pandas.html#type_in_series"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#easymoney.easy_pandas.type_in_series" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the types of objects in a Pandas Series.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>series</strong> (<code class="docutils literal"><span class="pre">Pandas</span> <span class="pre">Series</span></code>) &#8211; a series.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">list of the types in a series.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="docutils literal"><span class="pre">list</span></code></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+<span class="target" id="module-easymoney.sources.ecb_interface"></span><div class="section" id="european-central-bank-data">
+<h2>European Central Bank Data<a class="headerlink" href="#european-central-bank-data" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt id="easymoney.sources.ecb_interface.ecb_xml_exchange_data">
+<code class="descclassname">easymoney.sources.ecb_interface.</code><code class="descname">ecb_xml_exchange_data</code><span class="sig-paren">(</span><em>return_as='dict'</em>, <em>ecb_extension='stats/eurofxref/eurofxref-hist.xml'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/easymoney/sources/ecb_interface.html#ecb_xml_exchange_data"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#easymoney.sources.ecb_interface.ecb_xml_exchange_data" title="Permalink to this definition">¶</a></dt>
+<dd><div class="line-block">
+<div class="line">This tool harvests XML data European Central Bank via their generously provided API.</div>
+<div class="line">Expects the follwing in the XML data: &#8216;time&#8217;, &#8216;currency&#8217; and &#8216;rate&#8217;.</div>
+<div class="line">Returns either a Pandas DataFrame or nested dictionary of the form: <code class="docutils literal"><span class="pre">{time:</span> <span class="pre">{currency:</span> <span class="pre">rate}}</span></code>.</div>
+<div class="line">Please do not write procedures that slam their servers.</div>
+</div>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>return_as</strong> (<code class="docutils literal"><span class="pre">str</span></code>) &#8211; &#8216;dict&#8217; for dictionary (nested); &#8216;df&#8217; for Pandas DataFrame OR &#8216;both&#8217; for both a dict and DataFrame.</li>
+<li><strong>ecb_extension</strong> (<code class="docutils literal"><span class="pre">str</span></code>) &#8211; URL to the exchange rate XML data on <code class="docutils literal"><span class="pre">&quot;http://www.ecb.europa.eu&quot;</span></code>.
+Defaults to <code class="docutils literal"><span class="pre">'/stats/eurofxref/eurofxref-hist.xml'</span></code>.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">exchange rate with EUR as the base-currency.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><code class="docutils literal"><span class="pre">dict</span></code> or <code class="docutils literal"><span class="pre">Pandas</span> <span class="pre">DataFrame</span></code></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+<span class="target" id="module-easymoney.sources.world_bank_interface"></span><div class="section" id="world-bank-group-data">
+<h2>World Bank Group Data<a class="headerlink" href="#world-bank-group-data" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt id="easymoney.sources.world_bank_interface.world_bank_pull_wrapper">
+<code class="descclassname">easymoney.sources.world_bank_interface.</code><code class="descname">world_bank_pull_wrapper</code><span class="sig-paren">(</span><em>value_true_name=None</em>, <em>indicator='FP.CPI.TOTL'</em>, <em>return_as='data_frame'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/easymoney/sources/world_bank_interface.html#world_bank_pull_wrapper"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#easymoney.sources.world_bank_interface.world_bank_pull_wrapper" title="Permalink to this definition">¶</a></dt>
+<dd><div class="line-block">
+<div class="line">Tool to harvest data for specific indicator from the World Bank Group via their generously provided API.</div>
+<div class="line">Extracts world bank information based on a specific indicator and returns a Pandas DataFrame.</div>
+<div class="line">Currently expects the follwing in the XML data:
+country, ISO alpha 2 code, an indicator, value name (to be replaced by value_true_name) and year.</div>
+<div class="line">Please do not write procedures that slam their servers.</div>
+</div>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>value_true_name</strong> (<code class="docutils literal"><span class="pre">str</span></code>) &#8211; reable name for the indicator. If None, name will be extract from <code class="docutils literal"><span class="pre">indicator</span></code>.
+Defaults to None.</li>
+<li><strong>indicator</strong> (<code class="docutils literal"><span class="pre">str</span></code>) &#8211; World Bank Indicator. Defaults to &#8220;FP.CPI.TOTL&#8221;.</li>
+<li><strong>return_as</strong> (<code class="docutils literal"><span class="pre">str</span></code>) &#8211; &#8216;data_frame&#8217; or &#8216;dict&#8217;</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">DataFrame with the requested indicator information or a dictionary</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><code class="docutils literal"><span class="pre">dict</span></code> or <code class="docutils literal"><span class="pre">Pandas</span> <span class="pre">DateFrame</span></code></p>
+</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 </div>

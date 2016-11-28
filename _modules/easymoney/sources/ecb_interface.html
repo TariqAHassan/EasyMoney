@@ -1,0 +1,331 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>easymoney.sources.ecb_interface &mdash; EasyMoney 1.0.0 documentation</title>
+  
+
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+    <link rel="top" title="EasyMoney 1.0.0 documentation" href="../../../index.html"/>
+        <link rel="up" title="Module code" href="../../index.html"/> 
+
+  
+  <script src="../../../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../../../index.html" class="icon icon-home"> EasyMoney
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                1.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+                <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../README.html">EasyMoney</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../code.html">Developer Documentation</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="../../../index.html">EasyMoney</a>
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../../../index.html">Docs</a> &raquo;</li>
+      
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+      
+    <li>easymoney.sources.ecb_interface</li>
+      <li class="wy-breadcrumbs-aside">
+        
+          
+        
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for easymoney.sources.ecb_interface</h1><div class="highlight"><pre>
+<span></span><span class="ch">#!/usr/bin/env python3</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="sd">    European Central Bank Data</span>
+<span class="sd">    ~~~~~~~~~~~~~~~~~~~~~~~~~~</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="c1"># Modules</span>
+<span class="kn">import</span> <span class="nn">re</span>
+<span class="kn">import</span> <span class="nn">requests</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+
+<span class="kn">from</span> <span class="nn">collections</span> <span class="k">import</span> <span class="n">defaultdict</span>
+<span class="kn">from</span> <span class="nn">easymoney.support_tools</span> <span class="k">import</span> <span class="n">date_sort</span>
+<span class="kn">from</span> <span class="nn">easymoney.support_tools</span> <span class="k">import</span> <span class="n">date_reformat</span>
+
+
+<span class="k">def</span> <span class="nf">_ecb_data_frame</span><span class="p">(</span><span class="n">exchange_rate_dict</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+
+<span class="sd">    Convert `exchange_rate_dict` into a Pandas DataFrame</span>
+
+<span class="sd">    :param exchange_rate_dict: data harvest by `ecb_xml_exchange_data()`.</span>
+<span class="sd">    :type exchange_rate_dict: ``dict``</span>
+<span class="sd">    :return: dataframe of ECB exchange data.</span>
+<span class="sd">    :rytpe: ``Pandas DataFrame``</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># Convert to pandas dataframe</span>
+    <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="o">.</span><span class="n">from_dict</span><span class="p">(</span><span class="n">exchange_rate_dict</span><span class="p">,</span> <span class="n">orient</span><span class="o">=</span><span class="s1">&#39;index&#39;</span><span class="p">)</span>
+
+    <span class="c1"># convert date index --&gt; column</span>
+    <span class="n">df</span><span class="p">[</span><span class="s1">&#39;Date&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">index</span>
+    <span class="n">df</span><span class="o">.</span><span class="n">index</span> <span class="o">=</span> <span class="nb">range</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+
+    <span class="c1"># Melt the dataframe</span>
+    <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">melt</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">id_vars</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;Date&#39;</span><span class="p">],</span> <span class="n">value_vars</span><span class="o">=</span><span class="p">[</span><span class="n">d</span> <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">df</span><span class="o">.</span><span class="n">columns</span> <span class="k">if</span> <span class="n">d</span> <span class="o">!=</span> <span class="s1">&#39;Date&#39;</span><span class="p">])</span>
+    <span class="n">df</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;variable&quot;</span><span class="p">:</span> <span class="s2">&quot;Currency&quot;</span><span class="p">,</span> <span class="s2">&quot;value&quot;</span><span class="p">:</span> <span class="s2">&quot;Rate&quot;</span><span class="p">},</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+    <span class="c1"># Drop NaNs</span>
+    <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="n">pd</span><span class="o">.</span><span class="n">notnull</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;Rate&#39;</span><span class="p">])]</span>
+
+    <span class="c1"># Add Temp. Date Column</span>
+    <span class="n">df</span><span class="p">[</span><span class="s1">&#39;DateTemp&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">to_datetime</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;Date&#39;</span><span class="p">],</span> <span class="nb">format</span><span class="o">=</span><span class="s1">&#39;</span><span class="si">%d</span><span class="s1">/%m/%Y&#39;</span><span class="p">)</span>
+
+    <span class="c1"># Sort by currency code</span>
+    <span class="n">df</span><span class="o">.</span><span class="n">sort_values</span><span class="p">([</span><span class="s1">&#39;DateTemp&#39;</span><span class="p">,</span> <span class="s1">&#39;Currency&#39;</span><span class="p">],</span> <span class="n">ascending</span><span class="o">=</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+    <span class="c1"># Drop DateTemp</span>
+    <span class="k">del</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39;DateTemp&#39;</span><span class="p">]</span>
+
+    <span class="c1"># Refresh index and Return</span>
+    <span class="k">return</span> <span class="n">df</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">drop</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="ecb_xml_exchange_data"><a class="viewcode-back" href="../../../code.html#easymoney.sources.ecb_interface.ecb_xml_exchange_data">[docs]</a><span class="k">def</span> <span class="nf">ecb_xml_exchange_data</span><span class="p">(</span><span class="n">return_as</span><span class="o">=</span><span class="s1">&#39;dict&#39;</span><span class="p">,</span> <span class="n">ecb_extension</span><span class="o">=</span><span class="s2">&quot;stats/eurofxref/eurofxref-hist.xml&quot;</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+
+<span class="sd">    | This tool harvests XML data European Central Bank via their generously provided API.</span>
+<span class="sd">    | Expects the follwing in the XML data: &#39;time&#39;, &#39;currency&#39; and &#39;rate&#39;.</span>
+<span class="sd">    | Returns either a Pandas DataFrame or nested dictionary of the form: ``{time: {currency: rate}}``.</span>
+<span class="sd">    | Please do not write procedures that slam their servers.</span>
+
+<span class="sd">    :param return_as: &#39;dict&#39; for dictionary (nested); &#39;df&#39; for Pandas DataFrame OR &#39;both&#39; for both a dict and DataFrame.</span>
+<span class="sd">    :type return_as: ``str``</span>
+<span class="sd">    :param ecb_extension: URL to the exchange rate XML data on ``&quot;http://www.ecb.europa.eu&quot;``.</span>
+<span class="sd">                          Defaults to ``&#39;/stats/eurofxref/eurofxref-hist.xml&#39;``.</span>
+<span class="sd">    :type ecb_extension: ``str``</span>
+<span class="sd">    :return: exchange rate with EUR as the base-currency.</span>
+<span class="sd">    :rtype: ``dict`` or ``Pandas DataFrame``</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># Currency Codes</span>
+    <span class="n">all_currency_codes</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+
+    <span class="c1"># Constuct the URL to the XML data on the ECB&#39;s website.</span>
+    <span class="n">xmlpath</span> <span class="o">=</span> <span class="s2">&quot;http://www.ecb.europa.eu/&quot;</span> <span class="o">+</span> <span class="n">ecb_extension</span>
+
+    <span class="c1"># Request the data from the sever.</span>
+    <span class="n">url_request</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">xmlpath</span><span class="p">)</span>
+
+    <span class="c1"># Convert the XML to str, split on &#39;Cube&gt;&lt;Cube&#39; and remove the first element.</span>
+    <span class="n">parsed_xml</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">url_request</span><span class="o">.</span><span class="n">content</span><span class="p">)</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;Cube&gt;&lt;Cube&quot;</span><span class="p">)[</span><span class="mi">1</span><span class="p">:]</span>
+
+    <span class="c1"># Initialize the exchange rate dict</span>
+    <span class="n">exchange_rate_dict</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+
+    <span class="c1"># Initialize dict to track dates by currency</span>
+    <span class="n">currency_date_record</span> <span class="o">=</span> <span class="n">defaultdict</span><span class="p">(</span><span class="nb">set</span><span class="p">)</span>
+
+    <span class="c1"># Iterate though the parsed XML</span>
+    <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="n">parsed_xml</span><span class="p">:</span>
+        <span class="n">date</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">findall</span><span class="p">(</span><span class="s1">r&#39;time=&quot;(.*?)&quot;&#39;</span><span class="p">,</span> <span class="n">j</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">ccodes</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">findall</span><span class="p">(</span><span class="s1">r&#39;currency=&quot;(.*?)&quot; rate=&#39;</span><span class="p">,</span> <span class="n">j</span><span class="p">)</span>
+        <span class="n">rates</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">findall</span><span class="p">(</span><span class="s1">r&#39;rate=&quot;(.*?)&quot;&#39;</span><span class="p">,</span> <span class="n">j</span><span class="p">)</span>
+
+        <span class="c1"># Reformat Date</span>
+        <span class="n">reformatted_date</span> <span class="o">=</span> <span class="n">date_reformat</span><span class="p">(</span><span class="n">date</span><span class="p">,</span> <span class="n">from_format</span><span class="o">=</span><span class="s2">&quot;%Y-%m-</span><span class="si">%d</span><span class="s2">&quot;</span><span class="p">)</span>
+
+        <span class="c1"># Build Exchange Rate Dict</span>
+        <span class="n">exchange_rate_dict</span><span class="p">[</span><span class="n">reformatted_date</span><span class="p">]</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">ccodes</span><span class="p">,</span> <span class="p">[</span><span class="nb">float</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">rates</span><span class="p">]))</span>
+
+        <span class="c1"># Track Currency Codes</span>
+        <span class="n">all_currency_codes</span> <span class="o">+=</span> <span class="p">[</span><span class="n">c</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">ccodes</span> <span class="k">if</span> <span class="n">c</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">all_currency_codes</span><span class="p">]</span>
+
+        <span class="c1"># Track Dates</span>
+        <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">ccodes</span><span class="p">:</span>
+            <span class="n">currency_date_record</span><span class="p">[</span><span class="n">c</span><span class="p">]</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">reformatted_date</span><span class="p">)</span>
+
+    <span class="c1"># Sort currency_date_record</span>
+    <span class="n">currency_date_record_sorted</span> <span class="o">=</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="n">date_sort</span><span class="p">(</span><span class="n">v</span><span class="p">)</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">currency_date_record</span><span class="o">.</span><span class="n">items</span><span class="p">()}</span>
+
+    <span class="c1"># return as dict</span>
+    <span class="k">if</span> <span class="n">return_as</span> <span class="o">==</span> <span class="s1">&#39;dict&#39;</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">exchange_rate_dict</span><span class="p">,</span> <span class="n">all_currency_codes</span><span class="p">,</span> <span class="n">currency_date_record_sorted</span>
+    <span class="k">elif</span> <span class="n">return_as</span> <span class="o">==</span> <span class="s1">&#39;data_frame&#39;</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">_ecb_data_frame</span><span class="p">(</span><span class="n">exchange_rate_dict</span><span class="p">),</span> <span class="n">all_currency_codes</span>
+    <span class="k">elif</span> <span class="n">return_as</span> <span class="o">==</span> <span class="s1">&#39;both&#39;</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">exchange_rate_dict</span><span class="p">,</span> <span class="n">_ecb_data_frame</span><span class="p">(</span><span class="n">exchange_rate_dict</span><span class="p">),</span> <span class="n">all_currency_codes</span><span class="p">,</span> <span class="n">currency_date_record_sorted</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;`return_as` must be one of: &#39;dict&#39;, &#39;data_frame&#39; or `both`.&quot;</span><span class="p">)</span></div>
+
+<span class="n">ecb_currency_to_alpha2_dict</span> <span class="o">=</span> <span class="p">{</span>   <span class="s2">&quot;CYP&quot;</span><span class="p">:</span> <span class="s2">&quot;CY&quot;</span>
+                                <span class="p">,</span> <span class="s2">&quot;EEK&quot;</span><span class="p">:</span> <span class="s2">&quot;EE&quot;</span>
+                                <span class="p">,</span> <span class="s2">&quot;LTL&quot;</span><span class="p">:</span> <span class="s2">&quot;LT&quot;</span>
+                                <span class="p">,</span> <span class="s2">&quot;LVL&quot;</span><span class="p">:</span> <span class="s2">&quot;LV&quot;</span>
+                                <span class="p">,</span> <span class="s2">&quot;MTL&quot;</span><span class="p">:</span> <span class="s2">&quot;MT&quot;</span>
+                                <span class="p">,</span> <span class="s2">&quot;ROL&quot;</span><span class="p">:</span> <span class="s2">&quot;RO&quot;</span>
+                                <span class="p">,</span> <span class="s2">&quot;SIT&quot;</span><span class="p">:</span> <span class="s2">&quot;SI&quot;</span>
+                                <span class="p">,</span> <span class="s2">&quot;SKK&quot;</span><span class="p">:</span> <span class="s2">&quot;SK&quot;</span>
+                                <span class="p">,</span> <span class="s2">&quot;TRL&quot;</span><span class="p">:</span> <span class="s2">&quot;TR&quot;</span>
+<span class="p">}</span>
+
+
+
+
+
+
+
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2016, Tariq A. Hassan.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../../../',
+            VERSION:'1.0.0',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true
+        };
+    </script>
+      <script type="text/javascript" src="../../../_static/jquery.js"></script>
+      <script type="text/javascript" src="../../../_static/underscore.js"></script>
+      <script type="text/javascript" src="../../../_static/doctools.js"></script>
+      <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="../../../_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>
