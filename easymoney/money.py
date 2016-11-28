@@ -227,7 +227,7 @@ class EasyPeasy(object):
         |   :math:`c_{1}` = CPI of the region in *year_b*.
         |   :math:`c_{2}` = CPI of the region in *year_a*.
 
-        :param region: a region (currency codes may work, provided they are not common currencies, e.g., Euro).
+        :param region: a region.
         :type region: ``str``
         :param year_a: start year.
         :type year_a: ``int``
@@ -448,7 +448,7 @@ class EasyPeasy(object):
         :type from_currency: ``str``
         :param to_currency: the currency the amount is to be converted into.
         :type to_currency: ``str``
-        :param date: date of data to perform the conversion with. Dates must be of the form: ``DD/MM/YYYY``
+        :param date: date of data to perform the conversion with. Dates must be of the form: ``DD/MM/YYYY``.
         :type date: ``str``
         :param pretty_print: if True, pretty prints the table otherwise returns the table as a pandas DataFrame. Defaults to False.
         :type pretty_print: ``bool``
