@@ -75,6 +75,7 @@ class EasyPeasy(object):
         self.precision = precision
         self.fall_back = fall_back
 
+        min_suggest_value = 85
         # Check fuzzy_threshold
         if fuzzy_threshold != False and not isinstance(fuzzy_threshold, (float, int)):
             raise ValueError("`fuzzy_threshold` must be either `False`, a `float` or an `int`.")
@@ -82,7 +83,7 @@ class EasyPeasy(object):
             raise ValueError("`fuzzy_threshold` be between greater than 0.")
         elif isinstance(fuzzy_threshold, (float, int)) and fuzzy_threshold > 100:
             raise ValueError("`fuzzy_threshold` be less than 100.")
-        elif isinstance(fuzzy_threshold, (float, int)) and fuzzy_threshold < 85:
+        elif isinstance(fuzzy_threshold, (float, int)) and fuzzy_threshold < min_suggest_value:
             warn("Low `fuzzy_threshold` values, such as %s, may yield innaccurate results." % (str(fuzzy_threshold)))
 
         self.pycountry_wrap = PycountryWrap(fuzzy_threshold, data_path)
