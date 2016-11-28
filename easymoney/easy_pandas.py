@@ -169,7 +169,7 @@ def twoD_nested_dict(data_frame
                         WARNING: will OVERRIDE *to_float* and *to_int* if they reference nest_col_a or nest_col_b.
     :type keys_to_str: ``bool``
     :param engine: 'standard' for a slower (but well-tested) method of generating a nested dict; 'fast' to employ a
-                    speedy (but *not well tested*) method for generating a nested dict. Default to 'standard'.
+                    speedy (but *not well-tested*) method for generating a nested dict. Default to 'standard'.
     :type engine: ``str``
     :return: nested dict of the form: ``{nest_col_a: {nest_col_b: nest_col_c}``.
     :rtype: ``dict``

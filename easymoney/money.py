@@ -72,8 +72,8 @@ class EasyPeasy(object):
         Initialize the ``EasyPeasy()`` class.
 
         """
-        self.precision = precision
-        self.fall_back = fall_back
+        self._precision = precision
+        self._fall_back = fall_back
 
         min_suggest_fuzzy_threshold = 85
         # Check fuzzy_threshold
@@ -87,17 +87,17 @@ class EasyPeasy(object):
                 and fuzzy_threshold < min_suggest_fuzzy_threshold:
             warn("Low `fuzzy_threshold` values, such as %s, may yield innaccurate results." % (str(fuzzy_threshold)))
 
-        self.pycountry_wrap = PycountryWrap(fuzzy_threshold, data_path)
-        self.pycountries_alpha_2 = set([c.alpha_2 for c in list(pycountry.countries)])
+        self._pycountry_wrap = PycountryWrap(fuzzy_threshold, data_path)
+        self._pycountries_alpha_2 = set([c.alpha_2 for c in list(pycountry.countries)])
 
         # CPI Dict
-        self.cpi_dict = world_bank_pull(return_as='dict')
+        self._cpi_dict = world_bank_pull(return_as='dict')
 
         # Exchange Dict
-        self.exchange_dict, all_currency_codes, self.currency_date_record = ecb_xml_exchange_data(return_as='dict')
+        self._exchange_dict, all_currency_codes, self._currency_date_record = ecb_xml_exchange_data(return_as='dict')
 
         # Column Order for options
-        self.table_col_order = ['RegionFull', 'Region', 'Alpha2', 'Alpha3', 'Currencies', 'InflationDates', 'ExchangeDates']
+        self._table_col_order = ['RegionFull', 'Region', 'Alpha2', 'Alpha3', 'Currencies', 'InflationDates', 'ExchangeDates']
 
     def _params_check(self, amount="void", pretty_print="void"):
         """
@@ -133,7 +133,7 @@ class EasyPeasy(object):
         :return: the desired mapping from region to ISO Alpha2.
         :rtype: ``str`` or ``tuple``
         """
-        return self.pycountry_wrap.map_region_to_type(region=region, extract_type=map_to)
+        return self._pycountry_wrap.map_region_to_type(region=region, extract_type=map_to)
 
     def _cpi_years(self, region, warn=True):
         """
@@ -148,8 +148,8 @@ class EasyPeasy(object):
         :rtype: ``list``
         """
         cpi_years_list = list()
-        for year in sorted(list(self.cpi_dict.keys()), reverse=True):
-            cpi = self.cpi_dict.get(year, None).get(region, None)
+        for year in sorted(list(self._cpi_dict.keys()), reverse=True):
+            cpi = self._cpi_dict.get(year, None).get(region, None)
             if not isinstance(cpi, type(None)):
                 cpi_years_list.append(year)
 
@@ -188,8 +188,8 @@ class EasyPeasy(object):
         elif year == 'latest':
             return max(available_years)
         elif int(float(year)) not in available_years:
-            if self.fall_back:
-                natural_region_name = self.pycountry_wrap.map_region_to_type(region, 'name')
+            if self._fall_back:
+                natural_region_name = self._pycountry_wrap.map_region_to_type(region, 'name')
                 fall_back_year = closest_value(float(year), available_years)
                 warn(warn_msg % (year, natural_region_name, str(fall_back_year)))
                 return fall_back_year
@@ -212,7 +212,7 @@ class EasyPeasy(object):
         :return: CPI for a given year.
         :rtype: ``float``
         """
-        cpi = self.cpi_dict.get(str(int(float(year))), {}).get(self.region_map(region, 'alpha_2'), None)
+        cpi = self._cpi_dict.get(str(int(float(year))), {}).get(self.region_map(region, 'alpha_2'), None)
         if cpi is not None:
             return float(cpi)
         else:
@@ -278,7 +278,7 @@ class EasyPeasy(object):
         if (any([pd.isnull(c1), pd.isnull(c2)])) or (c2 == 0.0):
             return np.NaN
         else:
-            rate = round(((c1 - c2) / float(c2)) * 100, self.precision)
+            rate = round(((c1 - c2) / float(c2)) * 100, self._precision)
 
         # Return or Pretty Print.
         return rate if not pretty_print else print(rate, "%")
@@ -308,7 +308,7 @@ class EasyPeasy(object):
 
         # Input checking
         if year_a == year_b:
-            return mint(amount, self.precision, self.region_map(region, map_to='currency_alpha_3'), pretty_print)
+            return mint(amount, self._precision, self.region_map(region, map_to='currency_alpha_3'), pretty_print)
 
         # Get the CPI information
         inflation_dict, years = self.inflation(region, year_a, year_b, return_raw_cpi_dict='complete')
@@ -322,7 +322,7 @@ class EasyPeasy(object):
         adjusted_amount = inflation_dict[years['year_b']] / float(inflation_dict[years['year_a']]) * amount
 
         # Print or Return
-        return mint(adjusted_amount, self.precision, self.region_map(region, map_to='currency_alpha_3'), pretty_print)
+        return mint(adjusted_amount, self._precision, self.region_map(region, map_to='currency_alpha_3'), pretty_print)
 
 
     def _exchange_dates(self, currencies, min_max_rslt=False, date_format='%d/%m/%Y'):
@@ -343,9 +343,9 @@ class EasyPeasy(object):
         dates = list()
         for c in currencies:
             if c == 'EUR':
-                dates.append(sorted(list(self.exchange_dict.keys()), key=lambda x: datetime.strptime(x, date_format)))
+                dates.append(sorted(list(self._exchange_dict.keys()), key=lambda x: datetime.strptime(x, date_format)))
             else:
-                dates.append(self.currency_date_record.get(c.upper(), None))
+                dates.append(self._currency_date_record.get(c.upper(), None))
 
         # Remove None
         dates = list(filter(None, dates))
@@ -393,7 +393,7 @@ class EasyPeasy(object):
         if currency.upper() == 'EUR':
             return 1.0
 
-        available_data = self.currency_date_record.get(currency, None)
+        available_data = self._currency_date_record.get(currency, None)
         if available_data == None:
             raise AttributeError("Data could not obtained for '%s' from the\n" \
                                  "European Central Bank database currently cached." % (currency))
@@ -403,7 +403,7 @@ class EasyPeasy(object):
         elif date == 'latest':
             exchange_date = min_max_dates(available_data)[1]
         elif isinstance(date, str) and date not in available_data:
-            if self.fall_back:
+            if self._fall_back:
                 exchange_date = closest_date(date, available_data)
                 warn(warn_msg % (currency, date, exchange_date))
             else:
@@ -413,7 +413,7 @@ class EasyPeasy(object):
         else:
             raise ValueError("Invalid Date Supplied. Dates must be of the form DD/MM/YYYY.")
 
-        exchange_rate = self.exchange_dict.get(exchange_date, {}).get(currency, None)
+        exchange_rate = self._exchange_dict.get(exchange_date, {}).get(currency, None)
         if not isinstance(exchange_rate, type(None)):
             return exchange_rate
         else:
@@ -468,7 +468,7 @@ class EasyPeasy(object):
 
         # Return amount unaltered if self-conversion was requested.
         if from_currency_fn == to_currency_fn:
-            return mint(amount, self.precision, to_currency_fn, pretty_print)
+            return mint(amount, self._precision, to_currency_fn, pretty_print)
 
         # from_currency --> Base Currency --> to_currency
         conversion_to_invert = self._base_cur_to_lcu(from_currency_fn, date)
@@ -477,7 +477,7 @@ class EasyPeasy(object):
         converted_amount = (conversion_to_invert ** -1) * self._base_cur_to_lcu(to_currency_fn, date) * float(amount)
 
         # Return results (or pretty print)
-        return mint(converted_amount, self.precision, to_currency_fn, pretty_print)
+        return mint(converted_amount, self._precision, to_currency_fn, pretty_print)
 
 
     def normalize(self
@@ -536,7 +536,7 @@ class EasyPeasy(object):
         normalize_amount = self.currency_converter(real_amount, region, base_currency, date=exchange_date)
 
         # Return results (or pretty print)
-        return mint(normalize_amount, self.precision, self._user_currency_input(base_currency), pretty_print)
+        return mint(normalize_amount, self._precision, self._user_currency_input(base_currency), pretty_print)
 
 
     def _options_info_error(self, rformat):
@@ -580,15 +580,15 @@ class EasyPeasy(object):
         # Note: does not currently handle currency transitions
 
         # Use CurrencyRelationshipsDB as Base
-        d = [i for i in list(self.pycountry_wrap.alpha2_currency_dict.items()) if i[0] in self.pycountries_alpha_2]
+        d = [i for i in list(self._pycountry_wrap.alpha2_currency_dict.items()) if i[0] in self._pycountries_alpha_2]
         options_df = pd.DataFrame(d).rename(columns={0 : "Alpha2", 1 : "Currencies"})
 
         # Add Names
-        options_df['Region'] = [self.pycountry_wrap.map_region_to_type(c, 'name') for c in list(options_df['Alpha2'])]
-        options_df['RegionFull'] = [self.pycountry_wrap.map_region_to_type(c, 'official_name') for c in list(options_df['Alpha2'])]
+        options_df['Region'] = [self._pycountry_wrap.map_region_to_type(c, 'name') for c in list(options_df['Alpha2'])]
+        options_df['RegionFull'] = [self._pycountry_wrap.map_region_to_type(c, 'official_name') for c in list(options_df['Alpha2'])]
 
         # Add Alpha3
-        options_df['Alpha3'] = [self.pycountry_wrap.map_region_to_type(c, 'alpha_3') for c in list(options_df['Alpha2'])]
+        options_df['Alpha3'] = [self._pycountry_wrap.map_region_to_type(c, 'alpha_3') for c in list(options_df['Alpha2'])]
 
         # Map available Inflation Data onto this Base
         options_df['InflationDates'] = options_df['Alpha2'].map(
@@ -613,11 +613,11 @@ class EasyPeasy(object):
             warn("`table_overlap_only` can only take effect if `info` is equal to 'all'.")
 
         # Subset
-        col_order = self.table_col_order
+        col_order = self._table_col_order
         if info == 'exchange':
-            col_order = [c for c in self.table_col_order if c != 'InflationDates']
+            col_order = [c for c in self._table_col_order if c != 'InflationDates']
         elif info == 'inflation':
-            col_order = [c for c in self.table_col_order if c != 'ExchangeDates']
+            col_order = [c for c in self._table_col_order if c != 'ExchangeDates']
         elif info != 'all':
             self._options_info_error('table')
 
@@ -637,7 +637,7 @@ class EasyPeasy(object):
         if info.strip().lower() not in ['exchange', 'inflation']:
             self._options_info_error('list')
 
-        d = self.exchange_dict if info.strip().lower() == 'exchange' else self.cpi_dict
+        d = self._exchange_dict if info.strip().lower() == 'exchange' else self._cpi_dict
 
         full = [list(v.keys()) for k, v in d.items()]
         return sorted(set([i for s in full for i in s]))
@@ -680,9 +680,6 @@ class EasyPeasy(object):
             raise ValueError("`rformat` must be one of:\n"
                              " - 'list', for a list of the requested information.\n"
                              " - 'table', for a table (dataframe) of the requested information.")
-
-
-ep = EasyPeasy()
 
 
 
