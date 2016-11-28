@@ -661,8 +661,8 @@ class EasyPeasy(object):
         :param range_table_dates: if True, only report the minimum and maximum date for which data is available;
                               if False, all dates for which data is available will be reported. Defaults to True.
         :type range_table_dates: ``bool``
-        :return: DataFrame of Currency Information `EasyPeasy()` Understands.
-        :rtype: ``Pandas DataFrame``
+        :return: information table or list
+        :rtype: ``Pandas DataFrame`` or ``list``
         """
         pretty_df = None
         if rformat == 'list':
