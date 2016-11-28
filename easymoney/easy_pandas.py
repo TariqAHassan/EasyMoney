@@ -31,6 +31,7 @@ def strlist_to_list(to_parse, convert_to_str_first=False):
     str_list = str(to_parse) if convert_to_str_first else to_parse
     return [i.strip().replace("'", "") for i in [j.split(",") for j in [str_list.replace("[", "").replace("]", "")]][0]]
 
+
 def pandas_dictkey_to_key_unpack(pandas_series, unpack_dict, convert_values_to_str = False):
     """
 
@@ -51,10 +52,10 @@ def pandas_dictkey_to_key_unpack(pandas_series, unpack_dict, convert_values_to_s
     # Hacking the living daylights out of the pandas API
     return pandas_series.replace(unpack_dict).map(lambda x: np.NaN if 'nan' in str(x) else strlist_to_list(str(x)))
 
+
 def _standard_pd_nester(data_frame, nest_col_a, nest_col_b, nest_col_c, keys_to_str = True):
     """
 
-    *Private Method*
     Method to produce a nested dict from a large pandas dataframe.
     Reliable technique (although slow with large DataFrames).
 
@@ -87,11 +88,11 @@ def _standard_pd_nester(data_frame, nest_col_a, nest_col_b, nest_col_c, keys_to_
 
     return nested_dict
 
+
 def _fast_pd_nester(data_frame, nest_col_a, nest_col_b, nest_col_c, keys_to_str = True):
     """
 
-    | *Private Method*
-    | This is a *VERY* fast way to produce a nested dict from a large Pandas DataFrames.
+    | This is a fast way to produce a nested dict from a large Pandas DataFrames.
     | Can handle DataFrames with several nest_col_a entries that are the same,
     | e.g.,
     |         nest_col_a    nest_col_b  nest_col_c
@@ -100,7 +101,7 @@ def _fast_pd_nester(data_frame, nest_col_a, nest_col_b, nest_col_c, keys_to_str 
     | 2       1999-01-05      CHF          2
     | 3       1999-01-05      CYP          3
     |
-    | WARNING: Not well-tested.
+    | WARNING: Not well-tested. This procedure may produce inaccuracies.
 
     :param data_frame: see ``twoD_nested_dict()``.
     :type data_frame: Pandas DataFrame
@@ -134,6 +135,7 @@ def _fast_pd_nester(data_frame, nest_col_a, nest_col_b, nest_col_c, keys_to_str 
     # Return as a nested dict
     return dict(zip(grouped_data_frame[nest_col_a], grouped_data_frame['dict_zipped']))
 
+
 def twoD_nested_dict(data_frame
                      , nest_col_a = None
                      , nest_col_b = None
@@ -165,7 +167,7 @@ def twoD_nested_dict(data_frame
     :param keys_to_str: Convert the columns that will become keys to strings. Default to True.
                         WARNING: will OVERRIDE *to_float* and *to_int* if they reference nest_col_a or nest_col_b.
     :param engine: 'standard' for a slower (but better tested) method of generating a nested dict;
-                   'fast' to employ a very speedy (but not well tested) method for generating a nested dict.
+                   'fast' to employ a very speedy (but *not well tested*) method for generating a nested dict.
                     Default to 'standard'.
     :type engine: str
     :return: nested dict of the form {nest_col_a: {nest_col_b: nest_col_c}.
@@ -191,6 +193,7 @@ def twoD_nested_dict(data_frame
     elif engine == 'fast':
         return _fast_pd_nester(data_frame, nest_col_a, nest_col_b, nest_col_c, keys_to_str)
 
+
 def pandas_list_column_to_str(data_frame, columns, join_on = ", ", bracket_wrap = False):
     """
 
@@ -214,6 +217,7 @@ def pandas_list_column_to_str(data_frame, columns, join_on = ", ", bracket_wrap 
 
     return df
 
+
 def pandas_str_column_to_list(data_frame, columns):
     """
 
@@ -233,33 +237,37 @@ def pandas_str_column_to_list(data_frame, columns):
 
     return data_frame
 
+
 def type_in_series(series):
     """
-    Return the types of objects in a Pandas Series
-    :param series:
-    :type series: Pandas Series
-    :return:
-    :rtype: list
+
+    Return the types of objects in a Pandas Series.
+
+    :param series: a series.
+    :type series: ``Pandas Series``
+    :return: list of the types in a series.
+    :rtype: ``list``
     """
     return list(set([type(i).__name__ if str(i).strip() not in ['nan', ''] else 'nan' for i in series]))
+
 
 def prettify_all_pandas_list_cols(data_frame, join_on = ", ", allow_nan = True, exclude = [], bracket_wrap = False):
     """
 
     Converts all columns with only lists to list-seperated-strings.
 
-    :param data_frame:
-    :type data_frame: Pandas DataFrame
+    :param data_frame: a dataframe.
+    :type data_frame: ``Pandas DataFrame``
     :param nan: allow nans
-    :type nan: bool
+    :type nan: ``bool``
     :param join_on: a string to join on. Defaults to ", ".
-    :type join_on: str
+    :type join_on: ``str``
     :param exclude: columns to exclude Defaults to an empty-list, [].
-    :type exclude: list
-    :param bracket_wrap: wrap in brackets
-    :type bracket_wrap: bool
-    :return:
-    :rtype: Pandas DataFrame
+    :type exclude: ``list``
+    :param bracket_wrap: wrap in brackets.
+    :type bracket_wrap: ``bool``
+    :return: dataframe with columns lists converted to strings.
+    :rtype: ``Pandas DataFrame``
     """
     allowed = [['list'], ['list', 'nan']] if allow_nan else [['list']]
 
@@ -276,22 +284,32 @@ def prettify_all_pandas_list_cols(data_frame, join_on = ", ", allow_nan = True, 
 def items_null(element):
     """
 
-    :param element:
-    :return:
+    Check if an object is a NaN, including all the elements in an iterable.
+
+    :param element: a python object.
+    :type element: ``any``
+    :return: assessment of whether or not `element` is a NaN.
+    :rtype: ``bool``
     """
     if isinstance(element, (list, tuple, type(np.array))):
         return True if all(pd.isnull(i) for i in element) else False
     else:
-        return True if pd.isnull(element) else False
+        return pd.isnull(element)
 
 
 def pandas_null_drop(data_frame, subset=None):
     """
 
-    :param data_frame:
-    :return:
-    """
+    Drop Rows with NaNs of all, or a subset of, the dataframe's columns.
+    (Can handle iterables which only contain NaNs).
 
+    :param data_frame: a dataframe.
+    :rtype data_frame: ``Pandas DataFrame``
+    :param subset: a subset of columns. Defaults to None, which will apply to all columns.
+    :rtype subset: ``iterable``
+    :return: dataframe with NaN dropped.
+    :rtype: ``Pandas DataFrame``
+    """
     # Fill Empty cells with nans
     data_frame = data_frame.fillna(np.NaN)
 
@@ -303,32 +321,61 @@ def pandas_null_drop(data_frame, subset=None):
 
     return data_frame.reset_index(drop=True)
 
-
 # ----------------------------------------------------------------------------------------------------------
 # Printing Suit
 # ----------------------------------------------------------------------------------------------------------
 
 def _padding(s, amount, justify):
+    """
+
+    Add padding to a string.
+
+    :param s: a string.
+    :type s: ``str``
+    :param amount: the amount of white space to add.
+    :type amount: ``float`` or ``int``
+    :param justify: the justification of the resultant text. Must be one of: 'left' or 'center'.
+    :type justify: ``str``
+    :return: `s` justified, or as passed if `justify` is not one of: 'left' or 'center'.
+    :rtype: ``str``
+    """
     pad = ' ' * amount
     if justify == 'left':
         return "%s%s" % (str(s), pad)
     elif justify == 'center':
         return "%s%s%s" % (pad[:int(amount/2)], str(s), pad[int(amount/2):])
+    else:
+        return s
 
 def _pandas_series_alignment(pandas_series, justify):
+    """
+
+    Align all items in a pandas series.
+
+    :param pandas_series: a pandas series.
+    :type pandas_series: ``Pandas Series``
+    :param justify: the justification of the resultant text. Must be one of: 'left', 'right' or 'center'.
+    :type justify: ``str``
+    :return: aligned series
+    :rtype: ``str``
+    """
     if justify == 'right':
         return pandas_series
     longest_string = max([len(str(s)) for s in pandas_series])
-    return [_padding(s, longest_string - len(s), justify) for s in pandas_series]
+    return [_padding(s, longest_string - len(s), justify) if not items_null(s) else s for s in pandas_series]
+
 
 def align_pandas(data_frame, to_align='right'):
     """
 
-    Align the columns of a Pandas DataFrame
+    Align the columns of a Pandas DataFrame by adding whitespace.
 
-    :param data_frame: a Pandas DataFrame
+    :param data_frame: a dataframe.
+    :type data_frame: ``Pandas DataFrame``
     :param to_align: 'left', 'right', 'center' or a dictionary of the form {'COLUMN' : 'ALIGNMENT'}.
+    :type to_align: ``str``
     :return: aligned DataFrame
+    :rtype: ``Pandas DataFrame``
     """
     if isinstance(to_align, dict):
         alignment_dict = to_align
@@ -341,6 +388,7 @@ def align_pandas(data_frame, to_align='right'):
         data_frame[col] = _pandas_series_alignment(data_frame[col], justification)
 
     return data_frame
+
 
 def pandas_print_full(pd_df, full_rows = True, full_cols = True):
     """
@@ -363,10 +411,11 @@ def pandas_print_full(pd_df, full_rows = True, full_cols = True):
     if full_rows: pd.reset_option('display.max_rows')
     if full_cols: pd.set_option('expand_frame_repr', True)
 
+
 def pandas_pretty_print(data_frame, col_align='right', header_align='center', full_rows=True, full_cols=True):
     """
 
-    Pretty Print a Pandas DataFrame
+    Pretty Print a Pandas DataFrame.
 
     :param data_frame: a Pandas DataFrame
     :param col_align: 'left', 'right', 'center'' or a dictionary of the form {'COLUMN' : 'ALIGNMENT'}.
