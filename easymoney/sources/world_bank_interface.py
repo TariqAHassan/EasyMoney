@@ -69,7 +69,7 @@ def _world_bank_pull(dict_keys, raw_data):
     return data_frame.sort_values(['Alpha2', 'Year'], ascending = [1, 0]).reset_index(drop=True)
 
 
-def world_bank_pull_wrapper(value_true_name="CPI", indicator="FP.CPI.TOTL", return_type='data_frame'):
+def world_bank_pull_wrapper(value_true_name="CPI", indicator="FP.CPI.TOTL", return_as='data_frame'):
     """
 
     *Private Method*
@@ -80,8 +80,8 @@ def world_bank_pull_wrapper(value_true_name="CPI", indicator="FP.CPI.TOTL", retu
     :type value_true_name: str
     :param indicator:
     :type indicator: str
-    :param return_type: 'data_frame' or 'dict'
-    :type return_type: str
+    :param return_as: 'data_frame' or 'dict'
+    :type return_as: str
     :return: DataFrame with the requested indicator information or a dictionary
     :rtype: Pandas DateFrame or dict
     """
@@ -92,14 +92,16 @@ def world_bank_pull_wrapper(value_true_name="CPI", indicator="FP.CPI.TOTL", retu
     df = _world_bank_pull(dict_keys, raw_data)
 
     # Fill Empty Values with NaNs
-    df = df.fillna(value=np.NaN)
+    df = df.fillna(value=np.NaN).dropna(subset=['Year', 'Alpha2', 'CPI']).reset_index(drop=True)
 
-    if return_type == 'data_frame':
+    if return_as == 'data_frame':
         return df
-    elif return_type == 'dict':
-        return twoD_nested_dict(df.dropna(subset=['Year', 'Alpha2', 'CPI']), 'Year', 'Alpha2', 'CPI', engine='standard')
+    elif return_as == 'dict':
+        return twoD_nested_dict(df, 'Year', 'Alpha2', 'CPI')
+    elif return_as == 'both':
+        return df, twoD_nested_dict(df, 'Year', 'Alpha2', 'CPI')
     else:
-        raise ValueError("Invalid return_type.")
+        raise ValueError("Invalid option passed to return_as.")
 
 
 

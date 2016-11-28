@@ -12,6 +12,8 @@ import re
 import requests
 import pandas as pd
 
+from collections import defaultdict
+from easymoney.support_tools import date_sort
 from easymoney.support_tools import date_reformat
 
 def ecb_xml_exchange_data(return_as = 'dict', ecb_extension = "/stats/eurofxref/eurofxref-hist.xml"):
@@ -47,20 +49,37 @@ def ecb_xml_exchange_data(return_as = 'dict', ecb_extension = "/stats/eurofxref/
     # Initialize the exchange rate dict
     exchange_rate_db = dict()
 
+    # Initialize dict to track dates by currency
+    currency_date_record = defaultdict(set)
+
     # Iterate though the parsed XML
     for j in parsed_xml:
         date = re.findall(r'time="(.*?)"', j)[0]
         ccodes = re.findall(r'currency="(.*?)" rate=', j)
         rates = re.findall(r'rate="(.*?)"', j)
-        exchange_rate_db[date_reformat(date, from_format="%Y-%m-%d")] = dict(zip(ccodes, [float(x) for x in rates]))
+
+        # Reformat Date
+        reformatted_date = date_reformat(date, from_format="%Y-%m-%d")
+
+        # Build Exchange Rate Dict
+        exchange_rate_db[reformatted_date] = dict(zip(ccodes, [float(x) for x in rates]))
+
+        # Track Currency Codes
         all_currency_codes += [c for c in ccodes if c not in all_currency_codes]
+
+        # Track Dates
+        for c in ccodes:
+            currency_date_record[c].add(reformatted_date)
+
+    # Sort currency_date_record
+    currency_date_record_sorted = {k: date_sort(v) for k, v in currency_date_record.items()}
 
     # return as dict
     if return_as == 'dict':
-        return exchange_rate_db, all_currency_codes
+        return exchange_rate_db, all_currency_codes, currency_date_record_sorted
 
     # return as pandas df
-    elif return_as == 'data_frame' or return_as == 'both':
+    elif return_as in ['data_frame', 'both']:
         # Convert to pandas dataframe
         df = pd.DataFrame.from_dict(exchange_rate_db, orient = 'index')
 
@@ -90,7 +109,7 @@ def ecb_xml_exchange_data(return_as = 'dict', ecb_extension = "/stats/eurofxref/
         if return_as == 'data_frame':
             return df, all_currency_codes
         elif return_as == 'both':
-            return exchange_rate_db, df, all_currency_codes
+            return exchange_rate_db, df, all_currency_codes, currency_date_record_sorted
 
 ecb_currency_to_alpha2_dict = {   "CYP": "CY"
                                 , "EEK": "EE"

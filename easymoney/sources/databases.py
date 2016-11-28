@@ -12,26 +12,26 @@ from easymoney.support_tools import cln
 from easymoney.easy_pandas import twoD_nested_dict
 from easymoney.sources.world_bank_interface import world_bank_pull_wrapper
 
-def currency_mapping_to_dict(curr_path=''):
+def currency_mapping_to_dict(data_path=''):
     """
 
     :return:
     """
     # Read in the data
-    currency_mappings = pd.read_csv(curr_path + "easymoney/sources/data/CurrencyRelationshipsDB.csv",
-                                    usecols=['Alpha3', 'CurrencyCode'])
+    currency_mappings = pd.read_csv(data_path + "easymoney/sources/data/CurrencyRelationshipsDB.csv",
+                                    usecols=['Alpha2', 'CurrencyCode'])
 
     # Initialize a default dict
-    alpha3_currency = defaultdict(list)
+    alpha2_currency = defaultdict(list)
 
     # Loop though to generate a
-    for all_alpha3, currency in zip(*[currency_mappings[c] for c in ['Alpha3', 'CurrencyCode']]):
-        if not any(pd.isnull(i) for i in [all_alpha3, currency]):
-            for alpha3 in cln(all_alpha3).split(", "):
-                if currency.upper() not in alpha3_currency[alpha3.upper()]:
-                    alpha3_currency[alpha3.upper()].append(currency.upper())
+    for all_alpha2, currency in zip(*[currency_mappings[c] for c in ['Alpha2', 'CurrencyCode']]):
+        if not any(pd.isnull(i) for i in [all_alpha2, currency]):
+            for alpha2 in cln(all_alpha2).split(", "):
+                if currency.upper() not in alpha2_currency[alpha2.upper()]:
+                    alpha2_currency[alpha2.upper()].append(currency.upper())
 
-    return alpha3_currency
+    return alpha2_currency
 
 
 
