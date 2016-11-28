@@ -18,6 +18,7 @@ from pprint import pprint
 from easymoney.support_tools import mint
 from easymoney.support_tools import min_max
 from easymoney.support_tools import closest_date
+from easymoney.support_tools import year_extract
 from easymoney.support_tools import min_max_dates
 from easymoney.support_tools import closest_value
 from easymoney.support_tools import date_format_check
@@ -363,13 +364,13 @@ class EasyPeasy(object):
         self._params_check(amount, pretty_print)
 
         exchange_year = year_extract(exchange_date)
-        if not exchange_year.isdigit():
+        if exchange_date not in ['oldest', 'latest'] and not str(exchange_year).isdigit():
             warn("\n`exchange_date` is likely formatted improperly.")
 
-        # Check delta between `to_year` and `exchange_date`.
-        if abs(float(to_year) - float(exchange_year)) > 1:
-            warn("\nThe year for which the input amount is being adjusted\n"
-                 "for inflation is %s, whereas the exchange rate year is %s." % (str(to_year), str(exchange_year)))
+            # Check delta between `to_year` and `exchange_date`.
+            if abs(float(to_year) - float(exchange_year)) > 1: # note, this doesn't currently handle oldest v. latest.
+                warn("\nThe year for which the input amount is being adjusted\n"
+                     "for inflation is %s, whereas the exchange rate year is %s." % (str(to_year), str(exchange_year)))
 
         # Adjust input for inflation
         real_amount = self.inflation_calculator(amount, region, year_a=from_year, year_b=to_year)
@@ -402,9 +403,10 @@ class EasyPeasy(object):
 
     def _options_table(self, info, table_overlap_only=False, range_table_dates=True):
         """
-        Note: does not currently handle currency transitions
 
         """
+        # Note: does not currently handle currency transitions
+
         # Use CurrencyRelationshipsDB as Base
         d = [i for i in list(self.pycountry_wrap.alpha2_currency_dict.items()) if i[0] in self.pycountries_alpha_2]
         options_df = pd.DataFrame(d).rename(columns={0 : "Alpha2", 1 : "Currencies"})
@@ -456,7 +458,6 @@ class EasyPeasy(object):
         :param info:
         :return:
         """
-
         if info.strip().lower() not in ['exchange', 'inflation']:
             self._options_info_error('list')
 
@@ -486,13 +487,6 @@ class EasyPeasy(object):
                              " - 'list', for a list of the requested information.\n"
                              " - 'table', for a table (dataframe) of the requested information.")
 
-
-
-
-
-ep = EasyPeasy()
-
-ep.options()
 
 
 
