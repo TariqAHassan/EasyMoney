@@ -10,8 +10,11 @@
 import numpy as np
 from datetime import datetime
 
+from easymoney.support_tools import min_max
 from easymoney.easy_pandas import items_null
 from easymoney.support_tools import date_sort
+from easymoney.support_tools import min_max_dates
+
 
 
 def options_ranking(inflation, exchange):
@@ -46,9 +49,9 @@ def year_date_overlap(years, full_dates, date_format="%d/%m/%Y"):
 
     Get the overlap for a iterable of years and an iterable of full dates (as strings).
 
-    :param range_a: years of the form (year_a, year_b). Length must be equal to 2.
+    :param range_a: years of the form (year_a, year_b).
     :type range_a: ``iterable``
-    :param range_b: dates of the form (string_date_a, string_date_b). Length must be equal to 2.
+    :param range_b: dates of the form (string_date_a, string_date_b).
     :type range_b: ``iterable``
     :return: date overlap.
     :rtype: ``list``
@@ -58,8 +61,8 @@ def year_date_overlap(years, full_dates, date_format="%d/%m/%Y"):
         return np.NaN
 
     # Convert input to datetimes
-    year_datetimes = [datetime.strptime(dm + str(y), date_format) for y, dm in zip(sorted(years), ["01/01/", "31/12/"])]
-    dates_datetimes = [datetime.strptime(d, date_format) for d in date_sort(full_dates, from_format=date_format)]
+    year_datetimes = [datetime.strptime(dm + str(y), date_format) for y, dm in zip(min_max(years), ["01/01/", "31/12/"])]
+    dates_datetimes = [datetime.strptime(d, date_format) for d in min_max_dates(full_dates, from_format=date_format)]
 
     # Get date floor
     date_floor = max([year_datetimes[0], dates_datetimes[0]])
