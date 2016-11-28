@@ -160,10 +160,8 @@
 
 <span class="c1"># options_tools</span>
 <span class="kn">from</span> <span class="nn">easymoney.options_tools</span> <span class="k">import</span> <span class="n">options_ranking</span>
-<span class="kn">from</span> <span class="nn">easymoney.options_tools</span> <span class="k">import</span> <span class="n">multi_currency_dates</span>
 
 <span class="c1"># Easy Pandas</span>
-<span class="kn">from</span> <span class="nn">easymoney.easy_pandas</span> <span class="k">import</span> <span class="n">items_null</span>
 <span class="kn">from</span> <span class="nn">easymoney.easy_pandas</span> <span class="k">import</span> <span class="n">pandas_null_drop</span>
 <span class="kn">from</span> <span class="nn">easymoney.easy_pandas</span> <span class="k">import</span> <span class="n">pandas_pretty_print</span>
 
@@ -194,7 +192,7 @@
 <span class="sd">                                        Whenever possible, use terminology *exactly* as it appears in ``options()``.</span>
 
 <span class="sd">    :type fuzzy_threshold: ``int`` or ``float``</span>
-<span class="sd">    :param data_path: an alternative path to the database file(s). Defaults to &#39;&#39;.</span>
+<span class="sd">    :param data_path: path to the database file(s). Defaults to &#39;&#39;.</span>
 <span class="sd">                      Unless you know what you&#39;re doing, do not alter this parameter.</span>
 <span class="sd">    :type data_path: ``str``</span>
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -211,6 +209,12 @@
         <span class="c1"># Check fuzzy_threshold</span>
         <span class="k">if</span> <span class="n">fuzzy_threshold</span> <span class="o">!=</span> <span class="kc">False</span> <span class="ow">and</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">fuzzy_threshold</span><span class="p">,</span> <span class="p">(</span><span class="nb">float</span><span class="p">,</span> <span class="nb">int</span><span class="p">)):</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;`fuzzy_threshold` must be either `False`, a `float` or an `int`.&quot;</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">fuzzy_threshold</span><span class="p">,</span> <span class="p">(</span><span class="nb">float</span><span class="p">,</span> <span class="nb">int</span><span class="p">))</span> <span class="ow">and</span> <span class="n">fuzzy_threshold</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;`fuzzy_threshold` be between greater than 0.&quot;</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">fuzzy_threshold</span><span class="p">,</span> <span class="p">(</span><span class="nb">float</span><span class="p">,</span> <span class="nb">int</span><span class="p">))</span> <span class="ow">and</span> <span class="n">fuzzy_threshold</span> <span class="o">&gt;</span> <span class="mi">100</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;`fuzzy_threshold` be less than 100.&quot;</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">fuzzy_threshold</span><span class="p">,</span> <span class="p">(</span><span class="nb">float</span><span class="p">,</span> <span class="nb">int</span><span class="p">))</span> <span class="ow">and</span> <span class="n">fuzzy_threshold</span> <span class="o">&lt;</span> <span class="mi">85</span><span class="p">:</span>
+            <span class="n">warn</span><span class="p">(</span><span class="s2">&quot;Low `fuzzy_threshold` values, such as </span><span class="si">%s</span><span class="s2">, may yield innaccurate results.&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">fuzzy_threshold</span><span class="p">)))</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">pycountry_wrap</span> <span class="o">=</span> <span class="n">PycountryWrap</span><span class="p">(</span><span class="n">fuzzy_threshold</span><span class="p">,</span> <span class="n">data_path</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">pycountries_alpha_2</span> <span class="o">=</span> <span class="nb">set</span><span class="p">([</span><span class="n">c</span><span class="o">.</span><span class="n">alpha_2</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="nb">list</span><span class="p">(</span><span class="n">pycountry</span><span class="o">.</span><span class="n">countries</span><span class="p">)])</span>
@@ -433,7 +437,7 @@
 
         <span class="c1"># Input checking</span>
         <span class="k">if</span> <span class="n">year_a</span> <span class="o">==</span> <span class="n">year_b</span><span class="p">:</span>
-            <span class="k">return</span> <span class="nb">round</span><span class="p">(</span><span class="n">amount</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">precision</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">mint</span><span class="p">(</span><span class="n">amount</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">precision</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">region_map</span><span class="p">(</span><span class="n">region</span><span class="p">,</span> <span class="n">map_to</span><span class="o">=</span><span class="s1">&#39;currency_alpha_3&#39;</span><span class="p">),</span> <span class="n">pretty_print</span><span class="p">)</span>
 
         <span class="c1"># Get the CPI information</span>
         <span class="n">inflation_dict</span><span class="p">,</span> <span class="n">years</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">inflation</span><span class="p">(</span><span class="n">region</span><span class="p">,</span> <span class="n">year_a</span><span class="p">,</span> <span class="n">year_b</span><span class="p">,</span> <span class="n">return_raw_cpi_dict</span><span class="o">=</span><span class="s1">&#39;complete&#39;</span><span class="p">)</span>
@@ -447,7 +451,7 @@
         <span class="n">adjusted_amount</span> <span class="o">=</span> <span class="n">inflation_dict</span><span class="p">[</span><span class="n">years</span><span class="p">[</span><span class="s1">&#39;year_b&#39;</span><span class="p">]]</span> <span class="o">/</span> <span class="nb">float</span><span class="p">(</span><span class="n">inflation_dict</span><span class="p">[</span><span class="n">years</span><span class="p">[</span><span class="s1">&#39;year_a&#39;</span><span class="p">]])</span> <span class="o">*</span> <span class="n">amount</span>
 
         <span class="c1"># Print or Return</span>
-        <span class="k">return</span> <span class="n">mint</span><span class="p">(</span><span class="n">adjusted_amount</span><span class="p">,</span> <span class="n">currency</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">region_map</span><span class="p">(</span><span class="n">region</span><span class="p">,</span> <span class="n">map_to</span><span class="o">=</span><span class="s1">&#39;currency_alpha_3&#39;</span><span class="p">),</span> <span class="n">pretty_print</span><span class="o">=</span><span class="n">pretty_print</span><span class="p">)</span></div>
+        <span class="k">return</span> <span class="n">mint</span><span class="p">(</span><span class="n">adjusted_amount</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">precision</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">region_map</span><span class="p">(</span><span class="n">region</span><span class="p">,</span> <span class="n">map_to</span><span class="o">=</span><span class="s1">&#39;currency_alpha_3&#39;</span><span class="p">),</span> <span class="n">pretty_print</span><span class="p">)</span></div>
 
 
     <span class="k">def</span> <span class="nf">_exchange_dates</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">currencies</span><span class="p">,</span> <span class="n">min_max_rslt</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">date_format</span><span class="o">=</span><span class="s1">&#39;</span><span class="si">%d</span><span class="s1">/%m/%Y&#39;</span><span class="p">):</span>
@@ -593,7 +597,7 @@
 
         <span class="c1"># Return amount unaltered if self-conversion was requested.</span>
         <span class="k">if</span> <span class="n">from_currency_fn</span> <span class="o">==</span> <span class="n">to_currency_fn</span><span class="p">:</span>
-            <span class="k">return</span> <span class="n">mint</span><span class="p">(</span><span class="n">amount</span><span class="p">,</span> <span class="n">currency</span><span class="o">=</span><span class="n">to_currency_fn</span><span class="p">,</span> <span class="n">pretty_print</span><span class="o">=</span><span class="n">pretty_print</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">mint</span><span class="p">(</span><span class="n">amount</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">precision</span><span class="p">,</span> <span class="n">to_currency_fn</span><span class="p">,</span> <span class="n">pretty_print</span><span class="p">)</span>
 
         <span class="c1"># from_currency --&gt; Base Currency --&gt; to_currency</span>
         <span class="n">conversion_to_invert</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_base_cur_to_lcu</span><span class="p">(</span><span class="n">from_currency_fn</span><span class="p">,</span> <span class="n">date</span><span class="p">)</span>
@@ -602,7 +606,7 @@
         <span class="n">converted_amount</span> <span class="o">=</span> <span class="p">(</span><span class="n">conversion_to_invert</span> <span class="o">**</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">_base_cur_to_lcu</span><span class="p">(</span><span class="n">to_currency_fn</span><span class="p">,</span> <span class="n">date</span><span class="p">)</span> <span class="o">*</span> <span class="nb">float</span><span class="p">(</span><span class="n">amount</span><span class="p">)</span>
 
         <span class="c1"># Return results (or pretty print)</span>
-        <span class="k">return</span> <span class="n">mint</span><span class="p">(</span><span class="nb">round</span><span class="p">(</span><span class="n">converted_amount</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">precision</span><span class="p">),</span> <span class="n">currency</span><span class="o">=</span><span class="n">to_currency_fn</span><span class="p">,</span> <span class="n">pretty_print</span><span class="o">=</span><span class="n">pretty_print</span><span class="p">)</span></div>
+        <span class="k">return</span> <span class="n">mint</span><span class="p">(</span><span class="n">converted_amount</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">precision</span><span class="p">,</span> <span class="n">to_currency_fn</span><span class="p">,</span> <span class="n">pretty_print</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="EasyPeasy.normalize"><a class="viewcode-back" href="../../source/easymoney.html#easymoney.money.EasyPeasy.normalize">[docs]</a>    <span class="k">def</span> <span class="nf">normalize</span><span class="p">(</span><span class="bp">self</span>
@@ -661,7 +665,7 @@
         <span class="n">normalize_amount</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">currency_converter</span><span class="p">(</span><span class="n">real_amount</span><span class="p">,</span> <span class="n">region</span><span class="p">,</span> <span class="n">base_currency</span><span class="p">,</span> <span class="n">date</span><span class="o">=</span><span class="n">exchange_date</span><span class="p">)</span>
 
         <span class="c1"># Return results (or pretty print)</span>
-        <span class="k">return</span> <span class="n">mint</span><span class="p">(</span><span class="nb">round</span><span class="p">(</span><span class="n">normalize_amount</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">precision</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">_user_currency_input</span><span class="p">(</span><span class="n">base_currency</span><span class="p">),</span> <span class="n">pretty_print</span><span class="p">)</span></div>
+        <span class="k">return</span> <span class="n">mint</span><span class="p">(</span><span class="n">normalize_amount</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">precision</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_user_currency_input</span><span class="p">(</span><span class="n">base_currency</span><span class="p">),</span> <span class="n">pretty_print</span><span class="p">)</span></div>
 
     <span class="k">def</span> <span class="nf">_options_info_error</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rformat</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
