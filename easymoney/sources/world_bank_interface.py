@@ -60,7 +60,7 @@ def _wb_pull(dict_keys, raw_data):
     return data_frame.sort_values(['Alpha2', 'Year'], ascending = [1, 0]).reset_index(drop=True)
 
 
-def world_bank_pull_wrapper(value_true_name=None, indicator="FP.CPI.TOTL", return_as='data_frame'):
+def world_bank_pull(value_true_name=None, indicator="FP.CPI.TOTL", return_as='data_frame'):
     """
 
     | Tool to harvest data for specific indicator from the World Bank Group via their generously provided API.
@@ -80,7 +80,7 @@ def world_bank_pull_wrapper(value_true_name=None, indicator="FP.CPI.TOTL", retur
     :rtype: ``dict`` or ``Pandas DateFrame``
     """
     raw_data = wbdata.get_data(indicator)
-    readable_name = value_true_name.split(".")[1] if value_true_name is None else value_true_name
+    readable_name = value_true_name.split(".")[1] if value_true_name != None else value_true_name
     dict_keys = ['Country', 'Alpha2', 'Indicator', readable_name, 'Year']
 
     # Convert to DataFrame

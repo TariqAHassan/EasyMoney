@@ -37,7 +37,7 @@ from easymoney.easy_pandas import pandas_pretty_print
 
 # Online Data Sources
 from easymoney.sources.ecb_interface import ecb_xml_exchange_data
-from easymoney.sources.world_bank_interface import world_bank_pull_wrapper
+from easymoney.sources.world_bank_interface import world_bank_pull
 
 
 
@@ -75,22 +75,23 @@ class EasyPeasy(object):
         self.precision = precision
         self.fall_back = fall_back
 
-        min_suggest_value = 85
+        min_suggest_fuzzy_threshold = 85
         # Check fuzzy_threshold
         if fuzzy_threshold != False and not isinstance(fuzzy_threshold, (float, int)):
             raise ValueError("`fuzzy_threshold` must be either `False`, a `float` or an `int`.")
-        elif isinstance(fuzzy_threshold, (float, int)) and fuzzy_threshold <= 0:
-            raise ValueError("`fuzzy_threshold` be between greater than 0.")
-        elif isinstance(fuzzy_threshold, (float, int)) and fuzzy_threshold > 100:
-            raise ValueError("`fuzzy_threshold` be less than 100.")
-        elif isinstance(fuzzy_threshold, (float, int)) and fuzzy_threshold < min_suggest_value:
+        elif isinstance(fuzzy_threshold, (float, int)) and not isinstance(fuzzy_threshold, bool) and fuzzy_threshold <= 0:
+            raise ValueError("`fuzzy_threshold` must be greater than 0.")
+        elif isinstance(fuzzy_threshold, (float, int)) and not isinstance(fuzzy_threshold, bool) and fuzzy_threshold > 100:
+            raise ValueError("`fuzzy_threshold` must be less than 100.")
+        elif isinstance(fuzzy_threshold, (float, int)) and not isinstance(fuzzy_threshold, bool) \
+                and fuzzy_threshold < min_suggest_fuzzy_threshold:
             warn("Low `fuzzy_threshold` values, such as %s, may yield innaccurate results." % (str(fuzzy_threshold)))
 
         self.pycountry_wrap = PycountryWrap(fuzzy_threshold, data_path)
         self.pycountries_alpha_2 = set([c.alpha_2 for c in list(pycountry.countries)])
 
         # CPI Dict
-        self.cpi_dict = world_bank_pull_wrapper(return_as='dict')
+        self.cpi_dict = world_bank_pull(return_as='dict')
 
         # Exchange Dict
         self.exchange_dict, all_currency_codes, self.currency_date_record = ecb_xml_exchange_data(return_as='dict')
@@ -680,7 +681,7 @@ class EasyPeasy(object):
                              " - 'table', for a table (dataframe) of the requested information.")
 
 
-
+ep = EasyPeasy()
 
 
 
