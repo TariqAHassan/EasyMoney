@@ -51,7 +51,7 @@ def year_date_overlap(years, full_dates, date_format="%d/%m/%Y"):
     :param range_b: dates of the form (string_date_a, string_date_b). Length must be equal to 2.
     :type range_b: iterable
     :return: overlap
-    :rtype: tuple
+    :rtype: list
     """
     # Check inputs
     if any(items_null(i) for i in [years, full_dates]):
@@ -68,7 +68,7 @@ def year_date_overlap(years, full_dates, date_format="%d/%m/%Y"):
     date_ceiling = min([year_datetimes[1], dates_datetimes[1]])
 
     # Return
-    return date_floor.strftime(date_format), date_ceiling.strftime(date_format)
+    return [date_floor.strftime(date_format), date_ceiling.strftime(date_format)]
 
 
 
