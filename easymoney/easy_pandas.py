@@ -374,7 +374,7 @@ def align_pandas(data_frame, to_align='right'):
     :type data_frame: ``Pandas DataFrame``
     :param to_align: 'left', 'right', 'center' or a dictionary of the form: ``{'Column': 'Alignment'}``.
     :type to_align: ``str``
-    :return: aligned dataframe
+    :return: dataframe with aligned columns.
     :rtype: ``Pandas DataFrame``
     """
     if isinstance(to_align, dict):
