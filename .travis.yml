@@ -1,12 +1,13 @@
 language: python
 python:
+  - "2.7"
   - "3.4"
   - "3.5"
 # command to install dependencies
 cache: pip3
-install: "pip3 install fuzzywuzzy numpy pandas requests wbdata pycountry"
+install: "pip install fuzzywuzzy numpy pandas requests wbdata pycountry"
 # command to run tests
-script: python3 -W"ignore" tests/easy_tests.py
+script: python -W"ignore" tests/easy_tests.py
 notifications:
     on_success: never
     on_failure: never

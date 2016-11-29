@@ -32,6 +32,7 @@ setup(
                    , "Natural Language :: English"
                    , "Intended Audience :: Science/Research"
                    , "Intended Audience :: Financial and Insurance Industry"
+                   , "Programming Language :: Python :: 2.7"
                    , "Programming Language :: Python :: 3.4"
                    , "Programming Language :: Python :: 3.5"
                    , "Environment :: MacOS X"
