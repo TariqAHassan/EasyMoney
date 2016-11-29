@@ -15,6 +15,17 @@ import numpy as np
 import pandas as pd
 
 
+def pstr(s):
+    """
+
+    Convert to any obect to a string using pandas.
+
+    :param s: item to be converted to a string.
+    :type s: ``any``
+    :return: a string
+    :rtype: ``str``
+    """
+    return pd.Series([s]).astype('unicode')[0]
 
 
 def strlist_to_list(to_parse, convert_to_str_first=False):
@@ -31,7 +42,7 @@ def strlist_to_list(to_parse, convert_to_str_first=False):
     :return: string of a list to an actual list.
     :return: ``list``
     """
-    str_list = str(to_parse) if convert_to_str_first else to_parse
+    str_list = pstr(to_parse) if convert_to_str_first else to_parse
     return [i.strip().replace("'", "") for i in [j.split(",") for j in [str_list.replace("[", "").replace("]", "")]][0]]
 
 
@@ -51,9 +62,9 @@ def _pandas_dictkey_to_key_unpack(pandas_series, unpack_dict, convert_values_to_
     :rtype: ``Pandas Series``
     """
     if convert_values_to_str:
-        unpack_dict = {k: str(v) for k, v in unpack_dict.items()}
+        unpack_dict = {k: pstr(v) for k, v in unpack_dict.items()}
 
-    return pandas_series.replace(unpack_dict).map(lambda x: np.NaN if 'nan' in str(x) else strlist_to_list(str(x)))
+    return pandas_series.replace(unpack_dict).map(lambda x: np.NaN if 'nan' in pstr(x) else strlist_to_list(pstr(x)))
 
 
 def _standard_pd_nester(data_frame, nest_col_a, nest_col_b, nest_col_c, keys_to_str = True):
@@ -129,7 +140,7 @@ def _fast_pd_nester(data_frame, nest_col_a, nest_col_b, nest_col_c, keys_to_str 
     # Convert columns that will become keys to a string
     if keys_to_str:
         grouped_data_frame[nest_col_a] = grouped_data_frame[nest_col_a].astype(str)
-        grouped_data_frame[nest_col_b] = grouped_data_frame[nest_col_b].map(lambda x: [str(i) for i in x])
+        grouped_data_frame[nest_col_b] = grouped_data_frame[nest_col_b].map(lambda x: [pstr(i) for i in x])
 
     # Generate a dictionary by zipping the nest_col_b and nest_col_c columns
     grouped_data_frame['dict_zipped'] = grouped_data_frame[[nest_col_b, nest_col_c]].apply(
@@ -214,9 +225,9 @@ def pandas_list_column_to_str(data_frame, columns, join_on = ", ", bracket_wrap 
     """
     df = copy.deepcopy(data_frame)
     for col in columns:
-        df[col] = df[col].map(lambda x: join_on.join(x) if str(x) != 'nan' else x)
+        df[col] = df[col].map(lambda x: join_on.join(x) if pstr(x) != 'nan' else x)
         if bracket_wrap:
-            df[col] = df[col].map(lambda x: "[" + str(x) + "]" if str(x) != 'nan' else x)
+            df[col] = df[col].map(lambda x: "[" + pstr(x) + "]" if pstr(x) != 'nan' else x)
 
     return df
 
@@ -250,7 +261,7 @@ def type_in_series(series):
     :return: list of the types in a series.
     :rtype: ``list``
     """
-    return list(set([type(i).__name__ if str(i).strip() not in ['nan', ''] else 'nan' for i in series]))
+    return list(set([type(i).__name__ if pstr(i).strip() not in ['nan', ''] else 'nan' for i in series]))
 
 
 def prettify_all_pandas_list_cols(data_frame, join_on = ", ", allow_nan = True, exclude = [], bracket_wrap = False):
@@ -343,9 +354,9 @@ def _padding(s, amount, justify):
     """
     pad = ' ' * amount
     if justify == 'left':
-        return "%s%s" % (str(s), pad)
+        return "%s%s" % (pstr(s), pad)
     elif justify == 'center':
-        return "%s%s%s" % (pad[:int(amount/2)], str(s), pad[int(amount/2):])
+        return "%s%s%s" % (pad[:int(amount/2)], pstr(s), pad[int(amount/2):])
     else:
         return s
 
