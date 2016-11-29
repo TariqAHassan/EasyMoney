@@ -196,6 +196,9 @@
 <span class="sd">    :param data_path: alternative path to the database file(s). Defaults to none (&#39;&#39;).</span>
 <span class="sd">    :type data_path: ``str``</span>
 <span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># Fix: `EasyPeasy()` does not handle currencies like &#39;EEK&#39; properly.</span>
+    <span class="c1">#       They may not been appearing in options() correctly.</span>
+    <span class="c1">#       See: _user_currency_input() below.</span>
 
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">precision</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">fall_back</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">fuzzy_threshold</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">data_path</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -225,7 +228,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_cpi_dict</span> <span class="o">=</span> <span class="n">world_bank_pull</span><span class="p">(</span><span class="n">return_as</span><span class="o">=</span><span class="s1">&#39;dict&#39;</span><span class="p">)</span>
 
         <span class="c1"># Exchange Dict</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_exchange_dict</span><span class="p">,</span> <span class="n">all_currency_codes</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_currency_date_record</span> <span class="o">=</span> <span class="n">ecb_xml_exchange_data</span><span class="p">(</span><span class="n">return_as</span><span class="o">=</span><span class="s1">&#39;dict&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_exchange_dict</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">ecb_currency_codes</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_currency_date_record</span> <span class="o">=</span> <span class="n">ecb_xml_exchange_data</span><span class="p">(</span><span class="n">return_as</span><span class="o">=</span><span class="s1">&#39;dict&#39;</span><span class="p">)</span>
 
         <span class="c1"># Column Order for options</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_table_col_order</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;RegionFull&#39;</span><span class="p">,</span> <span class="s1">&#39;Region&#39;</span><span class="p">,</span> <span class="s1">&#39;Alpha2&#39;</span><span class="p">,</span> <span class="s1">&#39;Alpha3&#39;</span><span class="p">,</span> <span class="s1">&#39;Currencies&#39;</span><span class="p">,</span>
@@ -503,11 +506,15 @@
 <span class="sd">        :return: ISO Alpha 3 Currency Code</span>
 <span class="sd">        :rtype: ``pycountry object``</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Note: &#39;temp. fix&#39; has been added to handle currencies like &#39;EEK&#39;.</span>
+        <span class="c1">#        This capability should be integrated into region_map() in the future.</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">pycountry</span><span class="o">.</span><span class="n">currencies</span><span class="o">.</span><span class="n">lookup</span><span class="p">(</span><span class="n">currency_or_region</span><span class="p">)</span><span class="o">.</span><span class="n">alpha_3</span>
         <span class="k">except</span><span class="p">:</span>
-            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">region_map</span><span class="p">(</span><span class="n">currency_or_region</span><span class="p">,</span> <span class="s2">&quot;currency_alpha_3&quot;</span><span class="p">)</span>
-
+            <span class="k">if</span> <span class="n">currency_or_region</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">ecb_currency_codes</span><span class="p">:</span> <span class="c1"># temp fix</span>
+                <span class="k">return</span> <span class="n">currency_or_region</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">region_map</span><span class="p">(</span><span class="n">currency_or_region</span><span class="p">,</span> <span class="s2">&quot;currency_alpha_3&quot;</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">_base_cur_to_lcu</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">currency</span><span class="p">,</span> <span class="n">date</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -604,6 +611,9 @@
         <span class="c1"># Return amount unaltered if self-conversion was requested.</span>
         <span class="k">if</span> <span class="n">from_currency_fn</span> <span class="o">==</span> <span class="n">to_currency_fn</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">mint</span><span class="p">(</span><span class="n">amount</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_precision</span><span class="p">,</span> <span class="n">to_currency_fn</span><span class="p">,</span> <span class="n">pretty_print</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="nb">any</span><span class="p">(</span><span class="n">x</span> <span class="o">==</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">x</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="p">[</span><span class="n">to_currency_fn</span><span class="p">,</span> <span class="n">from_currency_fn</span><span class="p">]):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Could not convert &#39;</span><span class="si">%s</span><span class="s2">&#39; to &#39;</span><span class="si">%s</span><span class="s2">&#39;.&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">from_currency</span><span class="p">,</span> <span class="n">to_currency</span><span class="p">))</span>
 
         <span class="c1"># from_currency --&gt; Base Currency --&gt; to_currency</span>
         <span class="n">conversion_to_invert</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_base_cur_to_lcu</span><span class="p">(</span><span class="n">from_currency_fn</span><span class="p">,</span> <span class="n">date</span><span class="p">)</span>
@@ -820,8 +830,6 @@
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;`rformat` must be one of:</span><span class="se">\n</span><span class="s2">&quot;</span>
                              <span class="s2">&quot; - &#39;list&#39;, for a list of the requested information.</span><span class="se">\n</span><span class="s2">&quot;</span>
                              <span class="s2">&quot; - &#39;table&#39;, for a table (dataframe) of the requested information.&quot;</span><span class="p">)</span></div></div>
-
-
 
 
 

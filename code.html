@@ -503,8 +503,8 @@ from pd.Series of lists into comma-seperated strings.</p>
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
 <li><strong>data_frame</strong> (<code class="docutils literal"><span class="pre">Pandas</span> <span class="pre">DataFrame</span></code>) &#8211; a dataframe.</li>
-<li><strong>col_align</strong> (<code class="docutils literal"><span class="pre">str</span></code>) &#8211; &#8216;left&#8217;, &#8216;right&#8217;, &#8216;center&#8217;&#8217; or a dictionary of the form: <code class="docutils literal"><span class="pre">{'Column':</span> <span class="pre">'Alignment'}</span></code>.</li>
-<li><strong>header_align</strong> (<code class="docutils literal"><span class="pre">str</span></code>) &#8211; alignment of headers. Must be one of: &#8216;left&#8217;, &#8216;right&#8217;, &#8216;center&#8217;.</li>
+<li><strong>col_align</strong> (<code class="docutils literal"><span class="pre">str</span></code> or <code class="docutils literal"><span class="pre">dict</span></code>) &#8211; &#8216;left&#8217;, &#8216;right&#8217;, &#8216;center&#8217;&#8217; or a dictionary of the form: <code class="docutils literal"><span class="pre">{'Column':</span> <span class="pre">'Alignment'}</span></code>.</li>
+<li><strong>header_align</strong> (<code class="docutils literal"><span class="pre">str</span></code> or <code class="docutils literal"><span class="pre">dict</span></code>) &#8211; alignment of headers. Must be one of: &#8216;left&#8217;, &#8216;right&#8217;, &#8216;center&#8217;.</li>
 <li><strong>full_rows</strong> (<code class="docutils literal"><span class="pre">bool</span></code>) &#8211; print all rows.</li>
 <li><strong>full_cols</strong> (<code class="docutils literal"><span class="pre">bool</span></code>) &#8211; print all columns.</li>
 </ul>
@@ -588,7 +588,7 @@ from comma-seperated strings into a pd.Series of lists.</p>
 <dl class="function">
 <dt id="easymoney.easy_pandas.strlist_to_list">
 <code class="descclassname">easymoney.easy_pandas.</code><code class="descname">strlist_to_list</code><span class="sig-paren">(</span><em>to_parse</em>, <em>convert_to_str_first=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/easymoney/easy_pandas.html#strlist_to_list"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#easymoney.easy_pandas.strlist_to_list" title="Permalink to this definition">¶</a></dt>
-<dd><p>Work around for using <code class="docutils literal"><span class="pre">eval()</span></code> for the following conversion: <code class="docutils literal"><span class="pre">str(list)</span></code> &#8211;&gt; <code class="docutils literal"><span class="pre">list</span></code>.</p>
+<dd><p>Work around for using <code class="docutils literal"><span class="pre">eval()</span></code> for the following conversion: <code class="docutils literal"><span class="pre">str(list)</span></code> → <code class="docutils literal"><span class="pre">list</span></code>.</p>
 <p>For example: <code class="docutils literal"><span class="pre">&quot;[1992,</span> <span class="pre">'221-21',</span> <span class="pre">2102,</span> <span class="pre">'apples']&quot;</span></code> → <code class="docutils literal"><span class="pre">['1992',</span> <span class="pre">'221-21',</span> <span class="pre">'2102',</span> <span class="pre">'apples']</span></code>.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />

@@ -148,7 +148,7 @@
 <div class="viewcode-block" id="strlist_to_list"><a class="viewcode-back" href="../../code.html#easymoney.easy_pandas.strlist_to_list">[docs]</a><span class="k">def</span> <span class="nf">strlist_to_list</span><span class="p">(</span><span class="n">to_parse</span><span class="p">,</span> <span class="n">convert_to_str_first</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 
-<span class="sd">    Work around for using ``eval()`` for the following conversion: ``str(list)`` --&gt; ``list``.</span>
+<span class="sd">    Work around for using ``eval()`` for the following conversion: ``str(list)`` → ``list``.</span>
 
 <span class="sd">    For example: ``&quot;[1992, &#39;221-21&#39;, 2102, &#39;apples&#39;]&quot;`` → ``[&#39;1992&#39;, &#39;221-21&#39;, &#39;2102&#39;, &#39;apples&#39;]``.</span>
 
@@ -550,9 +550,9 @@
 <span class="sd">    :param data_frame: a dataframe.</span>
 <span class="sd">    :type data_frame: ``Pandas DataFrame``</span>
 <span class="sd">    :param col_align: &#39;left&#39;, &#39;right&#39;, &#39;center&#39;&#39; or a dictionary of the form: ``{&#39;Column&#39;: &#39;Alignment&#39;}``.</span>
-<span class="sd">    :type col_align: ``str``</span>
+<span class="sd">    :type col_align: ``str`` or ``dict``</span>
 <span class="sd">    :param header_align: alignment of headers. Must be one of: &#39;left&#39;, &#39;right&#39;, &#39;center&#39;.</span>
-<span class="sd">    :type header_align: ``str``</span>
+<span class="sd">    :type header_align: ``str`` or ``dict``</span>
 <span class="sd">    :param full_rows: print all rows.</span>
 <span class="sd">    :type full_rows: ``bool``</span>
 <span class="sd">    :param full_cols: print all columns.</span>
