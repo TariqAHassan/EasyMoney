@@ -67,6 +67,8 @@ class EasyPeasy(object):
     :type data_path: ``str``
     """
 
+    # To do: does not handle currencies like EEK.
+
     def __init__(self, precision=2, fall_back=True, fuzzy_threshold=False, data_path = ''):
         """
 
@@ -95,7 +97,7 @@ class EasyPeasy(object):
         self._cpi_dict = world_bank_pull(return_as='dict')
 
         # Exchange Dict
-        self._exchange_dict, all_currency_codes, self._currency_date_record = ecb_xml_exchange_data(return_as='dict')
+        self._exchange_dict, self.ecb_currency_codes, self._currency_date_record = ecb_xml_exchange_data(return_as='dict')
 
         # Column Order for options
         self._table_col_order = ['RegionFull', 'Region', 'Alpha2', 'Alpha3', 'Currencies',
@@ -376,8 +378,10 @@ class EasyPeasy(object):
         try:
             return pycountry.currencies.lookup(currency_or_region).alpha_3
         except:
-            return self.region_map(currency_or_region, "currency_alpha_3")
-
+            if currency_or_region in self.ecb_currency_codes:
+                return currency_or_region
+            else:
+                return self.region_map(currency_or_region, "currency_alpha_3")
 
     def _base_cur_to_lcu(self, currency, date):
         """
@@ -474,6 +478,9 @@ class EasyPeasy(object):
         # Return amount unaltered if self-conversion was requested.
         if from_currency_fn == to_currency_fn:
             return mint(amount, self._precision, to_currency_fn, pretty_print)
+
+        if any(x == None or x is None for x in [to_currency_fn, from_currency_fn]):
+            raise ValueError("Could not convert '%s' to '%s'." % (from_currency, to_currency))
 
         # from_currency --> Base Currency --> to_currency
         conversion_to_invert = self._base_cur_to_lcu(from_currency_fn, date)
@@ -690,8 +697,6 @@ class EasyPeasy(object):
             raise ValueError("`rformat` must be one of:\n"
                              " - 'list', for a list of the requested information.\n"
                              " - 'table', for a table (dataframe) of the requested information.")
-
-
 
 
 
