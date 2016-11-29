@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+# coding: utf-8
 
 """
 
@@ -13,6 +13,8 @@ import warnings
 import datetime
 import numpy as np
 import pandas as pd
+
+
 
 
 def strlist_to_list(to_parse, convert_to_str_first=False):
@@ -361,7 +363,7 @@ def _pandas_series_alignment(pandas_series, justify):
     """
     if justify == 'right':
         return pandas_series
-    longest_string = max([len(str(s)) for s in pandas_series])
+    longest_string = max([len(s) for s in pandas_series.astype('unicode')])
     return [_padding(s, longest_string - len(s), justify) if not items_null(s) else s for s in pandas_series]
 
 
