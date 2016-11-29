@@ -65,9 +65,14 @@ def world_bank_pull(value_true_name=None, indicator="FP.CPI.TOTL", return_as='da
 
     | Tool to harvest data for specific indicator from the World Bank Group via their generously provided API.
     | Extracts world bank information based on a specific indicator and returns a Pandas DataFrame.
-    | Currently expects the follwing in the XML data:
+    | Currently, this tools expects the following in the XML data:
                 country, ISO alpha 2 code, an indicator, value name (to be replaced by value_true_name) and year.
     | Please do not write procedures that slam their servers.
+    |
+    | Acknowledgement: this tools is made possible by the `wbdata` package.¹
+    |
+    | ¹Sherouse, Oliver (2014). Wbdata. Arlington, VA.
+    |
 
     :param value_true_name: reable name for the indicator. If None, this information will be extract from ``indicator``.
                             Defaults to None.
