@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+# coding: utf-8
 
 """
 
@@ -289,7 +289,10 @@ class EasyPeasy(object):
             rate = round(((c1 - c2) / float(c2)) * 100, self._precision)
 
         # Return or Pretty Print.
-        return rate if not pretty_print else print(rate, "%")
+        if not pretty_print:
+            return rate
+        else:
+            print(rate, "%")
 
 
     def inflation_calculator(self, amount, region, year_a, year_b, pretty_print=False):
