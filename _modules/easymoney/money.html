@@ -419,7 +419,10 @@
             <span class="n">rate</span> <span class="o">=</span> <span class="nb">round</span><span class="p">(((</span><span class="n">c1</span> <span class="o">-</span> <span class="n">c2</span><span class="p">)</span> <span class="o">/</span> <span class="nb">float</span><span class="p">(</span><span class="n">c2</span><span class="p">))</span> <span class="o">*</span> <span class="mi">100</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_precision</span><span class="p">)</span>
 
         <span class="c1"># Return or Pretty Print.</span>
-        <span class="k">return</span> <span class="n">rate</span> <span class="k">if</span> <span class="ow">not</span> <span class="n">pretty_print</span> <span class="k">else</span> <span class="nb">print</span><span class="p">(</span><span class="n">rate</span><span class="p">,</span> <span class="s2">&quot;%&quot;</span><span class="p">)</span></div>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">pretty_print</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">rate</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="n">rate</span><span class="p">,</span> <span class="s2">&quot;%&quot;</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="EasyPeasy.inflation_calculator"><a class="viewcode-back" href="../../source/easymoney.html#easymoney.money.EasyPeasy.inflation_calculator">[docs]</a>    <span class="k">def</span> <span class="nf">inflation_calculator</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">amount</span><span class="p">,</span> <span class="n">region</span><span class="p">,</span> <span class="n">year_a</span><span class="p">,</span> <span class="n">year_b</span><span class="p">,</span> <span class="n">pretty_print</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>

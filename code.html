@@ -706,9 +706,14 @@ Defaults to <code class="docutils literal"><span class="pre">'/stats/eurofxref/e
 <dd><div class="line-block">
 <div class="line">Tool to harvest data for specific indicator from the World Bank Group via their generously provided API.</div>
 <div class="line">Extracts world bank information based on a specific indicator and returns a Pandas DataFrame.</div>
-<div class="line">Currently expects the follwing in the XML data:
+<div class="line">Currently, this tools expects the following in the XML data:
 country, ISO alpha 2 code, an indicator, value name (to be replaced by value_true_name) and year.</div>
 <div class="line">Please do not write procedures that slam their servers.</div>
+<div class="line"><br /></div>
+<div class="line">Acknowledgement: this tools is made possible by the <cite>wbdata</cite> package.¹</div>
+<div class="line"><br /></div>
+<div class="line">¹Sherouse, Oliver (2014). Wbdata. Arlington, VA.</div>
+<div class="line"><br /></div>
 </div>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />

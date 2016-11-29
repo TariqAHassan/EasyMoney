@@ -195,9 +195,14 @@
 
 <span class="sd">    | Tool to harvest data for specific indicator from the World Bank Group via their generously provided API.</span>
 <span class="sd">    | Extracts world bank information based on a specific indicator and returns a Pandas DataFrame.</span>
-<span class="sd">    | Currently expects the follwing in the XML data:</span>
+<span class="sd">    | Currently, this tools expects the following in the XML data:</span>
 <span class="sd">                country, ISO alpha 2 code, an indicator, value name (to be replaced by value_true_name) and year.</span>
 <span class="sd">    | Please do not write procedures that slam their servers.</span>
+<span class="sd">    |</span>
+<span class="sd">    | Acknowledgement: this tools is made possible by the `wbdata` package.¹</span>
+<span class="sd">    |</span>
+<span class="sd">    | ¹Sherouse, Oliver (2014). Wbdata. Arlington, VA.</span>
+<span class="sd">    |</span>
 
 <span class="sd">    :param value_true_name: reable name for the indicator. If None, this information will be extract from ``indicator``.</span>
 <span class="sd">                            Defaults to None.</span>
