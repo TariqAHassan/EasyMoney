@@ -70,7 +70,7 @@ def _standard_pd_nester(data_frame, nest_col_a, nest_col_b, nest_col_c, keys_to_
     :type nest_col_c: ``str``
     :param keys_to_str: see ``twoD_nested_dict()``.
     :type keys_to_str: ``bool``
-    :return: nested dict of the form: ``{nest_col_a: {nest_col_b: nest_col_c}``.
+    :return: nested dict of the form: ``{nest_col_a: {nest_col_b: nest_col_c}}``.
     :rtype: dict
     """
     # Initialize
