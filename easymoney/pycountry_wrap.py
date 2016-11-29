@@ -8,30 +8,34 @@
 """
 # Import
 import pycountry
+import pkg_resources
+
 from warnings import warn
 from easymoney.sources.databases import currency_mapping_to_dict
 
+DEFAULT_DATA_PATH = pkg_resources.resource_filename('easymoney', 'sources/data')
 
 class PycountryWrap(object):
     """
 
     Tools wrapping the `pycountry` module.
 
+    :param path_to_data: path to the database file(s). Defaults to None.
+    :type path_to_data: ``str``
     :param fuzzy_match_threshold: a threshold for fuzzy matching confidence (requires the ``fuzzywuzzy`` package).
                                   For more, see ``EasyPeasy()`` in the `money` module.
     :type fuzzy_threshold: ``int`` or ``float``
-    :param data_path: path to the database file(s). Defaults to ''.
-    :type data_path: ``str``
     """
 
 
-    def __init__(self, fuzzy_threshold=False, data_path=''):
+    def __init__(self, path_to_data=None, fuzzy_threshold=False):
         """
 
         Initialize the ``PycountryWrap()`` class.
 
         """
         # Compute the dict mapping alpha2 codes to currencies
+        data_path = path_to_data if isinstance(path_to_data, str) else DEFAULT_DATA_PATH
         self.alpha2_currency_dict = currency_mapping_to_dict(data_path)
 
         # Get a list of country names

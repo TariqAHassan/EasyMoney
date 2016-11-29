@@ -12,19 +12,19 @@ from collections import defaultdict
 from easymoney.support_tools import cln
 
 
-def currency_mapping_to_dict(data_path=''):
+def currency_mapping_to_dict(path_to_data):
     """
 
     Constructs a mapping between country ISO Alpha 2 codes and currency ISO Alpha 3 codes.
 
-    :param data_path: path to the 'CurrencyRelationshipsDB.csv' database
-    :type data_path: ``str``
+    :param path_to_data: path to the 'CurrencyRelationshipsDB.csv' database.
+    :type path_to_data: ``str``
     :return: a dictionary mapping alpha2 codes to currency codes
     :rtype: ``dict``
     """
     # Read in the data
-    currency_mappings = pd.read_csv(data_path + "easymoney/sources/data/CurrencyRelationshipsDB.csv",
-                                    usecols=['Alpha2', 'CurrencyCode'])
+    data_path = (path_to_data if not path_to_data.endswith("/") else path_to_data[:-1])
+    currency_mappings = pd.read_csv(data_path + "/CurrencyRelationshipsDB.csv", usecols=['Alpha2', 'CurrencyCode'])
 
     # Initialize a default dict
     alpha2_currency = defaultdict(list)
@@ -37,10 +37,6 @@ def currency_mapping_to_dict(data_path=''):
                     alpha2_currency[alpha2.upper()].append(currency.upper())
 
     return alpha2_currency
-
-
-
-
 
 
 

@@ -22,10 +22,10 @@ from easymoney.money import EasyPeasy
 from easymoney.easy_pandas import items_null
 
 # Set the Data Path
-root_dir = str(os.getcwd()).split("/tests")[0] + "/"
+data_path = str(os.getcwd()).split("/tests")[0] + "/easymoney/sources/data"
 
 # Create an instance of the tool
-ep = EasyPeasy(fuzzy_threshold=85, data_path=root_dir)
+ep = EasyPeasy(fuzzy_threshold=85, data_path=data_path)
 
 
 

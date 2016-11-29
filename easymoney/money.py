@@ -63,14 +63,14 @@ class EasyPeasy(object):
                                         Whenever possible, use terminology *exactly* as it appears in ``options()``.
 
     :type fuzzy_threshold: ``int`` or ``float``
-    :param data_path: alternative path to the database file(s). Defaults to none ('').
+    :param data_path: alternative path to the database file(s). Defaults to None.
     :type data_path: ``str``
     """
     # Fix: `EasyPeasy()` does not handle currencies like 'EEK' properly.
     #       They may not been appearing in options() correctly.
     #       See: _user_currency_input() below.
 
-    def __init__(self, precision=2, fall_back=True, fuzzy_threshold=False, data_path = ''):
+    def __init__(self, precision=2, fall_back=True, fuzzy_threshold=False, data_path=None):
         """
 
         Initialize the ``EasyPeasy()`` class.
@@ -91,7 +91,8 @@ class EasyPeasy(object):
                 and fuzzy_threshold < min_suggested_fuzzy_threshold:
             warn("Low `fuzzy_threshold` values, such as %s, may yield innaccurate results." % (str(fuzzy_threshold)))
 
-        self._pycountry_wrap = PycountryWrap(fuzzy_threshold, data_path)
+        path_to_data = data_path if isinstance(data_path, str) else None
+        self._pycountry_wrap = PycountryWrap(path_to_data, fuzzy_threshold)
         self._pycountries_alpha_2 = set([c.alpha_2 for c in list(pycountry.countries)])
 
         # CPI Dict
