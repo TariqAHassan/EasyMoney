@@ -111,7 +111,7 @@ class OptionTests(unittest.TestCase):
         Specific: test range_table_dates = False.
         """
         # Request a Pandas DataFrame with all data information
-        all_dates_options_df = ep.options(pretty_print = False, range_table_dates=False)
+        all_dates_options_df = ep.options(pretty_print=False, range_table_dates=False)
 
         # Assert there are more than lists of two (i.e, [min, max] in the InflationRange column
         self.assertEqual(max([len(l) for l in all_dates_options_df["InflationDates"] if isinstance(l, list)]) > 2, True)
@@ -139,13 +139,13 @@ class FunctionalityTests(unittest.TestCase):
         super(FunctionalityTests, self).__init__(*args, **kwargs)
 
         # Request a list of nations for which there is exchange rate information.
-        self.exchange_options_list = ep.options(info = "exchange", rformat = "list", pretty_print=False)
+        self.exchange_options_list = ep.options(info="exchange", rformat="list", pretty_print=False)
 
         # Request a list of nations for which there is inflation information.
-        self.inflation_options_list = ep.options(info = "inflation", rformat = "list", pretty_print=False)
+        self.inflation_options_list = ep.options(info="inflation", rformat="list", pretty_print=False)
 
         # Request a Pandas DataFrame with all inflation information.
-        self.inflation_options_df = ep.options(info = "inflation", rformat = "table", pretty_print=False)
+        self.inflation_options_df = ep.options(info="inflation", rformat="table", pretty_print=False)
 
         # Construct a {Alpha2: [min(inflation_data), max(inflation_data)]} dict w.r.t. the inflation_options_df.
         self.inflation_dict = dict(zip(self.inflation_options_df["Alpha2"], self.inflation_options_df["InflationDates"]))
@@ -174,7 +174,7 @@ class FunctionalityTests(unittest.TestCase):
         self.assertEqual(CAD_alpha2, "CA")
 
         # (2) Request "CAN" be mapped to its ISO ALpha3 Code.
-        CAD_alpah3 = ep.region_map(region = "CAN", map_to = "alpha_3")
+        CAD_alpah3 = ep.region_map(region="CAN", map_to="alpha_3")
 
         # Assert (2) is "CAN"
         self.assertEqual(CAD_alpah3, "CAN")
