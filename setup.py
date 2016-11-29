@@ -25,14 +25,15 @@ setup(
                                         , "sources/single_use.*"
                                         , "sources/single_use"
                                         ]),
-    package_data = {'sources': ['data/*.csv'],},
+    package_data = {'easymoney': ['sources/data/*.csv'],},
     data_files = [('', ["LICENSE.txt"])],
     install_requires = ['numpy', 'pandas', 'requests', 'wbdata', 'pycountry'],
-    classifiers = [  "Development Status :: 5 - Production/Stable"
+    classifiers = ["Development Status :: 5 - Production/Stable"
                    , "Natural Language :: English"
                    , "Intended Audience :: Science/Research"
                    , "Intended Audience :: Financial and Insurance Industry"
                    , "Programming Language :: Python :: 2.7"
+                   , "Programming Language :: Python :: 3.3"
                    , "Programming Language :: Python :: 3.4"
                    , "Programming Language :: Python :: 3.5"
                    , "Environment :: MacOS X"
