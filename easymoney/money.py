@@ -67,7 +67,7 @@ class EasyPeasy(object):
     :type data_path: ``str``
     """
 
-    # To do: does not handle currencies like EEK.
+    # Fix: does not handle currencies like 'EEK' properly.
 
     def __init__(self, precision=2, fall_back=True, fuzzy_threshold=False, data_path = ''):
         """
