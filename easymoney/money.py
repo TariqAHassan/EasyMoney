@@ -386,6 +386,7 @@ class EasyPeasy(object):
             else:
                 return self.region_map(currency_or_region, "currency_alpha_3")
 
+
     def _base_cur_to_lcu(self, currency, date):
         """
 
@@ -700,6 +701,7 @@ class EasyPeasy(object):
             raise ValueError("`rformat` must be one of:\n"
                              " - 'list', for a list of the requested information.\n"
                              " - 'table', for a table (dataframe) of the requested information.")
+
 
 
 
