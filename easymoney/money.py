@@ -66,8 +66,9 @@ class EasyPeasy(object):
     :param data_path: alternative path to the database file(s). Defaults to none ('').
     :type data_path: ``str``
     """
-
-    # Fix: does not handle currencies like 'EEK' properly.
+    # Fix: `EasyPeasy()` does not handle currencies like 'EEK' properly.
+    #       They may not been appearing in options() correctly.
+    #       See: _user_currency_input() below.
 
     def __init__(self, precision=2, fall_back=True, fuzzy_threshold=False, data_path = ''):
         """
@@ -375,10 +376,12 @@ class EasyPeasy(object):
         :return: ISO Alpha 3 Currency Code
         :rtype: ``pycountry object``
         """
+        # Note: 'temp. fix' has been added to handle currencies like 'EEK'.
+        #        This capability should be integrated into region_map() in the future.
         try:
             return pycountry.currencies.lookup(currency_or_region).alpha_3
         except:
-            if currency_or_region in self.ecb_currency_codes:
+            if currency_or_region in self.ecb_currency_codes: # temp fix
                 return currency_or_region
             else:
                 return self.region_map(currency_or_region, "currency_alpha_3")
