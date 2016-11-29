@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+# coding: utf-8
 
 """
 
@@ -45,9 +45,10 @@ class PycountryWrap(object):
                 from fuzzywuzzy import process
                 self.extractOne = process.extractOne
             except:
-                raise ImportError("To use `fuzzy_threshold` please install `fuzzywuzzy`.\n"
-                                  " - python 2: $ pip install fuzzywuzzy\n"
-                                  " - python 3: $ pip3 install fuzzywuzzy\n"
+                raise ImportError("\nTo use `fuzzy_threshold` please install `fuzzywuzzy` as well as\n"
+                                  "`python-Levenshtein` for optimal performance.\n\n"
+                                  " - python 2: $ pip install fuzzywuzzy python-Levenshtein\n"
+                                  " - python 3: $ pip3 install fuzzywuzzy python-Levenshtein\n\n"
                                   "You may need to create a new Python instance for these changes to take effect.")
 
 
