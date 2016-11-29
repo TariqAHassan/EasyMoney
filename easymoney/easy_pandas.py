@@ -18,7 +18,7 @@ import pandas as pd
 def strlist_to_list(to_parse, convert_to_str_first=False):
     """
 
-    Work around for using ``eval()`` for the following conversion: ``str(list)`` --> ``list``.
+    Work around for using ``eval()`` for the following conversion: ``str(list)`` → ``list``.
 
     For example: ``"[1992, '221-21', 2102, 'apples']"`` → ``['1992', '221-21', '2102', 'apples']``.
 
