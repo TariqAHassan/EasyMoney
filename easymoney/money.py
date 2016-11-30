@@ -64,7 +64,7 @@ class EasyPeasy(object):
 
                                         Whenever possible, use terminology *exactly* as it appears in ``options()``.
 
-    :type fuzzy_threshold: ``int`` or ``float``
+    :type fuzzy_threshold: ``int``, ``float`` or ``bool``
     :param data_path: alternative path to the database file(s). Defaults to None.
     :type data_path: ``str``
     """
