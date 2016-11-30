@@ -56,7 +56,7 @@ class EasyPeasy(object):
     :param fuzzy_match_threshold: a threshold for fuzzy matching confidence (requires the ``fuzzywuzzy`` package).
                                   The value must be an number between 0 and 100. The *suggested* minimum values is 85.
                                   This will only impact attempts to match on natural names, e.g., attempting to match
-                                  'Canada' by passing 'Canadian'. Defaults to False.
+                                  'Canada' by passing 'Canadian'. If True, a threshold of 90 will be set. Defaults to False.
 
                                   .. warning::
 
