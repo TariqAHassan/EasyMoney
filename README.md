@@ -20,7 +20,7 @@ Feature Summary:
 
 ###Dependencies
 
-EasyMoney requires: [numpy], [pandas], [requests], [pycountry] and [wbdata]<sup>†</sup>.
+EasyMoney requires: [numpy], [pandas], [pycountry], [requests] and [wbdata]<sup>†</sup>.
 
 ------------------------------------------------------------------------
 
