@@ -54,7 +54,7 @@ The standard way to do this is as follows:
 ep = EasyPeasy()
 ```
 
-However, [fuzzy] searching can also easily be enabled.
+However, [fuzzy searching] can easily be enabled.
 
 ```python
 ep = EasyPeasy(fuzzy_threshold=True)
@@ -202,5 +202,5 @@ Indicators used:
   [requests]: http://docs.python-requests.org/en/master/
   [pycountry]: https://pypi.python.org/pypi/pycountry
   [wbdata]: https://github.com/OliverSherouse/wbdata
-  [fuzzy] https://github.com/seatgeek/fuzzywuzzy 
+  [fuzzy searching]: https://github.com/seatgeek/fuzzywuzzy 
   [here]: https://tariqahassan.github.io/EasyMoney/index.html
