@@ -55,7 +55,7 @@ The standard way to do this is as follows:
 ep = EasyPeasy()
 ```
 
-However, [fuzzy searching] can easily be enabled.
+However, [fuzzy searching] can also easily be enabled.
 
 ```python
 ep = EasyPeasy(fuzzy_threshold=True)
