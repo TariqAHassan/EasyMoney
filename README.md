@@ -150,9 +150,9 @@ ep.options()
 
 |   Region  | Alpha2 | Alpha3 | Currencies | InflationDates |      ExchangeDates        |         Overlap           |     
 |:---------:|:------:|:------:|:----------:|:--------------:|:-------------------------:|:-------------------------:|
-| Australia |  AUD   |  AUS   |     AUD    |  [1960, 2015]  | [1999-01-04, 2016-09-12] | [1999-01-04, 2015-12-31]   |
-|  Austria  |  EUR   |  AUT   |     EUR    |  [1960, 2015]  | [1999-01-04, 2016-09-12] | [1999-01-04, 2015-12-31]   |
-|  Belgium  |  EUR   |  BEL   |     EUR    |  [1960, 2015]  | [1999-01-04, 2016-09-12] | [1999-01-04, 2015-12-31]   |
+| Australia |  AUD   |  AUS   |     AUD    |  [1960, 2015]  | [04/01/1999, 29/11/2016] | [04/01/1999, 31/12/2015]   |
+|  Austria  |  EUR   |  AUT   |     EUR    |  [1960, 2015]  | [04/01/1999, 29/11/2016] | [04/01/1999, 31/12/2015]   |
+|  Belgium  |  EUR   |  BEL   |     EUR    |  [1960, 2015]  | [04/01/1999, 29/11/2016] | [04/01/1999, 31/12/2015]   |
 |   ...     |  ...   | ...    |     ...    |      ...       |           ...             |           ...             |
 
 Above, the *InflationDates* and *ExchangeDates* columns provide the range of dates for which inflation and exchange rate information 
