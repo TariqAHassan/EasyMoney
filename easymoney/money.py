@@ -141,7 +141,7 @@ class EasyPeasy(object):
 
         Map a 'region' to any one of: ISO Alpha 2, ISO Alpha 3, it's Name or Offical Name.
 
-            Examples::
+            Examples:
                 - ``EasyPeasy().region_map(region='CA', map_to='alpha_2')``       :math:`=` 'CA'
                 - ``EasyPeasy().region_map(region='Canada', map_to='alpha_3')``   :math:`=` 'CAN'
 
