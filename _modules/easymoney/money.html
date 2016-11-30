@@ -152,6 +152,7 @@
 <span class="kn">from</span> <span class="nn">easymoney.support_tools</span> <span class="k">import</span> <span class="n">year_extract</span>
 <span class="kn">from</span> <span class="nn">easymoney.support_tools</span> <span class="k">import</span> <span class="n">min_max_dates</span>
 <span class="kn">from</span> <span class="nn">easymoney.support_tools</span> <span class="k">import</span> <span class="n">closest_value</span>
+<span class="kn">from</span> <span class="nn">easymoney.support_tools</span> <span class="k">import</span> <span class="n">fast_date_range</span>
 <span class="kn">from</span> <span class="nn">easymoney.support_tools</span> <span class="k">import</span> <span class="n">date_format_check</span>
 <span class="kn">from</span> <span class="nn">easymoney.support_tools</span> <span class="k">import</span> <span class="n">sort_range_reverse</span>
 
@@ -161,6 +162,7 @@
 <span class="c1"># options_tools</span>
 <span class="kn">from</span> <span class="nn">easymoney.options_tools</span> <span class="k">import</span> <span class="n">options_ranking</span>
 <span class="kn">from</span> <span class="nn">easymoney.options_tools</span> <span class="k">import</span> <span class="n">year_date_overlap</span>
+<span class="kn">from</span> <span class="nn">easymoney.options_tools</span> <span class="k">import</span> <span class="n">alpha2_by_cpi_years</span>
 
 <span class="c1"># Easy Pandas</span>
 <span class="kn">from</span> <span class="nn">easymoney.easy_pandas</span> <span class="k">import</span> <span class="n">pandas_null_drop</span>
@@ -193,14 +195,14 @@
 <span class="sd">                                        Whenever possible, use terminology *exactly* as it appears in ``options()``.</span>
 
 <span class="sd">    :type fuzzy_threshold: ``int`` or ``float``</span>
-<span class="sd">    :param data_path: alternative path to the database file(s). Defaults to none (&#39;&#39;).</span>
+<span class="sd">    :param data_path: alternative path to the database file(s). Defaults to None.</span>
 <span class="sd">    :type data_path: ``str``</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="c1"># Fix: `EasyPeasy()` does not handle currencies like &#39;EEK&#39; properly.</span>
     <span class="c1">#       They may not been appearing in options() correctly.</span>
     <span class="c1">#       See: _user_currency_input() below.</span>
 
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">precision</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">fall_back</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">fuzzy_threshold</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">data_path</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">precision</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">fall_back</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">fuzzy_threshold</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">data_path</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 
 <span class="sd">        Initialize the ``EasyPeasy()`` class.</span>
@@ -209,26 +211,36 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_precision</span> <span class="o">=</span> <span class="n">precision</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_fall_back</span> <span class="o">=</span> <span class="n">fall_back</span>
 
+        <span class="n">fuzzy_search_threshold</span> <span class="o">=</span> <span class="n">fuzzy_threshold</span>
+        <span class="n">recommended_fuzzy_threshold</span> <span class="o">=</span> <span class="mi">90</span>
         <span class="n">min_suggested_fuzzy_threshold</span> <span class="o">=</span> <span class="mi">85</span>
         <span class="c1"># Check fuzzy_threshold</span>
-        <span class="k">if</span> <span class="n">fuzzy_threshold</span> <span class="o">!=</span> <span class="kc">False</span> <span class="ow">and</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">fuzzy_threshold</span><span class="p">,</span> <span class="p">(</span><span class="nb">float</span><span class="p">,</span> <span class="nb">int</span><span class="p">)):</span>
+        <span class="k">if</span> <span class="n">fuzzy_threshold</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">False</span> <span class="ow">and</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">fuzzy_threshold</span><span class="p">,</span> <span class="p">(</span><span class="nb">float</span><span class="p">,</span> <span class="nb">int</span><span class="p">)):</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;`fuzzy_threshold` must be either `False`, a `float` or an `int`.&quot;</span><span class="p">)</span>
-        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">fuzzy_threshold</span><span class="p">,</span> <span class="p">(</span><span class="nb">float</span><span class="p">,</span> <span class="nb">int</span><span class="p">))</span> <span class="ow">and</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">fuzzy_threshold</span><span class="p">,</span> <span class="nb">bool</span><span class="p">)</span> <span class="ow">and</span> <span class="n">fuzzy_threshold</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">elif</span> <span class="n">fuzzy_threshold</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>
+            <span class="n">fuzzy_search_threshold</span> <span class="o">=</span> <span class="n">recommended_fuzzy_threshold</span>
+        <span class="k">elif</span> <span class="n">fuzzy_threshold</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">False</span> <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">fuzzy_threshold</span><span class="p">,</span> <span class="p">(</span><span class="nb">float</span><span class="p">,</span> <span class="nb">int</span><span class="p">))</span> <span class="ow">and</span> <span class="n">fuzzy_threshold</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;`fuzzy_threshold` must be greater than 0.&quot;</span><span class="p">)</span>
-        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">fuzzy_threshold</span><span class="p">,</span> <span class="p">(</span><span class="nb">float</span><span class="p">,</span> <span class="nb">int</span><span class="p">))</span> <span class="ow">and</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">fuzzy_threshold</span><span class="p">,</span> <span class="nb">bool</span><span class="p">)</span> <span class="ow">and</span> <span class="n">fuzzy_threshold</span> <span class="o">&gt;</span> <span class="mi">100</span><span class="p">:</span>
+        <span class="k">elif</span> <span class="n">fuzzy_threshold</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">False</span> <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">fuzzy_threshold</span><span class="p">,</span> <span class="p">(</span><span class="nb">float</span><span class="p">,</span> <span class="nb">int</span><span class="p">))</span> <span class="ow">and</span> <span class="n">fuzzy_threshold</span> <span class="o">&gt;</span> <span class="mi">100</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;`fuzzy_threshold` must be less than 100.&quot;</span><span class="p">)</span>
-        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">fuzzy_threshold</span><span class="p">,</span> <span class="p">(</span><span class="nb">float</span><span class="p">,</span> <span class="nb">int</span><span class="p">))</span> <span class="ow">and</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">fuzzy_threshold</span><span class="p">,</span> <span class="nb">bool</span><span class="p">)</span> \
+        <span class="k">elif</span> <span class="n">fuzzy_threshold</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">False</span> <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">fuzzy_threshold</span><span class="p">,</span> <span class="p">(</span><span class="nb">float</span><span class="p">,</span> <span class="nb">int</span><span class="p">))</span> \
                 <span class="ow">and</span> <span class="n">fuzzy_threshold</span> <span class="o">&lt;</span> <span class="n">min_suggested_fuzzy_threshold</span><span class="p">:</span>
-            <span class="n">warn</span><span class="p">(</span><span class="s2">&quot;Low `fuzzy_threshold` values, such as </span><span class="si">%s</span><span class="s2">, may yield innaccurate results.&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">fuzzy_threshold</span><span class="p">)))</span>
+            <span class="n">warn</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Low `fuzzy_threshold` values, such as </span><span class="si">%s</span><span class="s2">, have an elevated &quot;</span>
+                 <span class="s2">&quot;likelihood of innaccurate results.&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">fuzzy_threshold</span><span class="p">)))</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">_pycountry_wrap</span> <span class="o">=</span> <span class="n">PycountryWrap</span><span class="p">(</span><span class="n">fuzzy_threshold</span><span class="p">,</span> <span class="n">data_path</span><span class="p">)</span>
+        <span class="n">path_to_data</span> <span class="o">=</span> <span class="n">data_path</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data_path</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span> <span class="k">else</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_pycountry_wrap</span> <span class="o">=</span> <span class="n">PycountryWrap</span><span class="p">(</span><span class="n">path_to_data</span><span class="p">,</span> <span class="n">fuzzy_search_threshold</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_pycountries_alpha_2</span> <span class="o">=</span> <span class="nb">set</span><span class="p">([</span><span class="n">c</span><span class="o">.</span><span class="n">alpha_2</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="nb">list</span><span class="p">(</span><span class="n">pycountry</span><span class="o">.</span><span class="n">countries</span><span class="p">)])</span>
 
         <span class="c1"># CPI Dict</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_cpi_dict</span> <span class="o">=</span> <span class="n">world_bank_pull</span><span class="p">(</span><span class="n">return_as</span><span class="o">=</span><span class="s1">&#39;dict&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">alpha2_cpi_record</span> <span class="o">=</span> <span class="n">alpha2_by_cpi_years</span><span class="p">(</span><span class="n">regions</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_pycountries_alpha_2</span><span class="p">,</span> <span class="n">cpi_dictionary</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_cpi_dict</span><span class="p">)</span>
 
         <span class="c1"># Exchange Dict</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_exchange_dict</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">ecb_currency_codes</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_currency_date_record</span> <span class="o">=</span> <span class="n">ecb_xml_exchange_data</span><span class="p">(</span><span class="n">return_as</span><span class="o">=</span><span class="s1">&#39;dict&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_exchange_dict</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ecb_currency_codes</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_currency_date_record</span> <span class="o">=</span> <span class="n">ecb_xml_exchange_data</span><span class="p">(</span><span class="n">return_as</span><span class="o">=</span><span class="s1">&#39;dict&#39;</span><span class="p">)</span>
+
+        <span class="c1"># Min max for _currency_date_record</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_currency_date_record_range</span> <span class="o">=</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="n">fast_date_range</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="s1">&#39;</span><span class="si">%d</span><span class="s1">/%m/%Y&#39;</span><span class="p">)</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_currency_date_record</span><span class="o">.</span><span class="n">items</span><span class="p">()}</span>
 
         <span class="c1"># Column Order for options</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_table_col_order</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;RegionFull&#39;</span><span class="p">,</span> <span class="s1">&#39;Region&#39;</span><span class="p">,</span> <span class="s1">&#39;Alpha2&#39;</span><span class="p">,</span> <span class="s1">&#39;Alpha3&#39;</span><span class="p">,</span> <span class="s1">&#39;Currencies&#39;</span><span class="p">,</span>
@@ -278,24 +290,22 @@
 
 <span class="sd">        Get Years for which CPI information is available for a given region.</span>
 
-<span class="sd">        :param region: region of the form allowed by `EasyPeasy().region_map()`</span>
+<span class="sd">        :param region: ISO Alpha 2 Code.</span>
 <span class="sd">        :type region: ``str``</span>
-<span class="sd">        :param warn: warn if data could not be obtained</span>
+<span class="sd">        :param warn: warn if data could not be obtained.</span>
 <span class="sd">        :type warn: ``bool``</span>
 <span class="sd">        :return: list of years for which CPI information is available.</span>
 <span class="sd">        :rtype: ``list``</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">cpi_years_list</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
-        <span class="k">for</span> <span class="n">year</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_cpi_dict</span><span class="o">.</span><span class="n">keys</span><span class="p">()),</span> <span class="n">reverse</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
-            <span class="n">cpi</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cpi_dict</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">year</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">region</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
-            <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">cpi</span><span class="p">,</span> <span class="nb">type</span><span class="p">(</span><span class="kc">None</span><span class="p">)):</span>
-                <span class="n">cpi_years_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">year</span><span class="p">)</span>
+        <span class="n">cpi_years_list</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">alpha2_cpi_record</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">region</span><span class="p">,</span> <span class="p">[])</span>
 
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">cpi_years_list</span><span class="p">):</span>
             <span class="k">return</span> <span class="n">cpi_years_list</span>
         <span class="k">elif</span> <span class="n">warn</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="s2">&quot;Could not obtain inflation (CPI) information for &#39;</span><span class="si">%s</span><span class="s2">&#39; from the</span><span class="se">\n</span><span class="s2">&quot;</span> \
                            <span class="s2">&quot;International Monetary Fund database currently cached.&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">region</span><span class="p">))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">None</span>
 
 
     <span class="k">def</span> <span class="nf">_cpi_match</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">region</span><span class="p">,</span> <span class="n">year</span><span class="p">):</span>
@@ -481,20 +491,13 @@
 <span class="sd">        :return:</span>
 <span class="sd">        :rtype: 1D ``list`` or 2D ``list``</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">dates</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
-        <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">currencies</span><span class="p">:</span>
-            <span class="k">if</span> <span class="n">c</span> <span class="o">==</span> <span class="s1">&#39;EUR&#39;</span><span class="p">:</span>
-                <span class="n">dates</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">sorted</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_exchange_dict</span><span class="o">.</span><span class="n">keys</span><span class="p">()),</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">datetime</span><span class="o">.</span><span class="n">strptime</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">date_format</span><span class="p">)))</span>
-            <span class="k">else</span><span class="p">:</span>
-                <span class="n">dates</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_currency_date_record</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">c</span><span class="o">.</span><span class="n">upper</span><span class="p">(),</span> <span class="kc">None</span><span class="p">))</span>
+        <span class="n">d</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_currency_date_record_range</span> <span class="k">if</span> <span class="n">min_max_rslt</span> <span class="k">else</span> <span class="bp">self</span><span class="o">.</span><span class="n">_currency_date_record</span>
+        <span class="n">dates</span> <span class="o">=</span> <span class="p">[</span><span class="n">d</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">c</span><span class="o">.</span><span class="n">upper</span><span class="p">(),</span> <span class="kc">None</span><span class="p">)</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">currencies</span><span class="p">]</span>
 
         <span class="c1"># Remove None</span>
         <span class="n">dates</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">filter</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="n">dates</span><span class="p">))</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">len</span><span class="p">(</span><span class="n">dates</span><span class="p">):</span>
             <span class="k">return</span> <span class="kc">None</span>
-
-        <span class="k">if</span> <span class="n">min_max_rslt</span><span class="p">:</span>
-            <span class="n">dates</span> <span class="o">=</span> <span class="p">[</span><span class="nb">list</span><span class="p">(</span><span class="n">min_max_dates</span><span class="p">(</span><span class="n">d</span><span class="p">))</span> <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">dates</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="p">(</span><span class="nb">list</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">,</span> <span class="nb">type</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">)))]</span>
 
         <span class="k">return</span> <span class="n">dates</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">dates</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span> <span class="k">else</span> <span class="n">dates</span>
 
@@ -514,7 +517,7 @@
         <span class="k">try</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">pycountry</span><span class="o">.</span><span class="n">currencies</span><span class="o">.</span><span class="n">lookup</span><span class="p">(</span><span class="n">currency_or_region</span><span class="p">)</span><span class="o">.</span><span class="n">alpha_3</span>
         <span class="k">except</span><span class="p">:</span>
-            <span class="k">if</span> <span class="n">currency_or_region</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">ecb_currency_codes</span><span class="p">:</span> <span class="c1"># temp fix</span>
+            <span class="k">if</span> <span class="n">currency_or_region</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ecb_currency_codes</span><span class="p">:</span> <span class="c1"># temp fix</span>
                 <span class="k">return</span> <span class="n">currency_or_region</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">region_map</span><span class="p">(</span><span class="n">currency_or_region</span><span class="p">,</span> <span class="s2">&quot;currency_alpha_3&quot;</span><span class="p">)</span>
@@ -545,9 +548,9 @@
                                  <span class="s2">&quot;European Central Bank database currently cached.&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">currency</span><span class="p">))</span>
 
         <span class="k">if</span> <span class="n">date</span> <span class="o">==</span> <span class="s1">&#39;oldest&#39;</span><span class="p">:</span>
-            <span class="n">exchange_date</span> <span class="o">=</span> <span class="n">min_max_dates</span><span class="p">(</span><span class="n">available_data</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">exchange_date</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_currency_date_record_range</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">currency</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
         <span class="k">elif</span> <span class="n">date</span> <span class="o">==</span> <span class="s1">&#39;latest&#39;</span><span class="p">:</span>
-            <span class="n">exchange_date</span> <span class="o">=</span> <span class="n">min_max_dates</span><span class="p">(</span><span class="n">available_data</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span>
+            <span class="n">exchange_date</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_currency_date_record_range</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">currency</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span>
         <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">date</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span> <span class="ow">and</span> <span class="n">date</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">available_data</span><span class="p">:</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_fall_back</span><span class="p">:</span>
                 <span class="n">exchange_date</span> <span class="o">=</span> <span class="n">closest_date</span><span class="p">(</span><span class="n">date</span><span class="p">,</span> <span class="n">available_data</span><span class="p">)</span>
@@ -563,7 +566,7 @@
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">exchange_rate</span><span class="p">,</span> <span class="nb">type</span><span class="p">(</span><span class="kc">None</span><span class="p">)):</span>
             <span class="k">return</span> <span class="n">exchange_rate</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">AttributeError</span><span class="p">(</span><span class="n">msg</span> <span class="o">%</span> <span class="p">(</span><span class="n">currency</span><span class="p">,</span> <span class="n">exchange_date</span><span class="p">))</span>
+            <span class="k">raise</span> <span class="ne">AttributeError</span><span class="p">(</span><span class="n">error_msg</span> <span class="o">%</span> <span class="p">(</span><span class="n">currency</span><span class="p">,</span> <span class="n">exchange_date</span><span class="p">))</span>
 
 
 <div class="viewcode-block" id="EasyPeasy.currency_converter"><a class="viewcode-back" href="../../source/easymoney.html#easymoney.money.EasyPeasy.currency_converter">[docs]</a>    <span class="k">def</span> <span class="nf">currency_converter</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">amount</span><span class="p">,</span> <span class="n">from_currency</span><span class="p">,</span> <span class="n">to_currency</span><span class="p">,</span> <span class="n">date</span><span class="o">=</span><span class="s2">&quot;latest&quot;</span><span class="p">,</span> <span class="n">pretty_print</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
@@ -609,8 +612,9 @@
         <span class="c1"># Check Params</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_params_check</span><span class="p">(</span><span class="n">amount</span><span class="p">,</span> <span class="n">pretty_print</span><span class="p">)</span>
 
-        <span class="c1"># to/from_currency --&gt; Alpha 3 Currency Code</span>
-        <span class="n">to_currency_fn</span><span class="p">,</span> <span class="n">from_currency_fn</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_user_currency_input</span><span class="p">(</span><span class="n">arg</span><span class="p">)</span> <span class="k">for</span> <span class="n">arg</span> <span class="ow">in</span> <span class="p">(</span><span class="n">to_currency</span><span class="p">,</span> <span class="n">from_currency</span><span class="p">))</span>
+        <span class="c1"># to/from_currency --&gt; Currency Alpha 3 Code</span>
+        <span class="n">ca3</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_user_currency_input</span><span class="p">(</span><span class="n">c</span><span class="p">)</span> <span class="k">if</span> <span class="n">c</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ecb_currency_codes</span> <span class="k">else</span> <span class="n">c</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="p">(</span><span class="n">to_currency</span><span class="p">,</span> <span class="n">from_currency</span><span class="p">)]</span>
+        <span class="n">to_currency_fn</span><span class="p">,</span> <span class="n">from_currency_fn</span> <span class="o">=</span> <span class="n">ca3</span>
 
         <span class="c1"># Return amount unaltered if self-conversion was requested.</span>
         <span class="k">if</span> <span class="n">from_currency_fn</span> <span class="o">==</span> <span class="n">to_currency_fn</span><span class="p">:</span>
@@ -759,7 +763,7 @@
 
         <span class="c1"># Weight Rows by Completeness; Sort by Data Overlap and Alpha2 Code</span>
         <span class="n">options_df</span><span class="p">[</span><span class="s1">&#39;TempRanking&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">options_df</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">options_ranking</span><span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="s1">&#39;InflationDates&#39;</span><span class="p">],</span> <span class="n">x</span><span class="p">[</span><span class="s1">&#39;ExchangeDates&#39;</span><span class="p">]),</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
-        <span class="n">options_df</span> <span class="o">=</span> <span class="n">options_df</span><span class="o">.</span><span class="n">sort_values</span><span class="p">([</span><span class="s1">&#39;TempRanking&#39;</span><span class="p">,</span> <span class="s1">&#39;Alpha2&#39;</span><span class="p">],</span> <span class="n">ascending</span><span class="o">=</span><span class="p">[</span><span class="kc">False</span><span class="p">,</span> <span class="kc">True</span><span class="p">])</span>
+        <span class="n">options_df</span> <span class="o">=</span> <span class="n">options_df</span><span class="o">.</span><span class="n">sort_values</span><span class="p">([</span><span class="s1">&#39;TempRanking&#39;</span><span class="p">,</span> <span class="s1">&#39;Region&#39;</span><span class="p">],</span> <span class="n">ascending</span><span class="o">=</span><span class="p">[</span><span class="kc">False</span><span class="p">,</span> <span class="kc">True</span><span class="p">])</span>
 
         <span class="k">if</span> <span class="n">table_overlap_only</span> <span class="ow">and</span> <span class="n">info</span> <span class="o">==</span> <span class="s1">&#39;all&#39;</span><span class="p">:</span>
             <span class="n">options_df</span> <span class="o">=</span> <span class="n">pandas_null_drop</span><span class="p">(</span><span class="n">options_df</span><span class="p">,</span> <span class="n">subset</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;InflationDates&#39;</span><span class="p">,</span> <span class="s1">&#39;ExchangeDates&#39;</span><span class="p">])</span>

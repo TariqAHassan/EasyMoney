@@ -200,7 +200,7 @@
 <span class="sd">    :rtype: ``dict`` or ``Pandas DataFrame``</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="c1"># Currency Codes</span>
-    <span class="n">all_currency_codes</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+    <span class="n">all_currency_codes</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;EUR&#39;</span><span class="p">]</span>
 
     <span class="c1"># Constuct the URL to the XML data on the ECB&#39;s website.</span>
     <span class="n">xmlpath</span> <span class="o">=</span> <span class="s2">&quot;http://www.ecb.europa.eu/&quot;</span> <span class="o">+</span> <span class="n">ecb_extension</span>
@@ -238,6 +238,7 @@
 
     <span class="c1"># Sort currency_date_record</span>
     <span class="n">currency_date_record_sorted</span> <span class="o">=</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="n">date_sort</span><span class="p">(</span><span class="n">v</span><span class="p">)</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">currency_date_record</span><span class="o">.</span><span class="n">items</span><span class="p">()}</span>
+    <span class="n">currency_date_record_sorted</span><span class="p">[</span><span class="s1">&#39;EUR&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">date_sort</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">exchange_rate_dict</span><span class="o">.</span><span class="n">keys</span><span class="p">()))</span>
 
     <span class="c1"># return as dict</span>
     <span class="k">if</span> <span class="n">return_as</span> <span class="o">==</span> <span class="s1">&#39;dict&#39;</span><span class="p">:</span>
