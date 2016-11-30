@@ -155,7 +155,7 @@ ep.options()
 |  Belgium  |   BE   |  BEL   |     EUR    |  [1960, 2015]  | [04/01/1999, 29/11/2016] | [04/01/1999, 31/12/2015]   |
 |   ...     |  ...   | ...    |     ...    |      ...       |           ...             |           ...             |
 
-Above, the *InflationDates* and *ExchangeDates* columns provide the range of dates for which inflation and exchange rate information 
+Above, the 'InflationDates' and 'ExchangeDates' columns provide the range of dates for which inflation and exchange rate information 
 is available, respectively. If you would prefer, all dates for which data is available can be show by setting the 
 `range_table_dates` parameter to `False`. The *Overlap* column shows the range of dates shared by the 'InflationDates'
 and 'ExchangeDates' columns.
