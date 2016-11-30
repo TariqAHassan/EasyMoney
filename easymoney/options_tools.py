@@ -88,6 +88,7 @@ def alpha2_by_cpi_years(regions, cpi_dictionary):
     :return: dictionary of years for which CPI information is available for a given country.
     :rtype: ``dict``
     """
+    # Note: not strictly for `EasyPeasy().options()` as this is also used in `EasyPeasy()._cpi_years()`.
     cpi_years_dict = defaultdict(list)
     for r in regions:
         for y in sorted(list(cpi_dictionary.keys()), reverse=True):
