@@ -189,7 +189,7 @@ Indicators used:
        		1. The ECB data used here can be obtained directly from the link provided above.
        		2. Rates are updated by the ECB around 16:00 CET.
        		3. The ECB states, clearly, that usage of this data for transaction purposes is strongly discouraged. 
-       		   This sentiment is echoed here; as stated above, ***this tool is intended to be for information purposes only***.
+       		   This sentiment is echoed here; as stated above, ***this tool is for information purposes only***.
        		4. All exchange rate-related results obtained from easymoney (including, but not necessarily limited to, currency conversion and normalization) are the result of calculations based on ECB data.
        		   These results are not a direct reporting of ECB-provided data..
     
