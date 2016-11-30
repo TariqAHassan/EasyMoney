@@ -164,7 +164,7 @@ and 'ExchangeDates' columns.
 
 ##Documentation
 
-For complete documentation, including a more extensive version of this document, please click [here].
+For complete documentation please click [here].
 
 ------------------------------------------------------------------------
 
