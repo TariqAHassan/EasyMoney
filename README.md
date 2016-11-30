@@ -143,7 +143,7 @@ ep.region_map('German', map_to='alpha_2')
 ####Options
 
 It's easy to explore the terminology understood by `EasyPeasy`, as well as the dates for which
-data is available, with `options()`.
+data is available.
 
 ```python
 ep.options()
