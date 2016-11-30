@@ -275,7 +275,7 @@ def prettify_all_pandas_list_cols(data_frame, join_on = ", ", allow_nan = True, 
     :type nan: ``bool``
     :param join_on: a string to join on. Defaults to ", ".
     :type join_on: ``str``
-    :param exclude: columns to exclude Defaults to an empty list (``[]``).
+    :param exclude: columns to exclude. Defaults to an empty list (``[]``).
     :type exclude: ``list``
     :param bracket_wrap: wrap in brackets.
     :type bracket_wrap: ``bool``
