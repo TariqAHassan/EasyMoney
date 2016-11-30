@@ -62,21 +62,21 @@ ep = EasyPeasy(fuzzy_threshold=True)
 
 ####Prototypical Conversion Problems
 
-#####Currency Converter
+#####1. Currency Converter
 ```python
 ep.currency_converter(amount=100000, from_currency="USD", to_currency="EUR", pretty_print=True)
 
 # 94,553.71 EUR
 ```
 
-#####Adjust for Inflation and Convert to a base currency
+#####2. Adjust for Inflation and Convert to a base currency
 ```python
 ep.normalize(amount=100000, region="CA", from_year=2010, to_year="latest", pretty_print=True)
 
 # 76,357.51 EUR
 ```
 
-#####Convert Currency in a more Natural Way
+#####3. Convert Currency in a more Natural Way
 ```python
 ep.currency_converter(amount=100, from_currency="Canada", to_currency="Ireland", pretty_print=True)
 
