@@ -152,6 +152,7 @@ class EasyPeasy(object):
         :return: the desired mapping from region to ISO Alpha2.
         :rtype: ``str`` or ``tuple``
         """
+        # handle currency transitions here.
         return self._pycountry_wrap.map_region_to_type(region=region, extract_type=map_to)
 
 
