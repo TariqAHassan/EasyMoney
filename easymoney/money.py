@@ -630,7 +630,7 @@ class EasyPeasy(object):
 
         # Weight Rows by Completeness; Sort by Data Overlap and Alpha2 Code
         options_df['TempRanking'] = options_df.apply(lambda x: options_ranking(x['InflationDates'], x['ExchangeDates']), axis=1)
-        options_df = options_df.sort_values(['TempRanking', 'Alpha2'], ascending=[False, True])
+        options_df = options_df.sort_values(['TempRanking', 'Region'], ascending=[False, True])
 
         if table_overlap_only and info == 'all':
             options_df = pandas_null_drop(options_df, subset=['InflationDates', 'ExchangeDates'])
