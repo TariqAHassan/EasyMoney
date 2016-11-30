@@ -42,7 +42,7 @@ EasyMoney requires: `numpy <http://www.numpy.org>`__,
 `pandas <http://pandas.pydata.org>`__,
 `requests <http://docs.python-requests.org/en/master/>`__,
 `pycountry <https://pypi.python.org/pypi/pycountry>`__ and
-`wbdata <https://github.com/OliverSherouse/wbdata>`__\ †.
+`wbdata <https://github.com/OliverSherouse/wbdata>`__\ :superscript:`†`.
 
 --------------
 
@@ -264,7 +264,7 @@ Indicators used:
             based on ECB data. These results do not constitute a direct
             reporting of ECB-provided data.
 
-†Sherouse, Oliver (2014). Wbdata. Arlington, VA.
+:superscript:`†`Sherouse, Oliver (2014). Wbdata. Arlington, VA.
 
 .. |Build Status| image:: https://travis-ci.org/TariqAHassan/EasyMoney.svg?branch=master
    :target: https://travis-ci.org/TariqAHassan/EasyMoney
