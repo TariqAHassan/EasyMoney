@@ -182,7 +182,7 @@ Indicators used:
        * Source: International Monetary Fund (IMF), International Financial Statistics.
        	* Notes:
        		1. All inflation-related results obtained from easymoney (including, but not necessarily limited to, inflation rate and normalization) are the result of calculations based on IMF data.
-       		   these results are not a direct reporting of IMF-provided data
+       		   These results do not constitute a direct reporting of IMF-provided data.
 2. [Euro foreign exchange reference rates - European Central Bank]
        * Source: European Central Bank (ECB).
        	* Notes:
@@ -191,7 +191,7 @@ Indicators used:
        		3. The ECB states, clearly, that usage of this data for transaction purposes is strongly discouraged. 
        		   This sentiment is echoed here; as stated above, ***this tool is for information purposes only***.
        		4. All exchange rate-related results obtained from easymoney (including, but not necessarily limited to, currency conversion and normalization) are the result of calculations based on ECB data.
-       		   These results are not a direct reporting of ECB-provided data..
+       		   These results do not constitute a direct reporting of ECB-provided data.
     
 <sup>†</sup>Sherouse, Oliver (2014). Wbdata. Arlington, VA. 
 
