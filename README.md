@@ -109,7 +109,7 @@ ep.normalize(amount=100, region="Germany", from_year=2010, to_year="latest", bas
 
 EasyMoney also understands that, while these two nations may share a common currency, the rate of inflation in these regions differ.
 
-#####3. Region Information
+####Region Information
 
 EasyPeasy's `region_map()` method exposes some of the functionality from the `pycountries` package in 
 a streamlined manner.
