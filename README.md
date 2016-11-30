@@ -12,7 +12,7 @@ Feature Summary:
 - Adjusting a given currency for Inflation
 - 'Normalizing' a currency, i.e., adjust for inflation and then convert to a base currency.
 - Relating ISO Alpha2/3 Country Codes, Currency Codes as well as a region's name to one another.
-- Automatically obtains the latest inflation and currency exchange rate information though online APIs.
+- This tool automatically obtains the latest inflation and currency exchange rate information though online APIs.
 
 **NOTICE: THIS TOOL IS FOR INFORMATION PURPOSES ONLY.**
 
