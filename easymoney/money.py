@@ -32,6 +32,7 @@ from easymoney.pycountry_wrap import PycountryWrap
 # options_tools
 from easymoney.options_tools import options_ranking
 from easymoney.options_tools import year_date_overlap
+from easymoney.options_tools import alpha2_by_cpi_years
 
 # Easy Pandas
 from easymoney.easy_pandas import pandas_null_drop
@@ -80,26 +81,30 @@ class EasyPeasy(object):
         self._precision = precision
         self._fall_back = fall_back
 
+        fuzzy_search_threshold = fuzzy_threshold
+        recommended_fuzzy_threshold = 90
         min_suggested_fuzzy_threshold = 85
         # Check fuzzy_threshold
-        if fuzzy_threshold is True or fuzzy_threshold == True:
+        if fuzzy_threshold is not False and not isinstance(fuzzy_threshold, (float, int)):
             raise ValueError("`fuzzy_threshold` must be either `False`, a `float` or an `int`.")
-        elif fuzzy_threshold != False and not isinstance(fuzzy_threshold, (float, int)):
-            raise ValueError("`fuzzy_threshold` must be either `False`, a `float` or an `int`.")
-        elif isinstance(fuzzy_threshold, (float, int)) and not isinstance(fuzzy_threshold, bool) and fuzzy_threshold <= 0:
+        elif fuzzy_threshold is True:
+            fuzzy_search_threshold = recommended_fuzzy_threshold
+        elif fuzzy_threshold is not False and isinstance(fuzzy_threshold, (float, int)) and fuzzy_threshold <= 0:
             raise ValueError("`fuzzy_threshold` must be greater than 0.")
-        elif isinstance(fuzzy_threshold, (float, int)) and not isinstance(fuzzy_threshold, bool) and fuzzy_threshold > 100:
+        elif fuzzy_threshold is not False and isinstance(fuzzy_threshold, (float, int)) and fuzzy_threshold > 100:
             raise ValueError("`fuzzy_threshold` must be less than 100.")
-        elif isinstance(fuzzy_threshold, (float, int)) and not isinstance(fuzzy_threshold, bool) \
+        elif fuzzy_threshold is not False and isinstance(fuzzy_threshold, (float, int)) \
                 and fuzzy_threshold < min_suggested_fuzzy_threshold:
-            warn("Low `fuzzy_threshold` values, such as %s, may yield innaccurate results." % (str(fuzzy_threshold)))
+            warn("\nLow `fuzzy_threshold` values, such as %s, have an elevated "
+                 "likelihood of innaccurate results." % (str(fuzzy_threshold)))
 
         path_to_data = data_path if isinstance(data_path, str) else None
-        self._pycountry_wrap = PycountryWrap(path_to_data, fuzzy_threshold)
+        self._pycountry_wrap = PycountryWrap(path_to_data, fuzzy_search_threshold)
         self._pycountries_alpha_2 = set([c.alpha_2 for c in list(pycountry.countries)])
 
         # CPI Dict
         self._cpi_dict = world_bank_pull(return_as='dict')
+        self.alpha2_cpi_record = alpha2_by_cpi_years(regions=self._pycountries_alpha_2, cpi_dictionary=self._cpi_dict)
 
         # Exchange Dict
         self._exchange_dict, self._ecb_currency_codes, self._currency_date_record = ecb_xml_exchange_data(return_as='dict')
@@ -155,24 +160,22 @@ class EasyPeasy(object):
 
         Get Years for which CPI information is available for a given region.
 
-        :param region: region of the form allowed by `EasyPeasy().region_map()`
+        :param region: ISO Alpha 2 Code.
         :type region: ``str``
-        :param warn: warn if data could not be obtained
+        :param warn: warn if data could not be obtained.
         :type warn: ``bool``
         :return: list of years for which CPI information is available.
         :rtype: ``list``
         """
-        cpi_years_list = list()
-        for year in sorted(list(self._cpi_dict.keys()), reverse=True):
-            cpi = self._cpi_dict.get(year, None).get(region, None)
-            if not isinstance(cpi, type(None)):
-                cpi_years_list.append(year)
+        cpi_years_list = self.alpha2_cpi_record.get(region, [])
 
         if len(cpi_years_list):
             return cpi_years_list
         elif warn:
             raise KeyError("Could not obtain inflation (CPI) information for '%s' from the\n" \
                            "International Monetary Fund database currently cached." % (region))
+        else:
+            return None
 
 
     def _cpi_match(self, region, year):
