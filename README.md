@@ -131,7 +131,7 @@ ep.region_map('GB', map_to='currency_alpha_3')
 If fuzzy searching is enabled, the search term does not have to exactly match
 those stored in the databases cached by an EasyPeasy instance.
 
-For example, it is possible to find the ISO Alpha 2 code for 'Germany' by passing 'German'.
+For example, it is possible to find the ISO Alpha 2 country code for 'Germany' by passing 'German'.
 
 ```python
 ep.region_map('German', map_to='alpha_2')
