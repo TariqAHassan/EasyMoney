@@ -264,7 +264,7 @@ Indicators used:
             based on ECB data. These results do not constitute a direct
             reporting of ECB-provided data.
 
-:superscript:`†`Sherouse, Oliver (2014). Wbdata. Arlington, VA.
+:superscript:`†` Sherouse, Oliver (2014). Wbdata. Arlington, VA.
 
 .. |Build Status| image:: https://travis-ci.org/TariqAHassan/EasyMoney.svg?branch=master
    :target: https://travis-ci.org/TariqAHassan/EasyMoney
