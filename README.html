@@ -85,7 +85,7 @@
 <li class="toctree-l1 current"><a class="current reference internal" href="#">EasyMoney</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#overview">Overview</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#project-summary">Project Summary</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#feature-summary">Feature Summary</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#feature-summary">Feature Summary:</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="#dependencies">Dependencies</a></li>
@@ -94,14 +94,14 @@
 <li class="toctree-l3"><a class="reference internal" href="#import-the-tool">Import the tool</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#create-an-instance-of-the-easypeasy-class">Create an instance of the EasyPeasy Class</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#prototypical-conversion-problems">Prototypical Conversion Problems</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#currency-converter">Currency Converter</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#adjust-for-inflation-and-convert">Adjust for Inflation and Convert</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#convert-currency-in-a-more-natural-way">Convert Currency in a more Natural Way</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#currency-converter">1. Currency Converter</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#adjust-for-inflation-and-convert-to-a-base-currency">2. Adjust for Inflation and Convert to a base currency</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#convert-currency-in-a-more-natural-way">3. Convert Currency in a more Natural Way</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#handling-common-currencies">Handling Common Currencies</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#currency-conversion">Currency Conversion:</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#normalization">Normalization</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#currency-conversion">1. Currency Conversion:</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#normalization">2. Normalization</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#region-information">Region Information</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#options">Options</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#databases">Databases</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="#license">License</a></li>
@@ -155,26 +155,31 @@
             
   <div class="section" id="easymoney">
 <h1>EasyMoney<a class="headerlink" href="#easymoney" title="Permalink to this headline">¶</a></h1>
+<p><a class="reference external" href="https://travis-ci.org/TariqAHassan/EasyMoney"><img alt="Build Status" src="https://travis-ci.org/TariqAHassan/EasyMoney.svg?branch=master" /></a></p>
 <div class="section" id="overview">
 <h2>Overview<a class="headerlink" href="#overview" title="Permalink to this headline">¶</a></h2>
 <div class="section" id="project-summary">
 <h3>Project Summary<a class="headerlink" href="#project-summary" title="Permalink to this headline">¶</a></h3>
 <p>This package is primarily intended to be used in the domain of Data Science to simplify
 the process of analysing data sets which contain money information. Often, the financial information
-within, and very often between, data sets is be separated in time (inflation), currency (conversion)
-as well as the ways in which these sources refer to the currency being used (e.g., ISO Alpha2 Codes vs. Currency Codes).
+within, and very often between, data sets is separated in time (inflation), currency (conversion)
+as well as the ways in which these sources refer to the currency being used (e.g., country codes vs. currency codes).
 Conventionally, this has required handcrafting a solution to control for these differences on a case-by-case basis.
 EasyMoney is intended to streamline this process to make comparisons across these dimensions
 extremely simple and straightforward.</p>
 </div>
 <div class="section" id="feature-summary">
-<h3>Feature Summary<a class="headerlink" href="#feature-summary" title="Permalink to this headline">¶</a></h3>
+<h3>Feature Summary:<a class="headerlink" href="#feature-summary" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
 <li>Computing Inflation</li>
 <li>Currency Conversion</li>
 <li>Adjusting a given currency for Inflation</li>
-<li>&#8216;Normalizing&#8217; a currency, i.e., adjust for inflation and then convert to a base currency.</li>
-<li>Relating ISO Alpha2/3 Codes, Currency Codes and a region&#8217;s Natural Name.</li>
+<li>&#8216;Normalizing&#8217; a currency, i.e., adjust for inflation and then convert
+to a base currency.</li>
+<li>Relating ISO Alpha2/3 Country Codes, Currency Codes as well as a
+region&#8217;s name to one another.</li>
+<li>This tool automatically obtains the latest inflation and currency
+exchange rate information though online APIs.</li>
 </ul>
 <p><strong>NOTICE: THIS TOOL IS FOR INFORMATION PURPOSES ONLY.</strong></p>
 </div>
@@ -184,14 +189,22 @@ extremely simple and straightforward.</p>
 <h2>Dependencies<a class="headerlink" href="#dependencies" title="Permalink to this headline">¶</a></h2>
 <p>EasyMoney requires: <a class="reference external" href="http://www.numpy.org">numpy</a>,
 <a class="reference external" href="http://pandas.pydata.org">pandas</a>,
-<a class="reference external" href="http://docs.python-requests.org/en/master/">requests</a> and
-<a class="reference external" href="https://github.com/OliverSherouse/wbdata">wbdata</a><sup>†</sup>.</p>
+<a class="reference external" href="http://docs.python-requests.org/en/master/">requests</a>,
+<a class="reference external" href="https://pypi.python.org/pypi/pycountry">pycountry</a> and
+<a class="reference external" href="https://github.com/OliverSherouse/wbdata">wbdata</a>†.</p>
 </div>
 <hr class="docutils" />
 <div class="section" id="installation">
 <h2>Installation<a class="headerlink" href="#installation" title="Permalink to this headline">¶</a></h2>
-<p><code class="docutils literal"><span class="pre">$</span> <span class="pre">pip3</span> <span class="pre">install</span> <span class="pre">easymoney</span></code></p>
-<p><em>Note</em>: EasyMoney requires Python 3.4 or later.</p>
+<p>Python Package Index:</p>
+<div class="code bash highlight-default"><div class="highlight"><pre><span></span>$ pip install easymoney
+</pre></div>
+</div>
+<p>Latest Build:</p>
+<div class="code bash highlight-default"><div class="highlight"><pre><span></span>$ pip install git+git://github.com/TariqAHassan/EasyMoney@master
+</pre></div>
+</div>
+<p>EasyMoney is compatible with Python 2.7 and 3.3+.</p>
 </div>
 <hr class="docutils" />
 <div class="section" id="examples">
@@ -204,7 +217,13 @@ extremely simple and straightforward.</p>
 </div>
 <div class="section" id="create-an-instance-of-the-easypeasy-class">
 <h3>Create an instance of the EasyPeasy Class<a class="headerlink" href="#create-an-instance-of-the-easypeasy-class" title="Permalink to this headline">¶</a></h3>
+<p>The standard way to do this is as follows:</p>
 <div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">ep</span> <span class="o">=</span> <span class="n">EasyPeasy</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>However, <a class="reference external" href="https://github.com/seatgeek/fuzzywuzzy">fuzzy searching</a>
+can also easily be enabled.</p>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">ep</span> <span class="o">=</span> <span class="n">EasyPeasy</span><span class="p">(</span><span class="n">fuzzy_threshold</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -212,26 +231,26 @@ extremely simple and straightforward.</p>
 <h3>Prototypical Conversion Problems<a class="headerlink" href="#prototypical-conversion-problems" title="Permalink to this headline">¶</a></h3>
 </div>
 <div class="section" id="currency-converter">
-<h3>Currency Converter<a class="headerlink" href="#currency-converter" title="Permalink to this headline">¶</a></h3>
-<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">ep</span><span class="o">.</span><span class="n">currency_converter</span><span class="p">(</span><span class="n">amount</span> <span class="o">=</span> <span class="mi">100</span><span class="p">,</span> <span class="n">from_currency</span> <span class="o">=</span> <span class="s2">&quot;USD&quot;</span><span class="p">,</span> <span class="n">to_currency</span> <span class="o">=</span> <span class="s2">&quot;EUR&quot;</span><span class="p">,</span> <span class="n">pretty_print</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span>
+<h3>1. Currency Converter<a class="headerlink" href="#currency-converter" title="Permalink to this headline">¶</a></h3>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">ep</span><span class="o">.</span><span class="n">currency_converter</span><span class="p">(</span><span class="n">amount</span><span class="o">=</span><span class="mi">100000</span><span class="p">,</span> <span class="n">from_currency</span><span class="o">=</span><span class="s2">&quot;USD&quot;</span><span class="p">,</span> <span class="n">to_currency</span><span class="o">=</span><span class="s2">&quot;EUR&quot;</span><span class="p">,</span> <span class="n">pretty_print</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
-<span class="c1"># 88.75 EUR</span>
+<span class="c1"># 94,553.71 EUR</span>
 </pre></div>
 </div>
 </div>
-<div class="section" id="adjust-for-inflation-and-convert">
-<h3>Adjust for Inflation and Convert<a class="headerlink" href="#adjust-for-inflation-and-convert" title="Permalink to this headline">¶</a></h3>
-<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">ep</span><span class="o">.</span><span class="n">normalize</span><span class="p">(</span><span class="n">amount</span> <span class="o">=</span> <span class="mi">100</span><span class="p">,</span> <span class="n">currency</span> <span class="o">=</span> <span class="s2">&quot;USD&quot;</span><span class="p">,</span> <span class="n">from_year</span> <span class="o">=</span> <span class="mi">2010</span><span class="p">,</span> <span class="n">to_year</span> <span class="o">=</span> <span class="s2">&quot;latest&quot;</span><span class="p">,</span> <span class="n">base_currency</span> <span class="o">=</span> <span class="s2">&quot;CAD&quot;</span><span class="p">,</span> <span class="n">pretty_print</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span>
+<div class="section" id="adjust-for-inflation-and-convert-to-a-base-currency">
+<h3>2. Adjust for Inflation and Convert to a base currency<a class="headerlink" href="#adjust-for-inflation-and-convert-to-a-base-currency" title="Permalink to this headline">¶</a></h3>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">ep</span><span class="o">.</span><span class="n">normalize</span><span class="p">(</span><span class="n">amount</span><span class="o">=</span><span class="mi">100000</span><span class="p">,</span> <span class="n">region</span><span class="o">=</span><span class="s2">&quot;CA&quot;</span><span class="p">,</span> <span class="n">from_year</span><span class="o">=</span><span class="mi">2010</span><span class="p">,</span> <span class="n">to_year</span><span class="o">=</span><span class="s2">&quot;latest&quot;</span><span class="p">,</span> <span class="n">pretty_print</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
-<span class="c1"># 140.66 CAD</span>
+<span class="c1"># 76,357.51 EUR</span>
 </pre></div>
 </div>
 </div>
 <div class="section" id="convert-currency-in-a-more-natural-way">
-<h3>Convert Currency in a more Natural Way<a class="headerlink" href="#convert-currency-in-a-more-natural-way" title="Permalink to this headline">¶</a></h3>
-<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">ep</span><span class="o">.</span><span class="n">currency_converter</span><span class="p">(</span><span class="n">amount</span> <span class="o">=</span> <span class="mi">100</span><span class="p">,</span> <span class="n">from_currency</span> <span class="o">=</span> <span class="s2">&quot;Canada&quot;</span><span class="p">,</span> <span class="n">to_currency</span> <span class="o">=</span> <span class="s2">&quot;Ireland&quot;</span><span class="p">,</span> <span class="n">pretty_print</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span>
+<h3>3. Convert Currency in a more Natural Way<a class="headerlink" href="#convert-currency-in-a-more-natural-way" title="Permalink to this headline">¶</a></h3>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">ep</span><span class="o">.</span><span class="n">currency_converter</span><span class="p">(</span><span class="n">amount</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">from_currency</span><span class="o">=</span><span class="s2">&quot;Canada&quot;</span><span class="p">,</span> <span class="n">to_currency</span><span class="o">=</span><span class="s2">&quot;Ireland&quot;</span><span class="p">,</span> <span class="n">pretty_print</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
-<span class="c1"># 68.58 EUR</span>
+<span class="c1"># 70.26 EUR</span>
 </pre></div>
 </div>
 </div>
@@ -239,8 +258,8 @@ extremely simple and straightforward.</p>
 <h3>Handling Common Currencies<a class="headerlink" href="#handling-common-currencies" title="Permalink to this headline">¶</a></h3>
 </div>
 <div class="section" id="currency-conversion">
-<h3>Currency Conversion:<a class="headerlink" href="#currency-conversion" title="Permalink to this headline">¶</a></h3>
-<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">ep</span><span class="o">.</span><span class="n">currency_converter</span><span class="p">(</span><span class="n">amount</span> <span class="o">=</span> <span class="mi">100</span><span class="p">,</span> <span class="n">from_currency</span> <span class="o">=</span> <span class="s2">&quot;France&quot;</span><span class="p">,</span> <span class="n">to_currency</span> <span class="o">=</span> <span class="s2">&quot;Germany&quot;</span><span class="p">,</span> <span class="n">pretty_print</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span>
+<h3>1. Currency Conversion:<a class="headerlink" href="#currency-conversion" title="Permalink to this headline">¶</a></h3>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">ep</span><span class="o">.</span><span class="n">currency_converter</span><span class="p">(</span><span class="n">amount</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">from_currency</span><span class="o">=</span><span class="s2">&quot;France&quot;</span><span class="p">,</span> <span class="n">to_currency</span><span class="o">=</span><span class="s2">&quot;Germany&quot;</span><span class="p">,</span> <span class="n">pretty_print</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
 <span class="c1"># 100.00 EUR</span>
 </pre></div>
@@ -248,92 +267,111 @@ extremely simple and straightforward.</p>
 <p>EasyMoney understands that these two nations share a common currency.</p>
 </div>
 <div class="section" id="normalization">
-<h3>Normalization<a class="headerlink" href="#normalization" title="Permalink to this headline">¶</a></h3>
-<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">ep</span><span class="o">.</span><span class="n">normalize</span><span class="p">(</span><span class="n">amount</span> <span class="o">=</span> <span class="mi">100</span><span class="p">,</span> <span class="n">currency</span> <span class="o">=</span> <span class="s2">&quot;France&quot;</span><span class="p">,</span> <span class="n">from_year</span> <span class="o">=</span> <span class="mi">2010</span><span class="p">,</span> <span class="n">to_year</span> <span class="o">=</span> <span class="s2">&quot;latest&quot;</span><span class="p">,</span> <span class="n">base_currency</span> <span class="o">=</span> <span class="s2">&quot;USD&quot;</span><span class="p">,</span> <span class="n">pretty_print</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span>
+<h3>2. Normalization<a class="headerlink" href="#normalization" title="Permalink to this headline">¶</a></h3>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">ep</span><span class="o">.</span><span class="n">normalize</span><span class="p">(</span><span class="n">amount</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">region</span><span class="o">=</span><span class="s2">&quot;France&quot;</span><span class="p">,</span> <span class="n">from_year</span><span class="o">=</span><span class="mi">2010</span><span class="p">,</span> <span class="n">to_year</span><span class="o">=</span><span class="s2">&quot;latest&quot;</span><span class="p">,</span> <span class="n">base_currency</span><span class="o">=</span><span class="s2">&quot;USD&quot;</span><span class="p">,</span> <span class="n">pretty_print</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
-<span class="c1"># 118.98 USD</span>
+<span class="c1"># 111.67 USD</span>
 </pre></div>
 </div>
-<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">ep</span><span class="o">.</span><span class="n">normalize</span><span class="p">(</span><span class="n">amount</span> <span class="o">=</span> <span class="mi">100</span><span class="p">,</span> <span class="n">currency</span> <span class="o">=</span> <span class="s2">&quot;Germany&quot;</span><span class="p">,</span> <span class="n">from_year</span> <span class="o">=</span> <span class="mi">2010</span><span class="p">,</span> <span class="n">to_year</span> <span class="o">=</span> <span class="s2">&quot;latest&quot;</span><span class="p">,</span> <span class="n">base_currency</span> <span class="o">=</span> <span class="s2">&quot;USD&quot;</span><span class="p">,</span> <span class="n">pretty_print</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">ep</span><span class="o">.</span><span class="n">normalize</span><span class="p">(</span><span class="n">amount</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">region</span><span class="o">=</span><span class="s2">&quot;Germany&quot;</span><span class="p">,</span> <span class="n">from_year</span><span class="o">=</span><span class="mi">2010</span><span class="p">,</span> <span class="n">to_year</span><span class="o">=</span><span class="s2">&quot;latest&quot;</span><span class="p">,</span> <span class="n">base_currency</span><span class="o">=</span><span class="s2">&quot;USD&quot;</span><span class="p">,</span> <span class="n">pretty_print</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
-<span class="c1"># 120.45 USD</span>
+<span class="c1"># 113.06 USD</span>
 </pre></div>
 </div>
 <p>EasyMoney also understands that, while these two nations may share a
-common currency, inflation may differ.</p>
+common currency, the rate of inflation in these regions could differ.</p>
+</div>
+<div class="section" id="region-information">
+<h3>Region Information<a class="headerlink" href="#region-information" title="Permalink to this headline">¶</a></h3>
+<p>EasyPeasy&#8217;s <code class="docutils literal"><span class="pre">region_map()</span></code> method exposes some of the functionality
+from the <code class="docutils literal"><span class="pre">pycountries</span></code> package in a streamlined manner.</p>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">ep</span><span class="o">.</span><span class="n">region_map</span><span class="p">(</span><span class="s1">&#39;GB&#39;</span><span class="p">,</span> <span class="n">map_to</span><span class="o">=</span><span class="s1">&#39;alpha_3&#39;</span><span class="p">)</span>
+
+<span class="c1"># GBR</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">ep</span><span class="o">.</span><span class="n">region_map</span><span class="p">(</span><span class="s1">&#39;GB&#39;</span><span class="p">,</span> <span class="n">map_to</span><span class="o">=</span><span class="s1">&#39;currency_alpha_3&#39;</span><span class="p">)</span>
+
+<span class="c1"># GBP</span>
+</pre></div>
+</div>
+<p>If fuzzy searching is enabled, the search term does not have to exactly
+match those stored in the databases cached by an <code class="docutils literal"><span class="pre">EasyPeasy</span></code> instance.</p>
+<p>For example, it is possible to find the ISO Alpha 2 country code for
+&#8216;Germany&#8217; by passing &#8216;German&#8217;.</p>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">ep</span><span class="o">.</span><span class="n">region_map</span><span class="p">(</span><span class="s1">&#39;German&#39;</span><span class="p">,</span> <span class="n">map_to</span><span class="o">=</span><span class="s1">&#39;alpha_2&#39;</span><span class="p">)</span>
+
+<span class="c1"># DE</span>
+</pre></div>
+</div>
 </div>
 <div class="section" id="options">
 <h3>Options<a class="headerlink" href="#options" title="Permalink to this headline">¶</a></h3>
-<p>It&#8217;s easy to explore the terminology understood by <cite>EasyPeasy</cite>, as well as the dates for which
-data is available, with <cite>options()</cite>.</p>
-<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">ep</span><span class="o">.</span><span class="n">options</span><span class="p">(</span><span class="n">info</span> <span class="o">=</span> <span class="s1">&#39;all&#39;</span><span class="p">,</span> <span class="n">pretty_print</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">overlap_only</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span>
+<p>It&#8217;s easy to explore the terminology understood by <code class="docutils literal"><span class="pre">EasyPeasy</span></code>, as
+well as the dates for which data is available.</p>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">ep</span><span class="o">.</span><span class="n">options</span><span class="p">()</span>
 </pre></div>
 </div>
 <table border="1" class="docutils">
 <colgroup>
-<col width="12%" />
 <col width="11%" />
 <col width="8%" />
 <col width="8%" />
 <col width="12%" />
-<col width="18%" />
-<col width="18%" />
 <col width="14%" />
+<col width="23%" />
+<col width="23%" />
 </colgroup>
 <thead valign="bottom">
 <tr class="row-odd"><th class="head">Region</th>
-<th class="head">Currency</th>
-<th class="head">Alpha2</th>
-<th class="head">Alpha3</th>
-<th class="head">Inflation
-Range</th>
-<th class="head">Exchange
-Range</th>
+<th class="head">Alpha
+2</th>
+<th class="head">Alpha
+3</th>
+<th class="head">Currenci
+es</th>
+<th class="head">InflationD
+ates</th>
+<th class="head">ExchangeDates</th>
 <th class="head">Overlap</th>
-<th class="head">Transitions</th>
 </tr>
 </thead>
 <tbody valign="top">
-<tr class="row-even"><td>Australia</td>
-<td>AUD</td>
+<tr class="row-even"><td>Austral
+ia</td>
 <td>AU</td>
 <td>AUS</td>
+<td>AUD</td>
 <td>[1960,
 2015]</td>
-<td>[1999-01-04 :
-2016-09-12]</td>
-<td>[1999-01-04 :
-2015-12-31]</td>
-<td>&nbsp;</td>
+<td>[04/01/1999,
+29/11/2016]</td>
+<td>[04/01/1999,
+31/12/2015]</td>
 </tr>
 <tr class="row-odd"><td>Austria</td>
-<td>EUR</td>
 <td>AT</td>
 <td>AUT</td>
+<td>EUR</td>
 <td>[1960,
 2015]</td>
-<td>[1999-01-04 :
-2016-09-12]</td>
-<td>[1999-01-04 :
-2015-12-31]</td>
-<td>1999 (ATS
-to EUR)</td>
+<td>[04/01/1999,
+29/11/2016]</td>
+<td>[04/01/1999,
+31/12/2015]</td>
 </tr>
 <tr class="row-even"><td>Belgium</td>
-<td>EUR</td>
 <td>BE</td>
 <td>BEL</td>
+<td>EUR</td>
 <td>[1960,
 2015]</td>
-<td>[1999-01-04 :
-2016-09-12]</td>
-<td>[1999-01-04 :
-2015-12-31]</td>
-<td>1999 (BEF
-to EUR)</td>
+<td>[04/01/1999,
+29/11/2016]</td>
+<td>[04/01/1999,
+31/12/2015]</td>
 </tr>
 <tr class="row-odd"><td>...</td>
-<td>...</td>
 <td>...</td>
 <td>...</td>
 <td>...</td>
@@ -343,70 +381,12 @@ to EUR)</td>
 </tr>
 </tbody>
 </table>
-<p>Above, the <em>InflationRange</em> and <em>ExchangeRange</em> columns provide the range of dates for
-which inflation and exchange rate information is available, respectively. The <em>Overlap</em> column
-shows the range of dates shared by these two columns.
-Additionally, the dates of known transitions from one currency to another are also provided.</p>
-<p>To gain access to a summary of the exchange data alone, &#8216;exchange&#8217; can be passed to <em>info</em>.
-Similarly, &#8216;inflation&#8217; can be passed to inspect inflation information separately.</p>
-<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="c1"># Currency Information Alone</span>
-<span class="n">ep</span><span class="o">.</span><span class="n">options</span><span class="p">(</span><span class="n">info</span> <span class="o">=</span> <span class="s1">&#39;exchange&#39;</span><span class="p">,</span> <span class="n">pretty_print</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span>
-
-<span class="c1"># Inflation Information Alone</span>
-<span class="n">ep</span><span class="o">.</span><span class="n">options</span><span class="p">(</span><span class="n">info</span> <span class="o">=</span> <span class="s1">&#39;inflation&#39;</span><span class="p">,</span> <span class="n">pretty_print</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span>
-</pre></div>
-</div>
-<p>Changing <code class="docutils literal"><span class="pre">pretty_print</span></code> to False will return the information in <code class="docutils literal"><span class="pre">options()</span></code> as
-a <code class="docutils literal"><span class="pre">Pandas</span> <span class="pre">DataFrame</span></code>.</p>
-<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">inflation_df</span> <span class="o">=</span> <span class="n">ep</span><span class="o">.</span><span class="n">options</span><span class="p">(</span><span class="n">info</span> <span class="o">=</span> <span class="s1">&#39;inflation&#39;</span><span class="p">,</span> <span class="n">pretty_print</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span>
-</pre></div>
-</div>
-<p>It is also possible to simply obtain a list of regions for which
-inflation information is available.</p>
-<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">inflation_list</span> <span class="o">=</span> <span class="n">ep</span><span class="o">.</span><span class="n">options</span><span class="p">(</span><span class="n">info</span> <span class="o">=</span> <span class="s1">&#39;inflation&#39;</span><span class="p">,</span> <span class="n">rformat</span> <span class="o">=</span> <span class="s1">&#39;list&#39;</span><span class="p">,</span> <span class="n">pretty_print</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span>
-</pre></div>
-</div>
-<p>This can also be done for exchange rate information.</p>
-<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">currency_list</span> <span class="o">=</span> <span class="n">ep</span><span class="o">.</span><span class="n">options</span><span class="p">(</span><span class="n">info</span> <span class="o">=</span> <span class="s1">&#39;exchange&#39;</span><span class="p">,</span> <span class="n">rformat</span> <span class="o">=</span> <span class="s1">&#39;list&#39;</span><span class="p">,</span> <span class="n">pretty_print</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span>
-</pre></div>
-</div>
-</div>
-<div class="section" id="databases">
-<h3>Databases<a class="headerlink" href="#databases" title="Permalink to this headline">¶</a></h3>
-<p>It&#8217;s also straightforward to gain access to the databases used by
-<code class="docutils literal"><span class="pre">EasyPeasy()</span></code>.</p>
-<p>To see all of the International Organization for Standardization (ISO)
-Alpha2 and Alpha3 codes (along with a region&#8217;s natural name) currently cached:</p>
-<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">ep</span><span class="o">.</span><span class="n">ISOAlphaCodesDB</span>
-</pre></div>
-</div>
-<p>To see all of the known transitions from one currency to another:</p>
-<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">ep</span><span class="o">.</span><span class="n">CurrencyTransitionDB</span>
-</pre></div>
-</div>
-<p>To see the raw Exchange Rate information currently cached:</p>
-<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">ep</span><span class="o">.</span><span class="n">ExchangeRatesDB</span>
-</pre></div>
-</div>
-<p>To see the raw Consumer Price Index (CPI) information currently cached:</p>
-<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">ep</span><span class="o">.</span><span class="n">ConsumerPriceIndexDB</span>
-</pre></div>
-</div>
-<p>Finally, to see the relationships between Country Names, ISO Alpha2/3
-Codes and Currency Codes currently understood by <code class="docutils literal"><span class="pre">EasyPeasy()</span></code>:</p>
-<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">ep</span><span class="o">.</span><span class="n">ConsumerPriceIndexDB</span>
-</pre></div>
-</div>
-<p>The databases used by <code class="docutils literal"><span class="pre">EasyPeasy()</span></code> can be saved disk so they can be used offline
-or modified. To do so, one can simply pass a directory when creating an
-instance of the <code class="docutils literal"><span class="pre">EasyPeasy()</span></code> class.</p>
-<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">ep</span> <span class="o">=</span> <span class="n">EasyPeasy</span><span class="p">(</span><span class="s1">&#39;/path/of/your/choosing&#39;</span><span class="p">)</span>
-</pre></div>
-</div>
-<p>If this directory does not contain any of the required databases, it
-will be populated with them. Conversely, if the the directory already contains
-some of the required databases, <code class="docutils literal"><span class="pre">EasyPeasy()</span></code> will automagically
-read in the existing databases and generate only those databases that are missing.</p>
+<p>Above, the &#8216;InflationDates&#8217; and &#8216;ExchangeDates&#8217; columns provide the
+range of dates for which inflation and exchange rate information is
+available, respectively. Additionally, all dates for which data is
+available can be show by setting the <code class="docutils literal"><span class="pre">range_table_dates</span></code> parameter to
+<code class="docutils literal"><span class="pre">False</span></code>. The &#8216;Overlap&#8217; column shows the range of dates shared by the
+&#8216;InflationDates&#8217; and &#8216;ExchangeDates&#8217; columns.</p>
 </div>
 </div>
 <hr class="docutils" />
@@ -424,9 +404,11 @@ read in the existing databases and generate only those databases that are missin
 <li>Source: International Monetary Fund (IMF), International Financial
 Statistics.<ul>
 <li>Notes:<ol class="arabic">
-<li>ALL INFLATION-RELATED RESULTS OBTAINED FROM EASYMONEY
-(INCLUDING, BUT NOT NECESSARILY LIMITED TO, INFLATION RATE AND NORMALIZATION)
-ARE THE RESULT OF CALCULATIONS BASED ON IMF DATA. THESE RESULTS ARE NOT A DIRECT REPORTING OF IMF-PROVIDED DATA.</li>
+<li>All inflation-related results obtained from easymoney
+(including, but not necessarily limited to, inflation rate
+and normalization) are the result of calculations based on
+IMF data. These results do not constitute a direct reporting
+of IMF-provided data.</li>
 </ol>
 </li>
 </ul>
@@ -440,13 +422,15 @@ Bank</a><ul>
 <li>The ECB data used here can be obtained directly from the
 link provided above.</li>
 <li>Rates are updated by the ECB around 16:00 CET.</li>
-<li>The ECB states, clearly, that usage for transaction purposes
-is strongly discouraged. This sentiment is echoed here;
-<strong>as stated above, this tool is intended to be for
-information purposes only</strong>.</li>
-<li>ALL EXCHANGE RATE-RELATED RESULTS OBTAINED FROM EASYMONEY
-(INCLUDING, BUT NOT NECESSARILY LIMITED TO, CURRENCY CONVERSION AND NORMALIZATION)
-ARE THE RESULT OF CALCULATIONS BASED ON ECB DATA. THESE RESULTS ARE NOT A DIRECT REPORTING OF ECB-PROVIDED DATA.</li>
+<li>The ECB states, clearly, that usage of this data for
+transaction purposes is strongly discouraged. This sentiment
+is echoed here; as stated above, <strong>*this tool is for
+information purposes only*</strong>.</li>
+<li>All exchange rate-related results obtained from easymoney
+(including, but not necessarily limited to, currency
+conversion and normalization) are the result of calculations
+based on ECB data. These results do not constitute a direct
+reporting of ECB-provided data.</li>
 </ol>
 </li>
 </ul>
@@ -454,7 +438,7 @@ ARE THE RESULT OF CALCULATIONS BASED ON ECB DATA. THESE RESULTS ARE NOT A DIRECT
 </ul>
 </li>
 </ol>
-<p><sup>†</sup> Sherouse, Oliver (2014). Wbdata. Arlington, VA.</p>
+<p>†Sherouse, Oliver (2014). Wbdata. Arlington, VA.</p>
 </div>
 </div>
 
