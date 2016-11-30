@@ -40,8 +40,8 @@ Dependencies
 
 EasyMoney requires: `numpy <http://www.numpy.org>`__,
 `pandas <http://pandas.pydata.org>`__,
-`requests <http://docs.python-requests.org/en/master/>`__,
-`pycountry <https://pypi.python.org/pypi/pycountry>`__ and
+`pycountry <https://pypi.python.org/pypi/pycountry>`__,
+`requests <http://docs.python-requests.org/en/master/>`__ and
 `wbdata <https://github.com/OliverSherouse/wbdata>`__\ :superscript:`†`.
 
 --------------
