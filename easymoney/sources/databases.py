@@ -8,8 +8,29 @@
 """
 # Imports
 import pandas as pd
+import pkg_resources
+
 from collections import defaultdict
 from easymoney.support_tools import cln
+
+
+DEFAULT_DATA_PATH = pkg_resources.resource_filename('easymoney', 'sources/data')
+
+
+def _path_selector(path_to_data):
+    """
+
+    Select path to the data.
+
+    :param path_to_data: a path to the databases required by EasyMoney.
+    :type path_to_data: ``str`` or ``None``
+    :return: DEFAULT_DATA_PATH if `path_to_data` is None; else path_to_data.
+    :rtype: ``str``
+    """
+    if isinstance(path_to_data, str):
+        return (path_to_data if not path_to_data.endswith("/") else path_to_data[:-1])
+    else:
+        return DEFAULT_DATA_PATH
 
 
 def currency_mapping_to_dict(path_to_data):
@@ -23,8 +44,8 @@ def currency_mapping_to_dict(path_to_data):
     :rtype: ``dict``
     """
     # Read in the data
-    data_path = (path_to_data if not path_to_data.endswith("/") else path_to_data[:-1])
-    currency_mappings = pd.read_csv(data_path + "/CurrencyRelationshipsDB.csv", usecols=['Alpha2', 'CurrencyCode'])
+    currency_mappings = pd.read_csv(_path_selector(path_to_data) + "/CurrencyRelationshipsDB.csv",
+                                    usecols=['Alpha2', 'CurrencyCode'])
 
     # Initialize a default dict
     alpha2_currency = defaultdict(list)
@@ -37,6 +58,21 @@ def currency_mapping_to_dict(path_to_data):
                     alpha2_currency[alpha2.upper()].append(currency.upper())
 
     return alpha2_currency
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

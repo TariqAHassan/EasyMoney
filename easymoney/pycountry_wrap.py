@@ -8,12 +8,11 @@
 """
 # Import
 import pycountry
-import pkg_resources
 
 from warnings import warn
 from easymoney.sources.databases import currency_mapping_to_dict
 
-DEFAULT_DATA_PATH = pkg_resources.resource_filename('easymoney', 'sources/data')
+
 
 class PycountryWrap(object):
     """
@@ -35,8 +34,7 @@ class PycountryWrap(object):
 
         """
         # Compute the dict mapping alpha2 codes to currencies
-        data_path = path_to_data if isinstance(path_to_data, str) else DEFAULT_DATA_PATH
-        self.alpha2_currency_dict = currency_mapping_to_dict(data_path)
+        self.alpha2_currency_dict = currency_mapping_to_dict(path_to_data)
 
         # Get a list of country names
         self.countries = [c.name for c in list(pycountry.countries)]
@@ -213,7 +211,6 @@ class PycountryWrap(object):
                     return None
         except:
             return None
-
 
 
 
