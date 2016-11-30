@@ -26,10 +26,14 @@ EasyMoney requires: [numpy], [pandas], [requests], [pycountry] and [wbdata]<sup>
 ###Installation
 
 Python Package Index:
-``$ pip install easymoney``
+```bash
+$ pip install easymoney
+```
 
 Latest Build:
-``pip install git+git://github.com/TariqAHassan/EasyMoney@master``
+```bash
+$ pip install git+git://github.com/TariqAHassan/EasyMoney@master
+```
 
 EasyMoney is compatible with Python 2.7 and 3.3+.
 
