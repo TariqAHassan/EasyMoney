@@ -22,6 +22,7 @@ from easymoney.support_tools import closest_date
 from easymoney.support_tools import year_extract
 from easymoney.support_tools import min_max_dates
 from easymoney.support_tools import closest_value
+from easymoney.support_tools import fast_date_range
 from easymoney.support_tools import date_format_check
 from easymoney.support_tools import sort_range_reverse
 
@@ -81,7 +82,9 @@ class EasyPeasy(object):
 
         min_suggested_fuzzy_threshold = 85
         # Check fuzzy_threshold
-        if fuzzy_threshold != False and not isinstance(fuzzy_threshold, (float, int)):
+        if fuzzy_threshold is True or fuzzy_threshold == True:
+            raise ValueError("`fuzzy_threshold` must be either `False`, a `float` or an `int`.")
+        elif fuzzy_threshold != False and not isinstance(fuzzy_threshold, (float, int)):
             raise ValueError("`fuzzy_threshold` must be either `False`, a `float` or an `int`.")
         elif isinstance(fuzzy_threshold, (float, int)) and not isinstance(fuzzy_threshold, bool) and fuzzy_threshold <= 0:
             raise ValueError("`fuzzy_threshold` must be greater than 0.")
@@ -99,7 +102,10 @@ class EasyPeasy(object):
         self._cpi_dict = world_bank_pull(return_as='dict')
 
         # Exchange Dict
-        self._exchange_dict, self.ecb_currency_codes, self._currency_date_record = ecb_xml_exchange_data(return_as='dict')
+        self._exchange_dict, self._ecb_currency_codes, self._currency_date_record = ecb_xml_exchange_data(return_as='dict')
+
+        # Min max for _currency_date_record
+        self._currency_date_record_range = {k: fast_date_range(v, '%d/%m/%Y') for k, v in self._currency_date_record.items()}
 
         # Column Order for options
         self._table_col_order = ['RegionFull', 'Region', 'Alpha2', 'Alpha3', 'Currencies',
@@ -352,20 +358,13 @@ class EasyPeasy(object):
         :return:
         :rtype: 1D ``list`` or 2D ``list``
         """
-        dates = list()
-        for c in currencies:
-            if c == 'EUR':
-                dates.append(sorted(list(self._exchange_dict.keys()), key=lambda x: datetime.strptime(x, date_format)))
-            else:
-                dates.append(self._currency_date_record.get(c.upper(), None))
+        d = self._currency_date_record_range if min_max_rslt else self._currency_date_record
+        dates = [d.get(c.upper(), None) for c in currencies]
 
         # Remove None
         dates = list(filter(None, dates))
         if not len(dates):
             return None
-
-        if min_max_rslt:
-            dates = [list(min_max_dates(d)) for d in dates if isinstance(d, (list, tuple, type(np.array)))]
 
         return dates[0] if len(dates) == 1 else dates
 
@@ -385,7 +384,7 @@ class EasyPeasy(object):
         try:
             return pycountry.currencies.lookup(currency_or_region).alpha_3
         except:
-            if currency_or_region in self.ecb_currency_codes: # temp fix
+            if currency_or_region in self._ecb_currency_codes: # temp fix
                 return currency_or_region
             else:
                 return self.region_map(currency_or_region, "currency_alpha_3")
@@ -416,9 +415,9 @@ class EasyPeasy(object):
                                  "European Central Bank database currently cached." % (currency))
 
         if date == 'oldest':
-            exchange_date = min_max_dates(available_data)[0]
+            exchange_date = self._currency_date_record_range.get(currency)[0]
         elif date == 'latest':
-            exchange_date = min_max_dates(available_data)[1]
+            exchange_date = self._currency_date_record_range.get(currency)[1]
         elif isinstance(date, str) and date not in available_data:
             if self._fall_back:
                 exchange_date = closest_date(date, available_data)
@@ -434,7 +433,7 @@ class EasyPeasy(object):
         if not isinstance(exchange_rate, type(None)):
             return exchange_rate
         else:
-            raise AttributeError(msg % (currency, exchange_date))
+            raise AttributeError(error_msg % (currency, exchange_date))
 
 
     def currency_converter(self, amount, from_currency, to_currency, date="latest", pretty_print=False):
@@ -480,8 +479,9 @@ class EasyPeasy(object):
         # Check Params
         self._params_check(amount, pretty_print)
 
-        # to/from_currency --> Alpha 3 Currency Code
-        to_currency_fn, from_currency_fn = (self._user_currency_input(arg) for arg in (to_currency, from_currency))
+        # to/from_currency --> Currency Alpha 3 Code
+        ca3 = [self._user_currency_input(c) if c not in self._ecb_currency_codes else c for c in (to_currency, from_currency)]
+        to_currency_fn, from_currency_fn = ca3
 
         # Return amount unaltered if self-conversion was requested.
         if from_currency_fn == to_currency_fn:

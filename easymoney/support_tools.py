@@ -169,6 +169,21 @@ def min_max_dates(list_of_dates, from_format="%d/%m/%Y"):
     return (pandas_datetime.min().strftime(from_format), pandas_datetime.max().strftime(from_format))
 
 
+def fast_date_range(dates, from_format='%d/%m/%Y'):
+    """
+
+    Fast function to find the min and max date in an iterable of date strings.
+
+    :param dates: iterable of strings
+    :type dates: ``iterable``
+    :param from_format: date format. Defaults to '%d/%m/%Y'.
+    :type from_format: ``str``
+    :return: [min(dates), max(dates)]
+    :rtype: ``list``
+    """
+    return [i.strftime(from_format) for i in min_max([datetime.strptime(j, from_format) for j in dates])]
+
+
 def closest_date(date, list_of_dates, from_format="%d/%m/%Y"):
     """
 
@@ -286,13 +301,6 @@ def mint(amount, precision, currency='', pretty_print=False):
         print(_money_formater(amount, precision, currency))
     else:
         return round(float(amount), precision)
-
-
-
-
-
-
-
 
 
 

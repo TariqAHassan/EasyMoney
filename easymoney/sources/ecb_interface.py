@@ -70,7 +70,7 @@ def ecb_xml_exchange_data(return_as='dict', ecb_extension="stats/eurofxref/eurof
     :rtype: ``dict`` or ``Pandas DataFrame``
     """
     # Currency Codes
-    all_currency_codes = list()
+    all_currency_codes = ['EUR']
 
     # Constuct the URL to the XML data on the ECB's website.
     xmlpath = "http://www.ecb.europa.eu/" + ecb_extension
@@ -108,6 +108,7 @@ def ecb_xml_exchange_data(return_as='dict', ecb_extension="stats/eurofxref/eurof
 
     # Sort currency_date_record
     currency_date_record_sorted = {k: date_sort(v) for k, v in currency_date_record.items()}
+    currency_date_record_sorted['EUR'] = date_sort(list(exchange_rate_dict.keys()))
 
     # return as dict
     if return_as == 'dict':
