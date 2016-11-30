@@ -157,7 +157,7 @@ ep.options()
 
 Above, the 'InflationDates' and 'ExchangeDates' columns provide the range of dates for which inflation and exchange rate information 
 is available, respectively. If you would prefer, all dates for which data is available can be show by setting the 
-`range_table_dates` parameter to `False`. The *Overlap* column shows the range of dates shared by the 'InflationDates'
+`range_table_dates` parameter to `False`. The 'Overlap' column shows the range of dates shared by the 'InflationDates'
 and 'ExchangeDates' columns.
 
 ------------------------------------------------------------------------
