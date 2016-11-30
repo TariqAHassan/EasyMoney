@@ -9,6 +9,7 @@
 # Imports
 import numpy as np
 from datetime import datetime
+from collections import defaultdict
 
 from easymoney.support_tools import min_max
 from easymoney.easy_pandas import items_null
@@ -74,10 +75,26 @@ def year_date_overlap(years, full_dates, date_format="%d/%m/%Y"):
     return [date_floor.strftime(date_format), date_ceiling.strftime(date_format)]
 
 
+def alpha2_by_cpi_years(regions, cpi_dictionary):
+    """
 
+    Tool to construct a dictionary of the form:
+    ``{CountryAlpha2: [Years for which CPI info is available]}``.
 
+    :param regions: an iterable of ISO alpha 2 country codes.
+    :type regions: ``iterable``
+    :param cpi_dictionary: dictionary of CPI information as returned by ``world_bank_pull(return_as='dict')``.
+    :param cpi_dictionary: ``dict``
+    :return: dictionary of years for which CPI information is available for a given country.
+    :rtype: ``dict``
+    """
+    cpi_years_dict = defaultdict(list)
+    for r in regions:
+        for y in sorted(list(cpi_dictionary.keys()), reverse=True):
+            if cpi_dictionary.get(y, None).get(r, None) != None:
+                cpi_years_dict[r].append(y)
 
-
+    return dict(cpi_years_dict)
 
 
 
