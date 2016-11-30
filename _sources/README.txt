@@ -18,7 +18,7 @@ EasyMoney is intended to streamline this process to make comparisons across thes
 extremely simple and straightforward.
 
 
-Feature Summary:
+Feature Summary
 '''''''''''''''
 
 -  Computing Inflation
