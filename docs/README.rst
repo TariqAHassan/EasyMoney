@@ -124,8 +124,8 @@ Prototypical Conversion Problems
 Handling Common Currencies
 ''''''''''''''''''''''''''
 
-1. Currency Conversion:
-'''''''''''''''''''''''
+1. Currency Conversion
+''''''''''''''''''''''
 
 .. code:: python
 

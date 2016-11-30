@@ -86,7 +86,7 @@ ep.currency_converter(amount=100, from_currency="Canada", to_currency="Ireland",
 
 ####Handling Common Currencies
 
-#####1. Currency Conversion:
+#####1. Currency Conversion
 ```python
 ep.currency_converter(amount=100, from_currency="France", to_currency="Germany", pretty_print=True)
 
