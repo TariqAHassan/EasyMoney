@@ -127,7 +127,7 @@ def _fast_pd_nester(data_frame, nest_col_a, nest_col_b, nest_col_c, keys_to_str 
     :type nest_col_c: str
     :param keys_to_str: see ``twoD_nested_dict()``.
     :type keys_to_str: ``bool``
-    :return: nested dict of the form {nest_col_a: {nest_col_b: nest_col_c}.
+    :return: nested dict of the form {nest_col_a: {nest_col_b: nest_col_c}}.
     :rtype: dict
     """
     # Group nest_col_b and nest_col_c by nest_col_a
@@ -264,14 +264,14 @@ def type_in_series(series):
     return list(set([type(i).__name__ if pstr(i).strip() not in ['nan', ''] else 'nan' for i in series]))
 
 
-def prettify_all_pandas_list_cols(data_frame, join_on = ", ", allow_nan = True, exclude = [], bracket_wrap = False):
+def prettify_all_pandas_list_cols(data_frame, join_on = ", ", allow_nan=True, exclude=[], bracket_wrap=False):
     """
 
     Converts all columns with only lists to list-seperated-strings.
 
     :param data_frame: a dataframe.
     :type data_frame: ``Pandas DataFrame``
-    :param nan: allow nans
+    :param allow_nan: allow nans
     :type nan: ``bool``
     :param join_on: a string to join on. Defaults to ", ".
     :type join_on: ``str``

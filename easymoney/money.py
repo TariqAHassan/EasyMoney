@@ -62,7 +62,7 @@ class EasyPeasy(object):
 
                                         Fuzzy matching may yield inaccurate results.
 
-                                        Whenever possible, use terminology *exactly* as it appears in ``options()``.
+                                        When possible, use terminology *exactly* as it appears in ``options()``.
 
     :type fuzzy_threshold: ``int``, ``float`` or ``bool``
     :param data_path: alternative path to the database file(s). Defaults to None.
@@ -102,9 +102,9 @@ class EasyPeasy(object):
         self._pycountry_wrap = PycountryWrap(path_to_data, fuzzy_search_threshold)
         self._pycountries_alpha_2 = set([c.alpha_2 for c in list(pycountry.countries)])
 
-        # CPI Dict
+        # CPI Dictionaries
         self._cpi_dict = world_bank_pull(return_as='dict')
-        self.alpha2_cpi_record = alpha2_by_cpi_years(regions=self._pycountries_alpha_2, cpi_dictionary=self._cpi_dict)
+        self._alpha2_cpi_record = alpha2_by_cpi_years(regions=self._pycountries_alpha_2, cpi_dictionary=self._cpi_dict)
 
         # Exchange Dict
         self._exchange_dict, self._ecb_currency_codes, self._currency_date_record = ecb_xml_exchange_data(return_as='dict')
@@ -147,7 +147,9 @@ class EasyPeasy(object):
 
         :param region: a 'region' in the format of a ISO Alpha2, ISO Alpha3 or currency code, as well as natural name.
         :type region: ``str``
-        :param map_to: 'alpha_2', 'alpha_3' 'name' or 'offical_name'. Defaults to 'alpha_2'.
+        :param map_to:  - for region: 'alpha_2', 'alpha_3', 'name' or 'official_name'.
+                        - for currency: 'currency_alpha_3', 'currency_numeric' or 'currency_name'.
+                        Defaults to 'alpha_2'.
         :type map_to: ``str``
         :return: the desired mapping from region to ISO Alpha2.
         :rtype: ``str`` or ``tuple``
@@ -168,7 +170,7 @@ class EasyPeasy(object):
         :return: list of years for which CPI information is available.
         :rtype: ``list``
         """
-        cpi_years_list = self.alpha2_cpi_record.get(region, [])
+        cpi_years_list = self._alpha2_cpi_record.get(region, [])
 
         if len(cpi_years_list):
             return cpi_years_list
