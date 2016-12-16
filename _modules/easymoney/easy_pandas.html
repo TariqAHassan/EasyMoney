@@ -257,7 +257,7 @@
 <span class="sd">    :type nest_col_c: str</span>
 <span class="sd">    :param keys_to_str: see ``twoD_nested_dict()``.</span>
 <span class="sd">    :type keys_to_str: ``bool``</span>
-<span class="sd">    :return: nested dict of the form {nest_col_a: {nest_col_b: nest_col_c}.</span>
+<span class="sd">    :return: nested dict of the form {nest_col_a: {nest_col_b: nest_col_c}}.</span>
 <span class="sd">    :rtype: dict</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="c1"># Group nest_col_b and nest_col_c by nest_col_a</span>
@@ -394,14 +394,14 @@
     <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="nb">set</span><span class="p">([</span><span class="nb">type</span><span class="p">(</span><span class="n">i</span><span class="p">)</span><span class="o">.</span><span class="n">__name__</span> <span class="k">if</span> <span class="n">pstr</span><span class="p">(</span><span class="n">i</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;nan&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">]</span> <span class="k">else</span> <span class="s1">&#39;nan&#39;</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">series</span><span class="p">]))</span></div>
 
 
-<div class="viewcode-block" id="prettify_all_pandas_list_cols"><a class="viewcode-back" href="../../code.html#easymoney.easy_pandas.prettify_all_pandas_list_cols">[docs]</a><span class="k">def</span> <span class="nf">prettify_all_pandas_list_cols</span><span class="p">(</span><span class="n">data_frame</span><span class="p">,</span> <span class="n">join_on</span> <span class="o">=</span> <span class="s2">&quot;, &quot;</span><span class="p">,</span> <span class="n">allow_nan</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">exclude</span> <span class="o">=</span> <span class="p">[],</span> <span class="n">bracket_wrap</span> <span class="o">=</span> <span class="kc">False</span><span class="p">):</span>
+<div class="viewcode-block" id="prettify_all_pandas_list_cols"><a class="viewcode-back" href="../../code.html#easymoney.easy_pandas.prettify_all_pandas_list_cols">[docs]</a><span class="k">def</span> <span class="nf">prettify_all_pandas_list_cols</span><span class="p">(</span><span class="n">data_frame</span><span class="p">,</span> <span class="n">join_on</span> <span class="o">=</span> <span class="s2">&quot;, &quot;</span><span class="p">,</span> <span class="n">allow_nan</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exclude</span><span class="o">=</span><span class="p">[],</span> <span class="n">bracket_wrap</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 
 <span class="sd">    Converts all columns with only lists to list-seperated-strings.</span>
 
 <span class="sd">    :param data_frame: a dataframe.</span>
 <span class="sd">    :type data_frame: ``Pandas DataFrame``</span>
-<span class="sd">    :param nan: allow nans</span>
+<span class="sd">    :param allow_nan: allow nans</span>
 <span class="sd">    :type nan: ``bool``</span>
 <span class="sd">    :param join_on: a string to join on. Defaults to &quot;, &quot;.</span>
 <span class="sd">    :type join_on: ``str``</span>

@@ -162,7 +162,7 @@ This will only impact attempts to match on natural names, e.g., attempting to ma
 <div class="admonition warning">
 <p class="first admonition-title">Warning</p>
 <p>Fuzzy matching may yield inaccurate results.</p>
-<p class="last">Whenever possible, use terminology <em>exactly</em> as it appears in <code class="docutils literal"><span class="pre">options()</span></code>.</p>
+<p class="last">When possible, use terminology <em>exactly</em> as it appears in <code class="docutils literal"><span class="pre">options()</span></code>.</p>
 </div>
 </li>
 <li><strong>data_path</strong> (<code class="docutils literal"><span class="pre">str</span></code>) &#8211; alternative path to the database file(s). Defaults to None.</li>
@@ -388,7 +388,12 @@ if False, all dates for which data is available will be reported. Defaults to Tr
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
 <li><strong>region</strong> (<code class="docutils literal"><span class="pre">str</span></code>) &#8211; a &#8216;region&#8217; in the format of a ISO Alpha2, ISO Alpha3 or currency code, as well as natural name.</li>
-<li><strong>map_to</strong> (<code class="docutils literal"><span class="pre">str</span></code>) &#8211; &#8216;alpha_2&#8217;, &#8216;alpha_3&#8217; &#8216;name&#8217; or &#8216;offical_name&#8217;. Defaults to &#8216;alpha_2&#8217;.</li>
+<li><strong>map_to</strong> (<code class="docutils literal"><span class="pre">str</span></code>) &#8211; <ul>
+<li>for region: &#8216;alpha_2&#8217;, &#8216;alpha_3&#8217;, &#8216;name&#8217; or &#8216;official_name&#8217;.</li>
+<li>for currency: &#8216;currency_alpha_3&#8217;, &#8216;currency_numeric&#8217; or &#8216;currency_name&#8217;.</li>
+</ul>
+<p>Defaults to &#8216;alpha_2&#8217;.</p>
+</li>
 </ul>
 </td>
 </tr>

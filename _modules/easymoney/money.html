@@ -192,7 +192,7 @@
 
 <span class="sd">                                        Fuzzy matching may yield inaccurate results.</span>
 
-<span class="sd">                                        Whenever possible, use terminology *exactly* as it appears in ``options()``.</span>
+<span class="sd">                                        When possible, use terminology *exactly* as it appears in ``options()``.</span>
 
 <span class="sd">    :type fuzzy_threshold: ``int``, ``float`` or ``bool``</span>
 <span class="sd">    :param data_path: alternative path to the database file(s). Defaults to None.</span>
@@ -232,9 +232,9 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_pycountry_wrap</span> <span class="o">=</span> <span class="n">PycountryWrap</span><span class="p">(</span><span class="n">path_to_data</span><span class="p">,</span> <span class="n">fuzzy_search_threshold</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_pycountries_alpha_2</span> <span class="o">=</span> <span class="nb">set</span><span class="p">([</span><span class="n">c</span><span class="o">.</span><span class="n">alpha_2</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="nb">list</span><span class="p">(</span><span class="n">pycountry</span><span class="o">.</span><span class="n">countries</span><span class="p">)])</span>
 
-        <span class="c1"># CPI Dict</span>
+        <span class="c1"># CPI Dictionaries</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_cpi_dict</span> <span class="o">=</span> <span class="n">world_bank_pull</span><span class="p">(</span><span class="n">return_as</span><span class="o">=</span><span class="s1">&#39;dict&#39;</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">alpha2_cpi_record</span> <span class="o">=</span> <span class="n">alpha2_by_cpi_years</span><span class="p">(</span><span class="n">regions</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_pycountries_alpha_2</span><span class="p">,</span> <span class="n">cpi_dictionary</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_cpi_dict</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_alpha2_cpi_record</span> <span class="o">=</span> <span class="n">alpha2_by_cpi_years</span><span class="p">(</span><span class="n">regions</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_pycountries_alpha_2</span><span class="p">,</span> <span class="n">cpi_dictionary</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_cpi_dict</span><span class="p">)</span>
 
         <span class="c1"># Exchange Dict</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_exchange_dict</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ecb_currency_codes</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_currency_date_record</span> <span class="o">=</span> <span class="n">ecb_xml_exchange_data</span><span class="p">(</span><span class="n">return_as</span><span class="o">=</span><span class="s1">&#39;dict&#39;</span><span class="p">)</span>
@@ -277,7 +277,9 @@
 
 <span class="sd">        :param region: a &#39;region&#39; in the format of a ISO Alpha2, ISO Alpha3 or currency code, as well as natural name.</span>
 <span class="sd">        :type region: ``str``</span>
-<span class="sd">        :param map_to: &#39;alpha_2&#39;, &#39;alpha_3&#39; &#39;name&#39; or &#39;offical_name&#39;. Defaults to &#39;alpha_2&#39;.</span>
+<span class="sd">        :param map_to:  - for region: &#39;alpha_2&#39;, &#39;alpha_3&#39;, &#39;name&#39; or &#39;official_name&#39;.</span>
+<span class="sd">                        - for currency: &#39;currency_alpha_3&#39;, &#39;currency_numeric&#39; or &#39;currency_name&#39;.</span>
+<span class="sd">                        Defaults to &#39;alpha_2&#39;.</span>
 <span class="sd">        :type map_to: ``str``</span>
 <span class="sd">        :return: the desired mapping from region to ISO Alpha2.</span>
 <span class="sd">        :rtype: ``str`` or ``tuple``</span>
@@ -298,7 +300,7 @@
 <span class="sd">        :return: list of years for which CPI information is available.</span>
 <span class="sd">        :rtype: ``list``</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">cpi_years_list</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">alpha2_cpi_record</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">region</span><span class="p">,</span> <span class="p">[])</span>
+        <span class="n">cpi_years_list</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_alpha2_cpi_record</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">region</span><span class="p">,</span> <span class="p">[])</span>
 
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">cpi_years_list</span><span class="p">):</span>
             <span class="k">return</span> <span class="n">cpi_years_list</span>
