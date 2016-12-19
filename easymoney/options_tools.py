@@ -92,7 +92,7 @@ def alpha2_by_cpi_years(regions, cpi_dictionary):
     cpi_years_dict = defaultdict(list)
     for r in regions:
         for y in sorted(list(cpi_dictionary.keys()), reverse=True):
-            if cpi_dictionary.get(y, None).get(r, None) != None:
+            if cpi_dictionary.get(y, {}).get(r, None) != None:
                 cpi_years_dict[r].append(y)
 
     return dict(cpi_years_dict)
