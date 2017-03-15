@@ -177,8 +177,8 @@ Indicators used:
        * The ECB data used here can be obtained directly from the link provided above.
        * Rates are updated by the ECB around 16:00 CET.
        * The ECB states, clearly, that usage of this data for transaction purposes is strongly discouraged. 
-          This sentiment is echoed here; as stated above, ***this tool is for information purposes only***.
-       * All exchange rate-related results obtained from easymoney (including, but not necessarily limited to, currency conversion and normalization) are the result of calculations based on ECB data.
+         This sentiment is echoed here; as stated above, ***this tool is for information purposes only***.
+       * All exchange rate-related results obtained from EasyMoney (including, but not necessarily limited to, currency conversion and normalization) are the result of calculations based on ECB data.
        		   These results do not constitute a direct reporting of ECB-provided data.
     
 <sup>†</sup>Sherouse, Oliver (2014). Wbdata. Arlington, VA. 
