@@ -168,18 +168,17 @@ This software is provided under a BSD License.
 Indicators used:
 
 1. [Consumer price index (2010 = 100)]
-       * Source: International Monetary Fund (IMF), International Financial Statistics.
-       	* Notes:
-       		1. All inflation-related results obtained from easymoney (including, but not necessarily limited to, inflation rate and normalization) are the result of calculations based on IMF data.
+    * Source: International Monetary Fund (IMF), International Financial Statistics.
+    * Note: All inflation-related results obtained from easymoney (including, but not necessarily limited to, inflation rate and normalization) are the result of calculations based on IMF data.
        		   These results do not constitute a direct reporting of IMF-provided data.
 2. [Euro foreign exchange reference rates - European Central Bank]
-       * Source: European Central Bank (ECB).
-       	* Notes:
-       		1. The ECB data used here can be obtained directly from the link provided above.
-       		2. Rates are updated by the ECB around 16:00 CET.
-       		3. The ECB states, clearly, that usage of this data for transaction purposes is strongly discouraged. 
-       		   This sentiment is echoed here; as stated above, ***this tool is for information purposes only***.
-       		4. All exchange rate-related results obtained from easymoney (including, but not necessarily limited to, currency conversion and normalization) are the result of calculations based on ECB data.
+    * Source: European Central Bank (ECB).
+    * Notes:
+       * The ECB data used here can be obtained directly from the link provided above.
+       * Rates are updated by the ECB around 16:00 CET.
+       * The ECB states, clearly, that usage of this data for transaction purposes is strongly discouraged. 
+          This sentiment is echoed here; as stated above, ***this tool is for information purposes only***.
+       * All exchange rate-related results obtained from easymoney (including, but not necessarily limited to, currency conversion and normalization) are the result of calculations based on ECB data.
        		   These results do not constitute a direct reporting of ECB-provided data.
     
 <sup>†</sup>Sherouse, Oliver (2014). Wbdata. Arlington, VA. 
