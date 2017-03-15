@@ -3,7 +3,7 @@ EasyMoney
 
 [![Build Status](https://travis-ci.org/TariqAHassan/EasyMoney.svg?branch=master)](https://travis-ci.org/TariqAHassan/EasyMoney)
 
-##Overview
+## Overview
 
 Feature Summary:
 
@@ -16,11 +16,11 @@ Feature Summary:
 
 **NOTICE: THIS TOOL IS FOR INFORMATION PURPOSES ONLY.**
 
-##Dependencies
+## Dependencies
 
 EasyMoney requires: [numpy], [pandas], [pycountry], [requests] and [wbdata]<sup>†</sup>.
 
-##Installation
+## Installation
 
 Python Package Index:
 ```bash
@@ -34,16 +34,14 @@ $ pip install git+git://github.com/TariqAHassan/EasyMoney@master
 
 EasyMoney is compatible with Python 2.7 and 3.3+.
 
-------------------------------------------------------------------------
+## Examples
 
-###Examples
-
-#####Import the tool
+##### Import the tool
 ```python
 from easymoney.money import EasyPeasy
 ```
 
-#####Create an instance of the EasyPeasy Class
+##### Create an instance of the EasyPeasy Class
 
 The standard way to do this is as follows:
 
@@ -57,32 +55,32 @@ However, [fuzzy searching] can also easily be enabled.
 ep = EasyPeasy(fuzzy_threshold=True)
 ```
 
-####Prototypical Conversion Problems
+#### Prototypical Conversion Problems
 
-#####1. Currency Converter
+##### 1. Currency Converter
 ```python
 ep.currency_converter(amount=100000, from_currency="USD", to_currency="EUR", pretty_print=True)
 
 # 94,553.71 EUR
 ```
 
-#####2. Adjust for Inflation and Convert to a base currency
+##### 2. Adjust for Inflation and Convert to a base currency
 ```python
 ep.normalize(amount=100000, region="CA", from_year=2010, to_year="latest", pretty_print=True)
 
 # 76,357.51 EUR
 ```
 
-#####3. Convert Currency in a more Natural Way
+##### 3. Convert Currency in a more Natural Way
 ```python
 ep.currency_converter(amount=100, from_currency="Canada", to_currency="Ireland", pretty_print=True)
 
 # 70.26 EUR
 ```
 
-####Handling Common Currencies
+#### Handling Common Currencies
 
-#####1. Currency Conversion
+##### 1. Currency Conversion
 ```python
 ep.currency_converter(amount=100, from_currency="France", to_currency="Germany", pretty_print=True)
 
@@ -90,7 +88,7 @@ ep.currency_converter(amount=100, from_currency="France", to_currency="Germany",
 ```
 EasyMoney understands that these two nations share a common currency.
 
-#####2. Normalization
+##### 2. Normalization
 
 ```python
 ep.normalize(amount=100, region="France", from_year=2010, to_year="latest", base_currency="USD", pretty_print=True)
@@ -106,7 +104,7 @@ ep.normalize(amount=100, region="Germany", from_year=2010, to_year="latest", bas
 
 EasyMoney also understands that, while these two nations may share a common currency, the rate of inflation in these regions could differ.
 
-####Region Information
+#### Region Information
 
 EasyPeasy's `region_map()` method exposes some of the functionality from the `pycountries` package in 
 a streamlined manner.
@@ -136,7 +134,7 @@ ep.region_map('German', map_to='alpha_2')
 # DE
 ```
 
-####Options
+#### Options
 
 It's easy to explore the terminology understood by `EasyPeasy`, as well as the dates for which
 data is available.
@@ -159,19 +157,19 @@ and 'ExchangeDates' columns.
 
 ------------------------------------------------------------------------
 
-##Documentation
+## Documentation
 
 For complete documentation please click [here].
 
 ------------------------------------------------------------------------
 
-##License
+## License
 
 This software is provided under a BSD License.
 
 ------------------------------------------------------------------------
 
-##Resources
+## Resources
 
 Indicators used:
 
