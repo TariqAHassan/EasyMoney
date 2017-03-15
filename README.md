@@ -3,7 +3,7 @@ EasyMoney
 
 [![Build Status](https://travis-ci.org/TariqAHassan/EasyMoney.svg?branch=master)](https://travis-ci.org/TariqAHassan/EasyMoney)
 
-###Overview
+##Overview
 
 Feature Summary:
 
@@ -16,15 +16,11 @@ Feature Summary:
 
 **NOTICE: THIS TOOL IS FOR INFORMATION PURPOSES ONLY.**
 
-------------------------------------------------------------------------
-
-###Dependencies
+##Dependencies
 
 EasyMoney requires: [numpy], [pandas], [pycountry], [requests] and [wbdata]<sup>†</sup>.
 
-------------------------------------------------------------------------
-
-###Installation
+##Installation
 
 Python Package Index:
 ```bash
