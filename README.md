@@ -155,19 +155,13 @@ is available, respectively. Additionally, all dates for which data is available 
 `range_table_dates` parameter to `False`. The 'Overlap' column shows the range of dates shared by the 'InflationDates'
 and 'ExchangeDates' columns.
 
-------------------------------------------------------------------------
-
 ## Documentation
 
 For complete documentation please click [here].
 
-------------------------------------------------------------------------
-
 ## License
 
 This software is provided under a BSD License.
-
-------------------------------------------------------------------------
 
 ## Resources
 
