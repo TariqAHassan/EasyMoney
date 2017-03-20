@@ -6,8 +6,6 @@
     ~~~~~~~~~~~~~~~~~~~~~~~
 
 """
-
-# Modules #
 import copy
 import warnings
 import datetime
@@ -335,7 +333,7 @@ def pandas_null_drop(data_frame, subset=None):
     return data_frame.reset_index(drop=True)
 
 # ----------------------------------------------------------------------------------------------------------
-# Printing Suit
+# Printing Suite
 # ----------------------------------------------------------------------------------------------------------
 
 def _padding(s, amount, justify):
@@ -445,22 +443,4 @@ def pandas_pretty_print(data_frame, col_align='right', header_align='center', fu
     pd.set_option('colheader_justify', header_align)
     pandas_print_full(aligned_df.fillna(""), full_rows, full_cols)
     pd.set_option('colheader_justify', 'right')
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
