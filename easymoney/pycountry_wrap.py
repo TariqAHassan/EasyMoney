@@ -13,7 +13,6 @@ from warnings import warn
 from easymoney.sources.databases import currency_mapping_to_dict
 
 
-
 class PycountryWrap(object):
     """
 
@@ -25,7 +24,6 @@ class PycountryWrap(object):
                                   For more, see ``EasyPeasy()`` in the `money` module.
     :type fuzzy_threshold: ``int`` or ``float``
     """
-
 
     def __init__(self, path_to_data=None, fuzzy_threshold=False):
         """
@@ -52,7 +50,6 @@ class PycountryWrap(object):
                                   " - python 2: $ pip install fuzzywuzzy python-Levenshtein\n"
                                   " - python 3: $ pip3 install fuzzywuzzy python-Levenshtein\n\n"
                                   "You may need to create a new Python instance for these changes to take effect.")
-
 
     def _country_extract(self, country, extract_type='alpha_2'):
         """
@@ -99,7 +96,6 @@ class PycountryWrap(object):
         else:
             raise ValueError("invalid extract_type supplied")
 
-
     def _currency_extract(self, currency_name, extract_type='currency_alpha_3'):
         """
 
@@ -131,7 +127,6 @@ class PycountryWrap(object):
         else:
             raise ValueError("invalid extract_type supplied")
 
-
     def _fuzzy_search(self, term, options):
         """
         
@@ -146,7 +141,6 @@ class PycountryWrap(object):
         """
         rslt = self.extractOne(term, options)
         return rslt[0] if rslt[1] >= self.fuzzy_threshold else None
-
 
     def _region_lookup(self, region):
         """
@@ -170,7 +164,6 @@ class PycountryWrap(object):
                     return None
             else:
                 return None
-
 
     def map_region_to_type(self, region, extract_type='alpha_2'):
         """
@@ -211,21 +204,3 @@ class PycountryWrap(object):
                     return None
         except:
             return None
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

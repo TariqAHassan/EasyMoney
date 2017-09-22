@@ -44,7 +44,7 @@ def strlist_to_list(to_parse, convert_to_str_first=False):
     return [i.strip().replace("'", "") for i in [j.split(",") for j in [str_list.replace("[", "").replace("]", "")]][0]]
 
 
-def _pandas_dictkey_to_key_unpack(pandas_series, unpack_dict, convert_values_to_str = False):
+def _pandas_dictkey_to_key_unpack(pandas_series, unpack_dict, convert_values_to_str=False):
     """
 
     Used to unpack ISO Alpha2 --> Alpha2 ISO code Pandas Series.
@@ -65,7 +65,7 @@ def _pandas_dictkey_to_key_unpack(pandas_series, unpack_dict, convert_values_to_
     return pandas_series.replace(unpack_dict).map(lambda x: np.NaN if 'nan' in pstr(x) else strlist_to_list(pstr(x)))
 
 
-def _standard_pd_nester(data_frame, nest_col_a, nest_col_b, nest_col_c, keys_to_str = True):
+def _standard_pd_nester(data_frame, nest_col_a, nest_col_b, nest_col_c, keys_to_str=True):
     """
 
     Method to produce a nested dict from a large pandas dataframe.
@@ -101,7 +101,7 @@ def _standard_pd_nester(data_frame, nest_col_a, nest_col_b, nest_col_c, keys_to_
     return nested_dict
 
 
-def _fast_pd_nester(data_frame, nest_col_a, nest_col_b, nest_col_c, keys_to_str = True):
+def _fast_pd_nester(data_frame, nest_col_a, nest_col_b, nest_col_c, keys_to_str=True):
     """
 
     | This is a fast way to produce a nested dict from a large Pandas DataFrames.
@@ -133,7 +133,7 @@ def _fast_pd_nester(data_frame, nest_col_a, nest_col_b, nest_col_c, keys_to_str 
     col_c_groupby = data_frame.groupby(nest_col_a)[nest_col_c].apply(lambda x: x.tolist()).reset_index()
 
     # Merge on nest_col_a
-    grouped_data_frame = pd.merge(col_b_groupby, col_c_groupby, on = nest_col_a, how = 'outer')
+    grouped_data_frame = pd.merge(col_b_groupby, col_c_groupby, on=nest_col_a, how='outer')
 
     # Convert columns that will become keys to a string
     if keys_to_str:
@@ -142,20 +142,20 @@ def _fast_pd_nester(data_frame, nest_col_a, nest_col_b, nest_col_c, keys_to_str 
 
     # Generate a dictionary by zipping the nest_col_b and nest_col_c columns
     grouped_data_frame['dict_zipped'] = grouped_data_frame[[nest_col_b, nest_col_c]].apply(
-                                                                    lambda x: dict(zip(x[0], x[1])), axis = 1)
+        lambda x: dict(zip(x[0], x[1])), axis=1)
 
     # Return as a nested dict
     return dict(zip(grouped_data_frame[nest_col_a], grouped_data_frame['dict_zipped']))
 
 
 def twoD_nested_dict(data_frame
-                     , nest_col_a = None
-                     , nest_col_b = None
-                     , nest_col_c = None
-                     , to_float = None
-                     , to_int = None
-                     , keys_to_str = True
-                     , engine = 'standard'):
+                     , nest_col_a=None
+                     , nest_col_b=None
+                     , nest_col_c=None
+                     , to_float=None
+                     , to_int=None
+                     , keys_to_str=True
+                     , engine='standard'):
     """
 
     Generate a nested dictionary from the columns of a pandas dataframe.
@@ -206,7 +206,7 @@ def twoD_nested_dict(data_frame
         return _fast_pd_nester(data_frame, nest_col_a, nest_col_b, nest_col_c, keys_to_str)
 
 
-def pandas_list_column_to_str(data_frame, columns, join_on = ", ", bracket_wrap = False):
+def pandas_list_column_to_str(data_frame, columns, join_on=", ", bracket_wrap=False):
     """
 
     Tool for converting the columns in a Pandas DataFrame
@@ -262,7 +262,7 @@ def type_in_series(series):
     return list(set([type(i).__name__ if pstr(i).strip() not in ['nan', ''] else 'nan' for i in series]))
 
 
-def prettify_all_pandas_list_cols(data_frame, join_on = ", ", allow_nan=True, exclude=[], bracket_wrap=False):
+def prettify_all_pandas_list_cols(data_frame, join_on=", ", allow_nan=True, exclude=[], bracket_wrap=False):
     """
 
     Converts all columns with only lists to list-seperated-strings.
@@ -332,6 +332,7 @@ def pandas_null_drop(data_frame, subset=None):
 
     return data_frame.reset_index(drop=True)
 
+
 # ----------------------------------------------------------------------------------------------------------
 # Printing Suite
 # ----------------------------------------------------------------------------------------------------------
@@ -354,9 +355,10 @@ def _padding(s, amount, justify):
     if justify == 'left':
         return "%s%s" % (pstr(s), pad)
     elif justify == 'center':
-        return "%s%s%s" % (pad[:int(amount/2)], pstr(s), pad[int(amount/2):])
+        return "%s%s%s" % (pad[:int(amount / 2)], pstr(s), pad[int(amount / 2):])
     else:
         return s
+
 
 def _pandas_series_alignment(pandas_series, justify):
     """
@@ -401,7 +403,7 @@ def align_pandas(data_frame, to_align='right'):
     return data_frame
 
 
-def pandas_print_full(pd_df, full_rows = True, full_cols = True):
+def pandas_print_full(pd_df, full_rows=True, full_cols=True):
     """
 
     Print *all* of a Pandas DataFrame.
@@ -443,4 +445,3 @@ def pandas_pretty_print(data_frame, col_align='right', header_align='center', fu
     pd.set_option('colheader_justify', header_align)
     pandas_print_full(aligned_df.fillna(""), full_rows, full_cols)
     pd.set_option('colheader_justify', 'right')
-

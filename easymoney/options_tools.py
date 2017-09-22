@@ -17,7 +17,6 @@ from easymoney.support_tools import date_sort
 from easymoney.support_tools import min_max_dates
 
 
-
 def options_ranking(inflation, exchange):
     """
 
@@ -62,7 +61,8 @@ def year_date_overlap(years, full_dates, date_format="%d/%m/%Y"):
         return np.NaN
 
     # Convert input to datetimes
-    year_datetimes = [datetime.strptime(dm + str(y), date_format) for y, dm in zip(min_max(years), ["01/01/", "31/12/"])]
+    year_datetimes = [datetime.strptime(dm + str(y), date_format) for y, dm in
+                      zip(min_max(years), ["01/01/", "31/12/"])]
     dates_datetimes = [datetime.strptime(d, date_format) for d in min_max_dates(full_dates, from_format=date_format)]
 
     # Get date floor
@@ -96,15 +96,3 @@ def alpha2_by_cpi_years(regions, cpi_dictionary):
                 cpi_years_dict[r].append(y)
 
     return dict(cpi_years_dict)
-
-
-
-
-
-
-
-
-
-
-
-

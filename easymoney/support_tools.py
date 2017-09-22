@@ -18,7 +18,7 @@ from datetime import datetime
 # ----------------------------------------------------------------------------------------------------------
 
 
-def cln(i, extent = 1):
+def cln(i, extent=1):
     """
 
     String white space 'cleaner'.
@@ -301,7 +301,3 @@ def mint(amount, precision, currency='', pretty_print=False):
         print(_money_formater(amount, precision, currency))
     else:
         return round(float(amount), precision)
-
-
-
-
